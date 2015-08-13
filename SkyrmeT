@@ -1,0 +1,323 @@
+#!/usr/bin/env python
+
+import numpy as np
+from scipy import integrate
+from scipy import special  
+from scipy import optimize
+ 
+ 
+# Physical constants in natural units 
+me = 0.51
+Alphae = 1/137.0
+Ee = np.sqrt(4 *np.pi)*Alphae
+Bc = me**2/Ee
+gauss = Bc/(4.41* 10**13)
+fm = 1/197.327
+cm = 10**13 * fm
+m = 100 *cm
+hbarc = 197.327
+km = 10**18 *fm
+GeV = 10**3
+KeV = 10**(-3.0)
+rho_0 = 0.16
+erg = 624150.9
+gram = 5.6*10**(26)
+s = (1/6.58 )*10**(22)
+minute = 60.0 *s
+hour = 60.0 *minute
+day = 24*hour
+year = 365* day
+kg = 10**3 *gram
+Msun = 1.9891* 10**30 *kg
+mPi = 134.98
+fPi = 130.0/np.sqrt(2.0)
+z = 0.568
+wv = 0.029
+M = 938.918;
+MN = 939.565
+MP = 938.272
+Mapprox = 939.0
+mP = 1.22*10**(19.0) *GeV
+G = mP**(-2.0)
+Mz = 91.1876* GeV
+Mw = 80.4 *GeV
+gw = 0.653
+ge = Ee/np.sqrt(4.0* np.pi)
+Thetaw = 28.75/180.0
+gz = ge/(np.sin(Thetaw)* np.cos(Thetaw))
+GF = 1.16636*10**(-11.0)
+kelvin = 0.862*10**(-9.0)
+
+#The refitted Skyrme parametrizations
+ska25s2009=np.array([-137.191, 153.932, -2181.28, 0.340552, 14605.8, 0.46161, 0.25],float)
+ska35s2009=np.array([-172.485, 172.087, -1767.71, 0.282732, 12899.2, 0.413266, 0.35],float)
+skt109=np.array([-112.324, 142.467, -1810.72, 0.28223, 12863., 0.392585, 1/3],float)
+skt209=np.array([-113.857, 143.999, -1807.87, 0.267778, 12802.4, 0.366144, 1/3],float)
+skt309=np.array([-124.432, 148.492, -1812.16, 0.288584, 12906.6, 0.416129, 1/3],float)
+eos1=[ska25s2009,ska35s2009,skt109,skt209,skt309]
+ska25s2010=np.array([7.88383, -0.431231, -2182.96, 0.293491, 14651.7, 0.304538, 0.25],float)
+ska35s2010=np.array([-2.41114, -0.507978, -1767.92, 0.247025, 12910.2, 0.220377, 0.35],float)
+skt110=np.array([25.175, -12.2601, -1815.65, 0.24924, 12984.8, 0.217553, 1/3],float)
+skt210=np.array([-28.3961, 16.7196, -1822.27, 0.258133, 13155.8, 0.24668, 1/3],float)
+skt310=np.array([4.51143, 0.0220502, -1816.13, 0.256993, 13025.9, 0.247513, 1/3],float)
+eos2=[ska25s2010,ska35s2010,skt110,skt210,skt310]
+eos=[eos1,eos2]
+
+
+a=b=t0=x0=t3=x3=alpha=0
+def init_skyrme(eff_mass,inter):
+	global a,b,t0,x0,t3,x3,alpha 
+	a,b,t0,x0,t3,x3,alpha=eos[eff_mass][inter][0],eos[eff_mass][inter][1],eos[eff_mass][inter][2],eos[eff_mass][inter][3]\
+							,eos[eff_mass][inter][4],eos[eff_mass][inter][5],eos[eff_mass][inter][6]
+	return 
+
+def mp(rho,y):
+	return M /(1.0 + M /(4.0 * hbarc**2) *rho* (a + 2.0 * y * b))
+	
+def mn(rho,y):
+	return M /(1 + M /(4 * hbarc**2) *rho* (a + 2 * (1-y) * b))
+
+def dmpdrho(rho,y):
+	return 0.0-(a+2.0*b*y)/(4.0*hbarc**2)*mp(rho,y)**2
+
+def dmndrho(rho,y):
+	return 0.0-(a+2.0*b*(1.0-y))/(4.0*hbarc**2)*mn(rho,y)**2
+
+def dmpdy(rho,y):
+	return 0.0-b*rho/(4.0*hbarc**2)*mp(rho,y)**2
+	
+def dmndy(rho,y):
+	return 0.0-b*rho/(4.0*hbarc**2)*mn(rho,y)**2
+
+def up(rho,y):
+	return (1/2.0* t0* (2.0 + x0 - y - 2.0* x0* y)* rho - 
+  1/24.0* t3* (-4.0 - alpha + 2.0* y* (1.0 + (-1.0 + y) *alpha) + \
+     x3* (-1.0 + 2.0* y)* (2.0 + (-1.0 + 2.0* y)* alpha))* rho**(1.0 + alpha))
+	
+def un(rho,y):
+	return (0.5* t0* (1.0+y+x0 *(-1.0+2.0* y))* rho-1/24.0* t3 *(-2.0 *(1+y+x3 *(-1.0+2.0 *y))\
+	+(-1.0+x3 *(1.0-2.0 *y)**2.0+2.0 *(-1.0+y) *y)*alpha) *rho**(1.0+alpha))
+
+#def dupdrho(rho,y):
+
+# This section treats rho, y as independent parameters and gives 
+# the rest of the thermodynamic potentials as functions of (rho,y,T)
+MU_MIN = MU_MAX=0
+MU_MIN_C=-200.0
+MU_MAX_C = 200.0
+RHO_MIN=0
+
+def mu_nt0(rho,y,T):
+	return un(rho,y)+(3.0**(2.0/3.0)*np.pi**(4.0/3.0)*rho**(2.0/3.0)*fm**(-2.0))/(2.0*mn(rho,y))
+
+def mu_pt0(rho,y,T):
+	return up(rho,y)+(3.0**(2.0/3.0)*np.pi**(4.0/3.0)*rho**(2.0/3.0)*fm**(-2.0))/(2.0*mp(rho,y))
+
+def rho_int(k,mass,ushift,Tt,mut):
+	arg=0.0-(k**2/(2.0*mass)-mut+ushift)/Tt
+	return k**2/np.pi**2*special.expit(arg)*fm**3.0
+
+def rho_f(mass,ushift,T,mu):
+	return integrate.quad(rho_int,0,np.inf,args=(mass,ushift,T,mu))[0]
+
+def rho_n(mun,rho,y,T):
+	return rho_f(mn(rho,y),un(rho,y),T,mun)
+
+def rho_p(mup,rho,y,T):
+	return rho_f(mn(rho,y),up(rho,y),T,mup)
+
+def mu_eq(mu,rho_type,rho,y,T):
+	if rho_type == rho_n:
+		rho_target = (1.0-y)*rho
+	else:
+		rho_target = y*rho
+	return rho_target-rho_type(mu,rho,y,T)
+
+def mu_rho(rho_type,rho,y,T):
+	if rho_type == rho_n:
+		MU_MIN = MU_MIN_C*mu_nt0(rho,y,T)
+		MU_MAX = MU_MAX_C*mu_nt0(rho,y,T)
+	else:
+		MU_MIN = MU_MIN_C*mu_pt0(rho,y,T)
+		MU_MAX = MU_MAX_C*mu_pt0(rho,y,T)
+	return optimize.brentq(mu_eq,MU_MIN,MU_MAX,args=(rho_type,rho,y,T))
+
+def mu_N(rho,y,T):
+	return mu_rho(rho_n,rho,y,T)
+
+def mu_P(rho,y,T):
+	return mu_rho(rho_p,rho,y,T)
+
+def rho_N(rho,y,T):
+	return rho_n(mu_N(rho,y,T),rho,y,T)
+
+def rho_P(rho,y,T):
+	return rho_p(mu_P(rho,y,T),rho,y,T)
+
+def tau_int(k,mass,ushift,T,mu):
+	arg=0.0-(k**2/(2.0*mass)-mu+ushift)/T
+	return k**4/np.pi**2*special.expit(arg)*fm**5.0
+
+def tau_f(mass,ushift,T,mu):
+	return integrate.quad(tau_int,0,np.inf,args=(mass,ushift,T,mu))[0]
+	
+def tau_n_rho(rho,y,T):
+	return tau_f(mn(rho,y),un(rho,y),T,mu_N(rho,y,T))
+
+def tau_p_rho(rho,y,T):	
+	return tau_f(mp(rho,y),up(rho,y),T,mu_P(rho,y,T))
+	
+def Ek_rho(rho,y,T):
+	return (tau_n_rho(rho,y,T)+tau_p_rho(rho,y,T))*hbarc**2/(2.0*M*rho)
+		
+def Ei_rho(rho,y,T):
+	return (-0.25 *t0 *(-1.0+x0 *(1.0-2.0 *y)**2 + 2.0*(-1.0 + y)*y)*\
+	 rho-1.0/24.0*t3*(-1.0+x3*(1.0-2.0*y)**2 \
+     +2.0*(-1.0 + y)*y)* rho**(1.0 +  alpha) + \
+     1/8.0*rho*(a*(tau_n_rho(rho,y,T)+tau_p_rho(rho,y,T)) + \
+     2.0*b*((1.0-y)*tau_n_rho(rho,y,T)+y*tau_p_rho(rho,y,T))))
+
+def Et_rho(rho,y,T):
+	return Ek_rho(rho,y,T)+Ei_rho(rho,y,T)
+	
+def s_int(k,mass,ushift,T,mu):
+	arg=0.0-(k**2/(2.0*mass)-mu+ushift)/T
+	f=special.expit(arg)
+	return 0.0-k**2/np.pi**2*(np.log(f**f)+np.log((1.0-f)**(1.0-f)))*fm**3.0
+
+def s_f(mass,ushift,T,mu):
+	return integrate.quad(s_int,0.0,np.inf,args=(mass,ushift,T,mu))[0]
+
+def s_N_rho(rho,y,T):
+	return s_f(mn(rho,y),un(rho,y),T,mu_N(rho,y,T))/rho
+
+def s_P_rho(rho,y,T):
+	return s_f(mp(rho,y),up(rho,y),T,mu_P(rho,y,T))/rho	
+
+def St_rho(rho,y,T):
+	return (s_P_rho(rho,y,T)+s_N_rho(rho,y,T))
+
+def Ft_rho(rho,y,T):
+	return (Et_rho(rho,y,T)-T*St_rho(rho,y,T))
+
+def Pt_rho(rho,y,T):
+	return rho*(T*St_rho(rho,y,T)-Et_rho(rho,y,T)+(1.0-y)*mu_N(rho,y,T)+y*mu_P(rho,y,T))
+	
+def rho_min(rho,y,T):
+	global RHO_MIN 
+	RHO_MIN =optimize.fminbound(Pt_rho,RHO_MIN,RHO_MAX,args=(y,T))
+	return	
+
+def skyrme_data_rho(rho,y,T):
+	return np.array([rho,y,T,mu_N(rho,y,T),mu_P(rho,y,T),Et_rho(rho,y,T),\
+	Ft_rho(rho,y,T),St_rho(rho,y,T),Pt_rho(rho,y,T)])
+
+def skyrme_data_table_rho(rho_array,y_array,T_array):
+	 data=np.zeros( (len(rho_array),len(y_array),len(T_array)) )
+	 for i in len(rho_array):
+		 for j in len(y_array):
+			 for k in len(T_array):
+				 data[i][j][k]=skyrme_data_rho(rho_array[i],y_array[j],T_array[k])
+	 return data
+
+# This section treats mun,mup as independent parameters and gives 
+# the rest of the thermodynamic potentials as functions of (mun,mup,T)
+
+Y_MIN= RHO_MIN =0.0000000001
+Y_MAX = 0.999999999
+RHO_MAX = 0.6
+
+def rho_eq(rho,rho_type,mu,y,T):
+	if rho_type == rho_n:
+		rho_target = (1.0-y)*rho
+	else:
+		rho_target = y*rho
+	return rho_target-rho_type(mu,rho,y,T)
+
+def rho_mu(rho_type,mu,y,T):
+	rho_min = RHO_MIN
+	rho_max = RHO_MAX
+	return optimize.brentq(rho_eq,rho_min,rho_max,args=(rho_type,mu,y,T))
+
+def y_eq(y,mun,mup,T):
+	return rho_mu(rho_n,mun,y,T)-rho_mu(rho_p,mup,y,T)
+
+def rho_y(mun,mup,T):
+	y_sol= optimize.brentq(y_eq,Y_MIN,Y_MAX,args=(mun,mup,T))
+	rho_sol = rho_mu(rho_n,mun,y_sol,T)
+	return np.array([rho_sol,y_sol])
+
+def tau_n_mu(mun,mup,T):
+	rhoy=rho_y(mun,mup,T)
+	return tau_f(mn(rhoy[0],rhoy[1]),un(rhoy[0],rhoy[1]),T,mun)
+
+def tau_p_mu(mun,mup,T):	
+	rhoy=rho_y(mun,mup,T)
+	return tau_f(mp(rhoy[0],rhoy[1]),up(rhoy[0],rhoy[1]),T,mup)
+
+def Ek_mu(mun,mup,T):
+	rhoy=rho_y(mun,mup,T)
+	return (tau_n_mu(mun,mup,T)+tau_p_mu(mun,mup,T))*hbarc**2/(2.0*M*rhoy[0])
+		
+def Ei_mu(mun,mup,T):
+	rhoy=rho_y(mun,mup,T)
+	return (-0.25 *t0 *(-1.0+x0 *(1.0-2.0 *rhoy[1])**2 + 2.0*(-1.0 + rhoy[1])*rhoy[1])*\
+	 rhoy[0]-1.0/24.0*t3*(-1.0+x3*(1.0-2.0*rhoy[1])**2 \
+     +2.0*(-1.0 + rhoy[1])*rhoy[1])* rhoy[0]**(1.0 +  alpha) + \
+     1/8.0*rhoy[0]*(a*(tau_n_mu(mun,mup,T)+tau_p_mu(mun,mup,T)) + \
+     2.0*b*((1.0-rhoy[1])*tau_n_mu(mun,mup,T)+rhoy[1]*tau_p_mu(mun,mup,T))))
+
+def Et_mu(mun,mup,T):
+	return Ek_mu(mun,mup,T)+Ei_mu(mun,mup,T)
+	
+def s_N_mu(mun,mup,T):
+	rhoy=rho_y(mun,mup,T)
+	return s_f(mn(rhoy[0],rhoy[1]),un(rhoy[0],rhoy[1]),T,mun)/rhoy[0]
+
+def s_P_mu(mun,mup,T):
+	rhoy=rho_y(mun,mup,T)
+	return s_f(mp(rhoy[0],rhoy[1]),up(rhoy[0],rhoy[1]),T,mup)/rhoy[0]	
+
+def St_mu(mun,mup,T):
+	return (s_P_mu(mun,mup,T)+s_N_mu(mun,mup,T))
+
+def Ft_mu(mun,mup,T):
+	return (Et_mu(mun,mup,T)-T*St_mu(mun,mup,T))
+
+def Pt_mu(mun,mup,T):
+	rhoy=rho_y(mun,mup,T)
+	return rhoy[0]*(T*St_mu(mun,mup,T)-Et_mu(mun,mup,T)+(1.0-rhoy[1])*mun+rhoy[1]*mup)	
+
+def skyrme_data_mu(mun,mup,T):
+	rhoy=rho_y(mun,mup,T)
+	return np.array([rhoy[0],rhoy[1],T,mun,mup,Et_mu(mun,mup,T),\
+	Ft_mu(mun,mup,T),St_mu(mun,mup,T),Pt_mu(mun,mup,T)])
+
+def skyrme_data_table_mu(mun_array,mup_array,T_array):
+	 data=np.zeros( (len(mun_array),len(mup_array),len(T_array)) )
+	 for i in len(mun_array):
+		 for j in len(mup_array):
+			 for k in len(T_array):
+				 data[i][j][k]=skyrme_data_mu(mun_array[i],mup_array[j],T_array[k])
+	 return data	
+eff_mass=1
+inter=3
+init_skyrme(eff_mass,inter)
+T=5.0
+MUN=-10.0
+MUP=-30.3
+#rho=0.08
+#y=0.3
+x=rho_y(MUN,MUP,T)
+rho_t=x[0]
+yt=x[1]
+print(skyrme_data_rho(rho_t,yt,T))
+print(skyrme_data_mu(MUN,MUP,T))
+#print(rho_mu(rho_n,-10.0,0.114,5.0),rho_mu(rho_p,-30.0,0.114,5.0))
+
+#print( skyrme_Data(np.array([0,1]),np.array([0,1]),np.array([0,1])))
+
+#print(rho_y_eq([0.07, 0.3],mu_N(rho,y,T),mu_N(rho,y,T),T))             
+#sol = optimize.minimize(rho_y_eq, [0.07, 0.0], args=(mu_N(rho,y,T),mu_N(rho,y,T),T))
+#print(sol.x)
+#print(rho_y(0.07,0.25,mu_N(rho,y,T),mu_P(rho,y,T),T))
