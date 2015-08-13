@@ -63,7 +63,10 @@ skt310=np.array([4.51143, 0.0220502, -1816.13, 0.256993, 13025.9, 0.247513, 1/3]
 eos2=[ska25s2010,ska35s2010,skt110,skt210,skt310]
 eos=[eos1,eos2]
 
+# eos1 -> Skyrme Parametirzations with effective neutron mass of 0.9 M
+# eos2 -> Skyrme Parametirzations with effective neutron mass of 1.0 M
 
+# Routine to select an interaction for calculations
 a=b=t0=x0=t3=x3=alpha=0
 def init_skyrme(eff_mass,inter):
 	global a,b,t0,x0,t3,x3,alpha 
@@ -71,6 +74,8 @@ def init_skyrme(eff_mass,inter):
 							,eos[eff_mass][inter][4],eos[eff_mass][inter][5],eos[eff_mass][inter][6]
 	return 
 
+
+# Effective Masses, Mean Field Shifts based on the parametrizations
 def mp(rho,y):
 	return M /(1.0 + M /(4.0 * hbarc**2) *rho* (a + 2.0 * y * b))
 	
@@ -98,20 +103,7 @@ def un(rho,y):
 	return (0.5* t0* (1.0+y+x0 *(-1.0+2.0* y))* rho-1/24.0* t3 *(-2.0 *(1+y+x3 *(-1.0+2.0 *y))\
 	+(-1.0+x3 *(1.0-2.0 *y)**2.0+2.0 *(-1.0+y) *y)*alpha) *rho**(1.0+alpha))
 
-#def dupdrho(rho,y):
-
-# This section treats rho, y as independent parameters and gives 
-# the rest of the thermodynamic potentials as functions of (rho,y,T)
-MU_MIN = MU_MAX=0
-MU_MIN_C=-200.0
-MU_MAX_C = 200.0
-RHO_MIN=0
-
-def mu_nt0(rho,y,T):
-	return un(rho,y)+(3.0**(2.0/3.0)*np.pi**(4.0/3.0)*rho**(2.0/3.0)*fm**(-2.0))/(2.0*mn(rho,y))
-
-def mu_pt0(rho,y,T):
-	return up(rho,y)+(3.0**(2.0/3.0)*np.pi**(4.0/3.0)*rho**(2.0/3.0)*fm**(-2.0))/(2.0*mp(rho,y))
+#Integrands for desnity, kinetic energy, entropy calculations
 
 def rho_int(k,mass,ushift,Tt,mut):
 	arg=0.0-(k**2/(2.0*mass)-mut+ushift)/Tt
@@ -125,6 +117,49 @@ def rho_n(mun,rho,y,T):
 
 def rho_p(mup,rho,y,T):
 	return rho_f(mn(rho,y),up(rho,y),T,mup)
+
+def tau_int(k,mass,ushift,T,mu):
+	arg=0.0-(k**2/(2.0*mass)-mu+ushift)/T
+	return k**4/np.pi**2*special.expit(arg)*fm**5.0
+
+def tau_f(mass,ushift,T,mu):
+	return integrate.quad(tau_int,0,np.inf,args=(mass,ushift,T,mu))[0]
+
+def s_int(k,mass,ushift,T,mu):
+	arg=0.0-(k**2/(2.0*mass)-mu+ushift)/T
+	f=special.expit(arg)
+	return 0.0-k**2/np.pi**2*(np.log(f**f)+np.log((1.0-f)**(1.0-f)))*fm**3.0
+
+def s_f(mass,ushift,T,mu):
+	return integrate.quad(s_int,0.0,np.inf,args=(mass,ushift,T,mu))[0]
+
+
+# This section treats rho, y as independent parameters and gives 
+# the rest of the thermodynamic potentials as functions of (rho,y,T)
+
+# Routines for the user:
+# mu_N(rho,y,T), mu_N(rho,y,T):
+#		the chemical potentials from total baryon density, 
+#          proton fraction, and temperature
+# Ek_rho(rho,y,T),Ei_rho(rho,y,T), Et_rho(rho,y,T):
+#		the energy per baryon -> kinetic, interaction, total
+# s_N_rho(rho,y,T), s_P_rho(rho,y,T), St_rho(rho,y,T):
+#		the entropy per baryon -> neutron, proton, total
+# Ft_rho(rho,y,T),Pt_rho(rho,y,T) -> free energy per bryon , pressure	
+# skyrme_data_rho(rho,y,T) -> all the data:
+# [rho, yp, T, mun, mup, Et, Ft, St, Pt]
+MU_MIN = MU_MAX=0
+MU_MIN_C=-200.0
+MU_MAX_C = 200.0
+RHO_MIN=0
+
+
+def mu_nt0(rho,y,T):
+	return un(rho,y)+(3.0**(2.0/3.0)*np.pi**(4.0/3.0)*rho**(2.0/3.0)*fm**(-2.0))/(2.0*mn(rho,y))
+
+def mu_pt0(rho,y,T):
+	return up(rho,y)+(3.0**(2.0/3.0)*np.pi**(4.0/3.0)*rho**(2.0/3.0)*fm**(-2.0))/(2.0*mp(rho,y))
+
 
 def mu_eq(mu,rho_type,rho,y,T):
 	if rho_type == rho_n:
@@ -142,6 +177,7 @@ def mu_rho(rho_type,rho,y,T):
 		MU_MAX = MU_MAX_C*mu_pt0(rho,y,T)
 	return optimize.brentq(mu_eq,MU_MIN,MU_MAX,args=(rho_type,rho,y,T))
 
+
 def mu_N(rho,y,T):
 	return mu_rho(rho_n,rho,y,T)
 
@@ -154,12 +190,7 @@ def rho_N(rho,y,T):
 def rho_P(rho,y,T):
 	return rho_p(mu_P(rho,y,T),rho,y,T)
 
-def tau_int(k,mass,ushift,T,mu):
-	arg=0.0-(k**2/(2.0*mass)-mu+ushift)/T
-	return k**4/np.pi**2*special.expit(arg)*fm**5.0
 
-def tau_f(mass,ushift,T,mu):
-	return integrate.quad(tau_int,0,np.inf,args=(mass,ushift,T,mu))[0]
 	
 def tau_n_rho(rho,y,T):
 	return tau_f(mn(rho,y),un(rho,y),T,mu_N(rho,y,T))
@@ -180,13 +211,6 @@ def Ei_rho(rho,y,T):
 def Et_rho(rho,y,T):
 	return Ek_rho(rho,y,T)+Ei_rho(rho,y,T)
 	
-def s_int(k,mass,ushift,T,mu):
-	arg=0.0-(k**2/(2.0*mass)-mu+ushift)/T
-	f=special.expit(arg)
-	return 0.0-k**2/np.pi**2*(np.log(f**f)+np.log((1.0-f)**(1.0-f)))*fm**3.0
-
-def s_f(mass,ushift,T,mu):
-	return integrate.quad(s_int,0.0,np.inf,args=(mass,ushift,T,mu))[0]
 
 def s_N_rho(rho,y,T):
 	return s_f(mn(rho,y),un(rho,y),T,mu_N(rho,y,T))/rho
@@ -222,6 +246,18 @@ def skyrme_data_table_rho(rho_array,y_array,T_array):
 
 # This section treats mun,mup as independent parameters and gives 
 # the rest of the thermodynamic potentials as functions of (mun,mup,T)
+
+# Routines for the user:
+# rho_y(mun,mup,T):
+#		the baryon density (rhoy[0]) and  proton fraction (rhoy[1]) from 
+#       the chemical potentials and temperature            
+# Ek_mu(mun,mup,T),Ei_mu(mun,mup,T), Et_mu(mun,mup,T):
+#		the energy per baryon -> kinetic, interaction, total
+# s_N_mu(mun,mup,T), s_P_mu(mun,mup,T), St_mu(mun,mup,T):
+#		the entropy per baryon -> neutron, proton, total
+# Ft_mu(mun,mup,T),Pt_mu(mun,mup,T) -> free energy per bryon , pressure	
+# skyrme_data_mu(mun,mup,T) -> all the data:
+# [rho, yp, T, mun, mup, Et, Ft, St, Pt]
 
 Y_MIN= RHO_MIN =0.0000000001
 Y_MAX = 0.999999999
@@ -300,24 +336,23 @@ def skyrme_data_table_mu(mun_array,mup_array,T_array):
 			 for k in len(T_array):
 				 data[i][j][k]=skyrme_data_mu(mun_array[i],mup_array[j],T_array[k])
 	 return data	
+
 eff_mass=1
 inter=3
 init_skyrme(eff_mass,inter)
 T=5.0
-MUN=-10.0
-MUP=-30.3
-#rho=0.08
-#y=0.3
+rho_low=0.01
+yp=0.4
+
+MUN=mu_N(rho_low,yp,T)
+MUP=mu_P(rho_low,yp,T)
+#RHO_MIN = rho_low+0.01
+#Y_MIN=yp+0.1
 x=rho_y(MUN,MUP,T)
 rho_t=x[0]
 yt=x[1]
-print(skyrme_data_rho(rho_t,yt,T))
+print(skyrme_data_rho(rho_low,yp,T))
 print(skyrme_data_mu(MUN,MUP,T))
-#print(rho_mu(rho_n,-10.0,0.114,5.0),rho_mu(rho_p,-30.0,0.114,5.0))
-
-#print( skyrme_Data(np.array([0,1]),np.array([0,1]),np.array([0,1])))
-
-#print(rho_y_eq([0.07, 0.3],mu_N(rho,y,T),mu_N(rho,y,T),T))             
-#sol = optimize.minimize(rho_y_eq, [0.07, 0.0], args=(mu_N(rho,y,T),mu_N(rho,y,T),T))
-#print(sol.x)
-#print(rho_y(0.07,0.25,mu_N(rho,y,T),mu_P(rho,y,T),T))
+#x1=rho_y_high(MUN,MUP,T)
+#x2=rho_y(MUN,MUP,T)
+#print(rho_eq(0.05,rho_n,MUN,x2[1],T),rho_eq(0.6,rho_n,MUN,x2[1],T))
