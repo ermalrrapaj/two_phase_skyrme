@@ -1,6 +1,7 @@
 CC=gcc
+CFLAGS=-g -O3 -fopenmp 
 CXX=g++
-CPPFLAGS=-g -O3 -fopenmp
+CPPFLAGS=-g -O3 -std=c++11 -fopenmp 
 F90=gfortran
 F90FLAGS=-g -O3 -fopenmp 
 INCLUDE = 
@@ -17,19 +18,21 @@ INCLUDE += -I$(INCDIR)
 # HDF5 libraries
 HDF5INCS=-I/usr/include
 HDF5LIBS=-L/usr/lib/x86_64-linux-gnu/ -lhdf5 -lhdf5_fortran -lhdf5 -lz -lhdf5_hl -lhdf5hl_fortran
-INCLUDE += $(HDF5INCS)  
-LIBS += $(HDF5LIBS)
+#INCLUDE += $(HDF5INCS)  
+#LIBS += $(HDF5LIBS)
+
+LIBS += -lgsl -lgslcblas -lm 
 
 # Source files
-#UTILDIR=util
-#UTILS:= h5_output.F90 bisect.f90 funct_fermi1.f90 
-#UTILS:=$(addprefix $(UTILDIR)/,$(UTILS)) 
+UTILDIR=./
+UTILS:= 
+UTILS:=$(addprefix $(UTILDIR)/,$(UTILS)) 
 
 EOSDIR=./
 EOSSRCS:= funct_fermi1.f90 EOSData.cpp EOSSkyrme.cpp 
 EOSSRCS:=$(addprefix $(EOSDIR)/,$(EOSSRCS)) 
 
-SRCS_ := $(EOSSRCS) #$(UTILS) $(EOSSRCS)
+SRCS_ := $(EOSSRCS) $(UTILS) 
 OBJS_ := ${SRCS_:.F90=.o}
 OBJS_ := ${OBJS_:.f90=.o}
 OBJS_ := ${OBJS_:.cpp=.o}
@@ -46,7 +49,6 @@ create_dirs:
 	@ if test ! -d $(OBJDIR)/$(NRDIR); then mkdir $(OBJDIR)/$(NRDIR); fi
 	@ if test ! -d $(OBJDIR)/$(EOSDIR); then mkdir $(OBJDIR)/$(EOSDIR); fi
 	@ if test ! -d $(OBJDIR)/$(UTILDIR); then mkdir $(OBJDIR)/$(UTILDIR); fi
-	@ echo $(OBJS)
 
 skyrme: $(OBJS) $(OBJDIR)/skyrme_exe.o
 	$(CXX) $(INCLUDE) -o $(EXEDIR)/$@ $^ $(LIBS)
@@ -57,11 +59,11 @@ clean:
 
 $(OBJDIR)/$(notdir %.o): $(SRCDIR)/%.c
 	@echo Compiling $< to $(OBJDIR)/$(notdir $@) 
-	@$(CC) -c $(F90FLAGS) $(INCLUDE) -o $@ $< $(LIBS)
+	@$(CC) -c $(CFLAGS) $(INCLUDE) -o $@ $< $(LIBS)
 
 $(OBJDIR)/$(notdir %.o): $(SRCDIR)/%.cpp
 	@echo Compiling $< to $(OBJDIR)/$(notdir $@) 
-	@$(CXX) -c $(F90FLAGS) $(INCLUDE) -o $@ $< $(LIBS)
+	@$(CXX) -c $(CPPFLAGS) $(INCLUDE) -o $@ $< $(LIBS)
 
 $(OBJDIR)/$(notdir %.o): $(SRCDIR)/%.f90 
 	@echo Compiling $< to $(OBJDIR)/$(notdir $@) 
