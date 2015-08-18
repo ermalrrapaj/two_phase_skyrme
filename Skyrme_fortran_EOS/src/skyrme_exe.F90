@@ -11,13 +11,10 @@ program test
   real(8) :: u,f
   integer :: np,i 
   
-  !call set_Skyrme(0.155d0,16.d0,375.d0,29.3d0,0.95d0,55.0d0,.true.,37.d0,.true.) 
+  ! Calculate the Skyrme parameters from assumed saturation density properties 
   call set_Skyrme(0.155d0,16.d0,375.d0,29.3d0,1.d0,55.0d0,.false.,37.d0,.false.) 
   do i=1,1000
     nt = 10.d0**(LOG10(0.2d0) + (LOG10(1.d-4) - LOG10(0.2d0))*DBLE(i)/999.d0) 
-    xp = 0.5d0
-    !xp = 0.01d0*DBLE(i-1)
-    !nt = 1.8d-1 
     xp = 0.5d0
     call get_bulk_state(nt,xp,ees,pps,musym,mup) 
     xp = 0.d0
