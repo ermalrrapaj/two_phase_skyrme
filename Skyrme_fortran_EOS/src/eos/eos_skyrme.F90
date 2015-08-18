@@ -31,7 +31,7 @@ module eos_skyrme_mod
 contains
   
   subroutine set_Skyrme(ns,BE,K,Sv,mstarom,L,use_Lin,Ks,use_Ksin) 
-   
+    ! Set the skyrme parameters using properties of matter at saturation 
     use nr 
     use nrtype 
    
@@ -112,6 +112,8 @@ contains
   end subroutine set_Skyrme 
 
   subroutine set_Skyrme_LS(ns,BE,K,Sv) 
+   ! Set the Skyrme parameters only using the binding energy, compressibility, 
+   ! and symmetry energy
    real(8), intent(in) :: ns,BE,K,Sv
    real(8) :: alphaLS 
 
@@ -124,6 +126,7 @@ contains
   end subroutine  
   
   subroutine get_zero_bulk_mu(nt,xp) 
+    ! Find were the neutron and proton chemical potentials are both zero
     use nrtype
     use nr 
     real(8), intent(out) :: xp, nt
@@ -150,6 +153,8 @@ contains
   end subroutine get_zero_bulk_mu 
   
   function get_bulk_state_from_mixed(eos_in) result(eos_out)
+    ! Given the proton number density and the neutron chemical potential,
+    ! find the neutron number density and return the eos properties
     use nrtype 
     use nr 
     use bisect_mod 
@@ -217,6 +222,8 @@ contains
   end function get_bulk_state_from_mixed 
    
   function get_bulk_state_from_mu(eos_in) result (eos_out)  
+    ! Given the neutron and proton chemical potentials, find the neutron and 
+    ! proton number densities and return the eos properties
     use nrtype 
     use nr 
     type(eos_com), intent(in) :: eos_in 
@@ -277,6 +284,8 @@ contains
   end function get_bulk_state_from_mu 
 
   function get_bulk_state(eos_in) result (eos_out)  
+    ! For given baryon number density and proton fraction, find the 
+    ! thermodynamic properties
     type(eos_com), intent(in) :: eos_in 
     type(eos_com) :: eos_out
 
