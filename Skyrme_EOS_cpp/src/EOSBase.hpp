@@ -16,7 +16,7 @@ public:
   EOSBase(){}
   //EOSData FromMuAndT(const EOSData& eosIn) const =0; 
   virtual EOSData FromNAndT(const EOSData& eosIn) const =0; 
-  //EOSData FromMixedAndT(const EOSData& eosIn) const =0; 
+  virtual EOSData FromNpMunAndT(const EOSData& eosIn) const =0; 
 protected:
 private: 
 };

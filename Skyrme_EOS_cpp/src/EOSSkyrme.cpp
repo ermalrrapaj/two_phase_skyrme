@@ -9,6 +9,7 @@
 #include <math.h>
 
 #include "EOSSkyrme.hpp" 
+#include "OneDimensionalRoot.hpp"
 
 static double HBC = 197.3; 
 static double MNUC = 949.565/HBC;
@@ -28,13 +29,31 @@ EOSSkyrme::EOSSkyrme() :
     mG(0.0),
     mDelta(2.002) {}
 
+EOSData EOSSkyrme::FromNpMunAndT(const EOSData& eosIn) const {
+  
+  auto root_func = [&eosIn, this](double nn)->double {  
+      EOSData out = BaseEOSCall(eosIn.T(), nn, eosIn.Np()); 
+      return (out.Mun() - eosIn.Mun()) / (eosIn.Mun() + 1.e-30);
+  }; 
+  
+  OneDimensionalRoot rootFinder(1.e-10);
+  double nn_lo = 1.e-30;
+  double nn_hi = 1.e3;
+  double nn = rootFinder.FindRoot(root_func, nn_lo, nn_hi);
+  
+  return BaseEOSCall(eosIn.T(), nn, eosIn.Np());  
+}
+
 EOSData EOSSkyrme::FromNAndT(const EOSData& eosIn) const {
-  const double T = eosIn.T(); 
-  const double nn = eosIn.Nn();
-  const double np = eosIn.Np(); 
+  return BaseEOSCall(eosIn.T(), eosIn.Nn(), eosIn.Np()); 
+} 
+
+EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn, 
+    const double np) const {
+  
   const double nt = nn + np; 
   const double xp = np/(nt+1.e-40);
-
+  
   double momsp = 1.0 + mF*(nn + np) + mG*(nn - np);
   double momsn = 1.0 + mF*(nn + np) - mG*(nn - np);
   

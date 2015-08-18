@@ -17,10 +17,19 @@ public:
   EOSSkyrme();
   //EOSData FromMuAndT(const EOSData& eosIn) const; 
   EOSData FromNAndT(const EOSData& eosIn) const; 
-  //EOSData FromNpMunAndT(const EOSData& eosIn) const;
+  EOSData FromNpMunAndT(const EOSData& eosIn) const;
    
 protected:
-  double mA, mB, mC, mD, mF, mG, mDelta; 
+
+  EOSData BaseEOSCall(const double T, const double nn, const double np) const;
+  double mA;
+  double mB;
+  double mC;
+  double mD;
+  double mF;
+  double mG;
+  double mDelta;
+   
 private: 
 };
 
