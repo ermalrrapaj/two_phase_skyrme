@@ -6,8 +6,8 @@
 ///
 ///
 
-#ifndef EOS_EOSBASE_HPP_
-#define EOS_EOSBASE_HPP_
+#ifndef EOS_EOSDATA_HPP_
+#define EOS_EOSDATA_HPP_
 
 #include <utility>
 #include <limits>
@@ -28,20 +28,20 @@ public:
       const double ss = std::numeric_limits<double>::quiet_NaN(), 
       const double ee = std::numeric_limits<double>::quiet_NaN());
   
-  double T();  
-  double Ye(); 
-  double Nb(); 
-  double Nn();  
-  double Np();  
-  double P(); 
-  double Mun();  
-  double Mup();  
-  double E();  
-  double S();  
+  double T() const;  
+  double Ye() const; 
+  double Nb() const; 
+  double Nn() const;  
+  double Np() const;  
+  double P() const; 
+  double Mun() const;  
+  double Mup() const;  
+  double E() const;  
+  double S() const;  
 
   std::pair<double, bool> mT, mNp, mNn;
   std::pair<double, bool> mP, mMun, mMup, mE, mS;
 
 };
-#endif // EOS_EOSBASE_HPP_
+#endif // EOS_EOSDATA_HPP_
 

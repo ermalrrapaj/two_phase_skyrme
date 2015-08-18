@@ -125,7 +125,7 @@ EOSData EOSData::Output(const double T, const double nn, const double np,
   return out; 
 }
  
-double EOSData::T()  { 
+double EOSData::T() const { 
   if (mT.second) { 
     return mT.first; 
   } else {
@@ -133,7 +133,7 @@ double EOSData::T()  {
   }
 }
 
-double EOSData::Ye() { 
+double EOSData::Ye() const { 
   if (mNp.second && mNn.second) {
     return mNp.first/(mNn.first + mNp.first);
   } else {
@@ -141,7 +141,7 @@ double EOSData::Ye() {
   }
 }
 
-double EOSData::Nb() { 
+double EOSData::Nb() const { 
   if (mNp.second && mNn.second) {
     return mNn.first + mNp.first; 
   } else {
@@ -149,7 +149,7 @@ double EOSData::Nb() {
   }
 } 
 
-double EOSData::Nn() { 
+double EOSData::Nn() const { 
   if (mNn.second) {
     return mNn.first;
   } else { 
@@ -157,7 +157,7 @@ double EOSData::Nn() {
   }
 }
 
-double EOSData::Np() { 
+double EOSData::Np() const { 
   if (mNp.second) {
     return mNp.first;
   } else {
@@ -165,7 +165,7 @@ double EOSData::Np() {
   }
 }
 
-double EOSData::P() { 
+double EOSData::P() const { 
   if (mP.second) { 
     return mP.first; 
   } else { 
@@ -173,7 +173,7 @@ double EOSData::P() {
   }
 } 
 
-double EOSData::Mun() { 
+double EOSData::Mun() const { 
   if (mMun.second) {
     return mMun.first;
   } else { 
@@ -181,7 +181,7 @@ double EOSData::Mun() {
   }
 } 
 
-double EOSData::Mup() { 
+double EOSData::Mup() const { 
   if (mMup.second) {
     return mMup.first;
   } else {
@@ -189,7 +189,7 @@ double EOSData::Mup() {
   }
 } 
 
-double EOSData::E() { 
+double EOSData::E() const { 
   if (mE.second) { 
     return mE.first; 
   } else {
@@ -197,7 +197,7 @@ double EOSData::E() {
   }
 } 
   
-double EOSData::S() { 
+double EOSData::S() const { 
   if (mS.second) { 
     return mS.first; 
   } else {
