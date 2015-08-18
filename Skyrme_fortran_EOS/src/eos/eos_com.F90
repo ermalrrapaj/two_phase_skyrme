@@ -1,6 +1,7 @@
 module eos_com_mod
   implicit none
-  
+  ! This is a type for passing around EoS information in a concise and 
+  ! extensible manner 
   type eos_com
     real(8) :: nb  = -1.d0 
     real(8) :: np  = -1.d0 
