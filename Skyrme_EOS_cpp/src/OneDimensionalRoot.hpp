@@ -21,7 +21,7 @@ public:
       mTol(tol), mMaxIter(maxIter) {} 
 
   template<class FUNCTION>
-  double FindRoot(FUNCTION func, double xlo, double xhi) {
+  double operator() (FUNCTION func, double xlo, double xhi) {
     // Similar to stack overflow 13289311 
     gsl_function F; 
     F.function = [] (double x, void * p)->double { 

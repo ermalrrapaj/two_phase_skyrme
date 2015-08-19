@@ -22,7 +22,7 @@ public:
       mTol(tol), mMaxIter(maxIter) {} 
 
   template<class FUNCTION>
-  std::vector<double> FindRoot(FUNCTION func, const std::vector<double>& xg, 
+  std::vector<double> operator() (FUNCTION func, const std::vector<double>& xg, 
       const int nFunc) {
 
     // Build the GSL type functions from the passed function
