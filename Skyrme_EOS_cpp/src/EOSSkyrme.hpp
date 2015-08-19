@@ -18,7 +18,9 @@ public:
   //EOSData FromMuAndT(const EOSData& eosIn) const; 
   EOSData FromNAndT(const EOSData& eosIn) const; 
   EOSData FromNpMunAndT(const EOSData& eosIn) const;
-   
+  std::unique_ptr<EOSBase> MakeUniquePtr() const {
+    return std::unique_ptr<EOSBase>(new EOSSkyrme(*this));
+  }   
 protected:
 
   EOSData BaseEOSCall(const double T, const double nn, const double np) const;
