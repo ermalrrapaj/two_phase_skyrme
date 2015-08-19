@@ -15,7 +15,7 @@
 class EOSSkyrme : public EOSBase {
 public:
   EOSSkyrme();
-  //EOSData FromMuAndT(const EOSData& eosIn) const; 
+  std::vector<EOSData> FromMuAndT(const EOSData& eosIn) const; 
   EOSData FromNAndT(const EOSData& eosIn) const; 
   EOSData FromNpMunAndT(const EOSData& eosIn) const;
   std::unique_ptr<EOSBase> MakeUniquePtr() const {

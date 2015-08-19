@@ -6,10 +6,12 @@
 ///
 ///
 
+#include <vector>
 #include <math.h>
 
 #include "EOSSkyrme.hpp" 
 #include "OneDimensionalRoot.hpp"
+#include "MultiDimensionalRoot.hpp"
 
 static double HBC = 197.3; 
 static double MNUC = 949.565/HBC;
@@ -29,19 +31,47 @@ EOSSkyrme::EOSSkyrme() :
     mG(0.0),
     mDelta(2.002) {}
 
+std::vector<EOSData> EOSSkyrme::FromMuAndT(const EOSData& eosIn) const {
+  
+  MultiDimensionalRoot rootFinder(1.e-10);
+  auto root_func = [&eosIn, this] (std::vector<double> logN) -> 
+      std::vector<double> { 
+    EOSData out = BaseEOSCall(eosIn.T(), exp(logN[0]), exp(logN[1]));
+    return {(out.Mun() - eosIn.Mun())/(eosIn.Mun() + 1.e-7), 
+            (out.Mup() - eosIn.Mup())/(eosIn.Mup() + 1.e-7)};
+  };
+  
+  std::vector<EOSData> eosOut; 
+   
+  // Look for a low density solution first   
+  try {
+    std::vector<double> logN = rootFinder.FindRoot(root_func, {1.e-8, 1.e-8}, 2); 
+    EOSData low = BaseEOSCall(eosIn.T(), exp(logN[0]), exp(logN[1]));
+    eosOut.push_back(low);
+  } catch(...) {}
+  
+  // Look for a high density solution second
+  try {
+    std::vector<double> logN = rootFinder.FindRoot(root_func, {1.e1, 1.e1}, 2); 
+    EOSData hi = BaseEOSCall(eosIn.T(), exp(logN[0]), exp(logN[1]));
+    eosOut.push_back(hi);
+  } catch(...) {}
+  return eosOut;
+}
+
 EOSData EOSSkyrme::FromNpMunAndT(const EOSData& eosIn) const {
   
-  auto root_func = [&eosIn, this](double nn)->double {  
-      EOSData out = BaseEOSCall(eosIn.T(), nn, eosIn.Np()); 
+  auto root_func = [&eosIn, this](double logNn)->double {  
+      EOSData out = BaseEOSCall(eosIn.T(), exp(logNn), eosIn.Np()); 
       return (out.Mun() - eosIn.Mun()) / (eosIn.Mun() + 1.e-30);
   }; 
   
   OneDimensionalRoot rootFinder(1.e-10);
-  double nn_lo = 1.e-30;
-  double nn_hi = 1.e3;
-  double nn = rootFinder.FindRoot(root_func, nn_lo, nn_hi);
+  double nn_lo = log(1.e-80);
+  double nn_hi = log(1.e3);
+  double logNn = rootFinder.FindRoot(root_func, nn_lo, nn_hi);
   
-  return BaseEOSCall(eosIn.T(), nn, eosIn.Np());  
+  return BaseEOSCall(eosIn.T(), exp(logNn), eosIn.Np());  
 }
 
 EOSData EOSSkyrme::FromNAndT(const EOSData& eosIn) const {
