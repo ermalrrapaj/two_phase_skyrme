@@ -57,5 +57,5 @@ protected:
   int mMaxIter; 
 
 };
-#endif // EOS_EOSDATA_HPP_
+#endif // EOS_ONEDIMENSIONALROOT_HPP_
 
