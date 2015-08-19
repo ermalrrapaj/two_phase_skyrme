@@ -45,14 +45,14 @@ std::vector<EOSData> EOSSkyrme::FromMuAndT(const EOSData& eosIn) const {
    
   // Look for a low density solution first   
   try {
-    std::vector<double> logN = rootFinder.FindRoot(root_func, {1.e-8, 1.e-8}, 2); 
+    std::vector<double> logN = rootFinder(root_func, {1.e-8, 1.e-8}, 2); 
     EOSData low = BaseEOSCall(eosIn.T(), exp(logN[0]), exp(logN[1]));
     eosOut.push_back(low);
   } catch(...) {}
   
   // Look for a high density solution second
   try {
-    std::vector<double> logN = rootFinder.FindRoot(root_func, {1.e1, 1.e1}, 2); 
+    std::vector<double> logN = rootFinder(root_func, {1.e1, 1.e1}, 2); 
     EOSData hi = BaseEOSCall(eosIn.T(), exp(logN[0]), exp(logN[1]));
     eosOut.push_back(hi);
   } catch(...) {}
@@ -69,7 +69,7 @@ EOSData EOSSkyrme::FromNpMunAndT(const EOSData& eosIn) const {
   OneDimensionalRoot rootFinder(1.e-10);
   double nn_lo = log(1.e-80);
   double nn_hi = log(1.e3);
-  double logNn = rootFinder.FindRoot(root_func, nn_lo, nn_hi);
+  double logNn = rootFinder(root_func, nn_lo, nn_hi);
   
   return BaseEOSCall(eosIn.T(), exp(logNn), eosIn.Np());  
 }
