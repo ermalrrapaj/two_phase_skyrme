@@ -12,12 +12,11 @@
 #include "EOSSkyrme.hpp" 
 #include "OneDimensionalRoot.hpp"
 #include "MultiDimensionalRoot.hpp"
-
-static double HBC = 197.327; 
+#include "Constants.hpp"
+ 
+static double HBC = Constants::HBCFmMeV ; 
 static double MNUC = 938.918/HBC;
-static double PI = 3.14159; 
-static double ALPHA = 3.0/(10.0*MNUC)*pow(3.0*PI*PI,2.0/3.0);
-static double e_ele = sqrt(1.4299764/HBC);
+static double PI = Constants::Pi; 
 
 extern "C" {
   double ifermi12_(double* scale_density);
