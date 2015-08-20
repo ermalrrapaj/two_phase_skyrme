@@ -10,13 +10,16 @@
 #define EOS_GIBBSPHASECONSTRUCT_HPP_
 
 #include <memory> 
+#include <vector> 
 
 #include "EOSBase.hpp"
+#include "EOSData.hpp"
 
 class GibbsPhaseConstruct {
 public: 
   GibbsPhaseConstruct(const EOSBase& eos);  
 protected: 
+  std::vector<EOSData> FindPhasePoint(double T, double mun);
   std::unique_ptr<EOSBase> mpEos; 
 }; 
 #endif // EOS_GIBBSPHASECONSTRUCT_HPP_
