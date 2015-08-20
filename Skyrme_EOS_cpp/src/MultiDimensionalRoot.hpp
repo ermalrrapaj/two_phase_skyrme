@@ -13,6 +13,7 @@
 #include <functional> 
 #include <stdexcept> 
 #include <iostream>
+#include <cstdio>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_multiroots.h> 
 
@@ -32,12 +33,14 @@ public:
     F.f = [] (const gsl_vector * x, void * p, gsl_vector * f)->int { 
       std::vector<double> xin; 
       for (unsigned int i=0; i < x->size; ++i) {
-        xin.push_back(gsl_vector_get(x, i));
+        double xt = gsl_vector_get(x, i);
+        if (xt != xt) return GSL_EDOM; 
+        xin.push_back(xt);
       }
-      
       std::vector<double> ff = (*static_cast<FUNCTION*>(p))(xin);
       
       for (unsigned int i=0; i < x->size; ++i) {
+        if (ff[i] != ff[i]) return GSL_ERANGE;
         gsl_vector_set(f, i, ff[i]);
       }
       return GSL_SUCCESS;
@@ -49,13 +52,12 @@ public:
       gsl_vector_set(x, i, xg[i]); 
     }
 
-    const gsl_multiroot_fsolver_type *T; 
-    gsl_multiroot_fsolver *s;
-    T = gsl_multiroot_fsolver_hybrids; 
-    s = gsl_multiroot_fsolver_alloc(T, nFunc);
-    gsl_multiroot_fsolver_set(s, &F, x);
+    const gsl_multiroot_fsolver_type *T = gsl_multiroot_fsolver_hybrids; 
+    gsl_multiroot_fsolver *s = gsl_multiroot_fsolver_alloc(T, nFunc);
+    int status = gsl_multiroot_fsolver_set(s, &F, x);
      
-    int status; 
+    if (status) printf(" GSL Error: %s\n", gsl_strerror(status)); 
+    
     int iter = 0; 
     do { 
       iter++; 
