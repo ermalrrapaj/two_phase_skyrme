@@ -36,6 +36,33 @@ int main() {
     NpLoG = outDat[0].Np()*0.95;
     NpHiG = outDat[1].Np()*1.05;
   } 
+  
+  NpLoG = 1.e-20;
+  NpHiG = 0.08;
+  for (double mun = 0.0; mun > -20.0; mun -= 0.005) {
+    
+    std::vector<EOSData> outDat;
+    
+    try { 
+      outDat = gibbs.FindPhasePoint(TMeV/Constants::HBCFmMeV, 
+          mun/Constants::HBCFmMeV, NpLoG, NpHiG); 
+    } catch (...) {
+      std::cerr << mun <<  " failed.\n";
+      continue;
+    }
+
+    std::cout << outDat[0].Nn() << " "; 
+    std::cout << outDat[1].Nn() << " "; 
+    std::cout << outDat[0].Np() << " "; 
+    std::cout << outDat[1].Np() << " ";
+    std::cout << outDat[1].P()*Constants::HBCFmMeV << " ";
+    std::cout << outDat[1].Mun()*Constants::HBCFmMeV << " ";
+    std::cout << outDat[1].Mup()*Constants::HBCFmMeV << std::endl;
+     
+    NpLoG = outDat[0].Np()*0.95;
+    NpHiG = outDat[1].Np()*1.05;
+  } 
+  
   return 0;
 }
 
