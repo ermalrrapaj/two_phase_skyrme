@@ -15,11 +15,18 @@
 class EOSSkyrme : public EOSBase {
 public:
   EOSSkyrme();
-  
+  EOSSkyrme(double A,  double B,  double C,  double D,  double F,
+            double G,  double delta) : mA(A), mB(B), mC(C), mD(D),
+            mF(F), mG(G), mDelta(delta) {};
   std::vector<EOSData> FromMuAndT(const EOSData& eosIn) const; 
   EOSData FromNAndT(const EOSData& eosIn) const; 
   EOSData FromNpMunAndT(const EOSData& eosIn) const;
-  
+  static EOSSkyrme FromErmalSkyrme(const double a, const double b,
+      const double t0, const double x0, const double t3, 
+      const double x3, const double alpha);
+  static EOSSkyrme FromErmalSkyrme(std::vector<double>& param);
+  static EOSSkyrme FromEosObs(const double ns, const double BE, const double K,
+  const double Sv, const double mstarom, const double L, const double Ks);
   std::unique_ptr<EOSBase> MakeUniquePtr() const {
     return std::unique_ptr<EOSBase>(new EOSSkyrme(*this));
   }  

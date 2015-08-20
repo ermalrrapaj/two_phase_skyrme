@@ -13,9 +13,11 @@
 #include "OneDimensionalRoot.hpp"
 #include "MultiDimensionalRoot.hpp"
 
-static double HBC = 197.3; 
-static double MNUC = 949.565/HBC;
+static double HBC = 197.327; 
+static double MNUC = 938.918/HBC;
 static double PI = 3.14159; 
+static double ALPHA = 3.0/(10.0*MNUC)*pow(3.0*PI*PI,2.0/3.0);
+static double e_ele = sqrt(1.4299764/HBC);
 
 extern "C" {
   double ifermi12_(double* scale_density);
@@ -78,6 +80,38 @@ EOSData EOSSkyrme::FromNAndT(const EOSData& eosIn) const {
   return BaseEOSCall(eosIn.T(), eosIn.Nn(), eosIn.Np()); 
 } 
 
+EOSSkyrme EOSSkyrme:: FromErmalSkyrme(const double a, const double b,
+    const double t0, const double x0, const double t3, 
+    const double x3, const double alpha){  
+    double A, B, C, D, F, G, delta;
+    F = (a+b)*MNUC/4.0/HBC;
+	G = -b*MNUC/4.0/HBC;
+	A = 0.25*t0*(1.0-x0)/HBC; 
+	B = 0.125*t0*(1.0+2.0*x0)/HBC;
+	C = t3*(1.0-x3)/24.0/HBC;
+	D = t3*(1.0+2.0*x3)/48.0/HBC;
+	delta = alpha+1.0;
+	// If needed to verify conversion!
+	//std::cout<<A<<", "<<B<<", "<<C<<", "<<D<<", "<<F<<", "<<G<<", "<<delta<<"\n";
+	EOSSkyrme out(A,B,C,D,F,G,delta);
+	return out;
+} 
+
+EOSSkyrme EOSSkyrme:: FromErmalSkyrme(std::vector<double>& param) {
+    double A, B, C, D, F, G, delta;
+    F = (param[0]+param[1])*MNUC/4.0/HBC;
+	G = -param[1]*MNUC/4.0/HBC;
+	A = 0.25*param[2]*(1.0-param[3])/HBC; 
+	B = 0.125*param[2]*(1.0+2.0*param[3])/HBC;
+	C = param[4]*(1.0-param[5])/24.0/HBC;
+	D = param[4]*(1.0+2.0*param[5])/48.0/HBC;
+	delta = param[6]+1.0;
+	// If needed to verify conversion!
+	//std::cout<<A<<", "<<B<<", "<<C<<", "<<D<<", "<<F<<", "<<G<<", "<<delta<<"\n";
+	EOSSkyrme out(A,B,C,D,F,G,delta);
+	return out;
+}
+
 EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn, 
     const double np) const {
   
@@ -87,8 +121,8 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
   double momsp = 1.0 + mF*(nn + np) + mG*(nn - np);
   double momsn = 1.0 + mF*(nn + np) - mG*(nn - np);
   
-  double invetan = 2.0*PI*PI * nn * pow(2.0*MNUC/momsn*T, 1.5); 
-  double invetap = 2.0*PI*PI * np * pow(2.0*MNUC/momsp*T, 1.5); 
+  double invetan = 2.0*PI*PI * nn * pow(2.0*MNUC/momsn*T, -1.5); 
+  double invetap = 2.0*PI*PI * np * pow(2.0*MNUC/momsp*T, -1.5); 
   double etan = ifermi12_(&invetan); 
   double etap = ifermi12_(&invetap); 
   double taup = pow(2.0*MNUC/momsp*T, 2.5)/(2.0*PI*PI) * zfermi32_(&etap);
@@ -108,9 +142,9 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
       + (mA + 4.0*mB*xp*(1.0-xp))*nt*nt 
       + (mC + 4.0*mD*xp*(1.0-xp))*pow(nt, mDelta + 1.0);
   double pp = (5.0/6.0*momsp - 0.5)/MNUC*taup + (5.0/6.0*momsn - 0.5)/MNUC*taun
-      + (mA + 4.0*mB*xp*(1.0-xp))*nt*nt // Check that there shouldn't be a factor fo two here 
+      + (mA + 4.0*mB*xp*(1.0-xp))*nt*nt 
       + (mC + 4.0*mD*xp*(1.0-xp))*mDelta*pow(nt, mDelta + 1.0);
-  double ss = 5.0/(6.0*MNUC*T)*(momsp*taup + momsn*taun) - nt*etap - nn*etan; 
+  double ss = 5.0/(6.0*MNUC*T)*(taup*momsp + taun*momsn) - np*etap - nn*etan; 
    
   return EOSData::Output(T, nn, np, mun, mup, pp, ss/nt, ee/nt);  
 }
