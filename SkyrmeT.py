@@ -304,8 +304,8 @@ def St_rho_list(rho_array,y,T):
 	return s_array
 
 def Ft_rho_y(rho,y,T):
-	taun=tau_N_rho(rho,y,T)
-	taup=tau_P_rho(rho,y,T)
+	taun=tau_N_rho_y(rho,y,T)
+	taup=tau_P_rho_y(rho,y,T)
 	ek=(taun+taup)*hbarc**2/(2.0*M*rho)
 	ei=(-0.25 *t0 *(-1.0+x0 *(1.0-2.0 *y)**2 + 2.0*(-1.0 + y)*y)*\
 	rho-1.0/24.0*t3*(-1.0+x3*(1.0-2.0*y)**2 \
@@ -314,21 +314,21 @@ def Ft_rho_y(rho,y,T):
 	2.0*b*((1.0-y)*taun+y*taup)))
 	st=(s_f(mn(rho,y),un(rho,y),T,mu_N(rho,y,T))\
 	+s_f(mp(rho,y),up(rho,y),T,mu_P(rho,y,T)))/rho
-	return (ek_ei-T*st)
+	return (ek+ei-T*st)
 
 def Pt_rho_y(rho,y,T):
 	MN,UN,MUN=mn(rho,y),un(rho,y),mu_N(rho,y,T)
 	MP,UP,MUP=mp(rho,y),up(rho,y),mu_P(rho,y,T)
-	taun=tau_f(MN,UN,T,MUN)
-	taup=tau_f(MP,UP,T,MUP)
+	taun=tau_N_rho_y(rho,y,T)
+	taup=tau_P_rho_y(rho,y,T)
 	sn=s_f(MN,UN,T,MUN)
 	sp=s_f(MP,UP,T,MUP)
 	ek=(taun+taup)*hbarc**2/(2.0*M)
 	ei=rho*(-0.25 *t0 *(-1.0+x0 *(1.0-2.0 *y)**2 + 2.0*(-1.0 + y)*y)*\
 	 rho-1.0/24.0*t3*(-1.0+x3*(1.0-2.0*y)**2 \
      +2.0*(-1.0 + y)*y)* rho**(1.0 +  alpha) + \
-     1/8.0*rho*(a*(taun+taup)) + \
-     2.0*b*((1.0-y)*taun+y*taup))
+     1/8.0*rho*(a*(taun+taup) + \
+     2.0*b*((1.0-y)*taun+y*taup)))
 	return rho*(MUN*(1.0-y)+y*MUP)+T*(sn+sp)-ek-ei
 
 def Pt_rho_mun_mup(rho,y,MUN,MUP,T):
@@ -375,21 +375,21 @@ def skyrme_data_table_rho_y(rho_array,y_array,T_array):
 	 return data
 	
 
-eff_mass=1
-inter=3
+eff_mass=0
+inter=1
 init_skyrme(eff_mass,inter)
-YPT= 0.3
-T=2.0
-rho_b=0.005
-pt=Pt_rho_y(rho_b,YPT,T)
-MUN=mu_N(rho_b,YPT,T)
-MUP=mu_P(rho_b,YPT,T)
+YPT= 0.5
+T=5.0
+rhob=0.1
+print(skyrme_data_rho_y(rhob,YPT,T))
+#MUN=mu_N(rho_b,YPT,T)
+#MUP=mu_P(rho_b,YPT,T)
 #rhoy=rho_y_PTMU(0.2,0.5,pt,MUN,MUP,T)
-print("Parametrization chosen: ",eosname[eff_mass][inter])
-print("The input parameters for the gas:")
-print("rho = ",rho_b," fm^-3, yp = ",YPT,", T = ",T," MeV")
-print("Output values from input:")
-print("mu_n = ",MUN," MeV, mu_p = ",MUP," MeV, P = ",pt," MeV fm^-3")
+#print("Parametrization chosen: ",eosname[eff_mass][inter])
+#print("The input parameters for the gas:")
+#print("rho = ",rho_b," fm^-3, yp = ",YPT,", T = ",T," MeV")
+#print("Output values from input:")
+#print("mu_n = ",MUN," MeV, mu_p = ",MUP," MeV, P = ",pt," MeV fm^-3")
 #print("Using P,mu_n,mu_p find (rho,y) for the liquid by solving the system of equations:")
 #print( "(ABS( (P-P(rho,y))/P )*100 , ABS( (rho_n-rho_n(rho,y,mu_n))/rho_n ) + ABS( (rho_p-rho_p(rho,y,mu_n))/rho_p )*100")
 #print("where, rho_n = (1-y) * rho, rho_p = y * rho")
