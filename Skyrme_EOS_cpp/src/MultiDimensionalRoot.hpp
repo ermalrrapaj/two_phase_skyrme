@@ -26,6 +26,7 @@ public:
   std::vector<double> operator() (FUNCTION func, const std::vector<double>& xg, 
       const int nFunc) {
 
+    gsl_set_error_handler_off();
     // Build the GSL type functions from the passed function
     // Similar to stack overflow 13289311 
     gsl_multiroot_function F;
@@ -56,7 +57,7 @@ public:
     gsl_multiroot_fsolver *s = gsl_multiroot_fsolver_alloc(T, nFunc);
     int status = gsl_multiroot_fsolver_set(s, &F, x);
      
-    if (status) printf(" GSL Error: %s\n", gsl_strerror(status)); 
+    //if (status) printf(" GSL Error: %s\n", gsl_strerror(status)); 
     
     int iter = 0; 
     do { 
@@ -65,6 +66,8 @@ public:
       if (status) break; // Solver is stuck  
       status = gsl_multiroot_test_residual(s->f, mTol);  
     } while (status == GSL_CONTINUE && iter < mMaxIter);
+    
+    gsl_set_error_handler(NULL);
     
     if (iter >= mMaxIter || status) 
         throw std::runtime_error("Multi root find did not converge.");
