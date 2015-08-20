@@ -20,6 +20,7 @@ public:
   virtual std::vector<EOSData> FromMuAndT(const EOSData& eosIn) const =0; 
   virtual EOSData FromNAndT(const EOSData& eosIn) const =0; 
   virtual EOSData FromNpMunAndT(const EOSData& eosIn) const =0; 
+  virtual EOSData FromMupNnAndT(const EOSData& eosIn) const =0; 
   virtual std::unique_ptr<EOSBase> MakeUniquePtr() const =0; 
 protected:
 private: 
