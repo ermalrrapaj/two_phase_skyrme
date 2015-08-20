@@ -50,9 +50,17 @@ std::vector<EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, double mun,
 
   // Now get to high precision with non-linear scaled version of equations
   initial = false;
-  logNp = rootFinder(root_f, logNp, 2); 
+  logNp = rootFinder(root_f, logNp, 2);
   
-  return {mpEos->FromNpMunAndT(EOSData::InputFromTMunNp(T, mun, exp(logNp[0]))),
-          mpEos->FromNpMunAndT(EOSData::InputFromTMunNp(T, mun, 
-          exp(logNp[0]) + exp(logNp[1])))};
+  EOSData eosLo = mpEos->FromNpMunAndT(
+      EOSData::InputFromTMunNp(T, mun, exp(logNp[0])));
+  EOSData eosHi = mpEos->FromNpMunAndT(
+      EOSData::InputFromTMunNp(T, mun, exp(logNp[0]) + exp(logNp[1])));
+  
+  if (fabs(eosHi.Np()/eosLo.Np()-1.0) < 1.e-4 &&
+      fabs(eosHi.Nn()/eosLo.Nn()-1.0) < 1.e-4) {
+    throw std::runtime_error("GibbsPhaseConstruct converged to the same point.");
+  }
+  
+  return {eosLo, eosHi}; 
 }  
