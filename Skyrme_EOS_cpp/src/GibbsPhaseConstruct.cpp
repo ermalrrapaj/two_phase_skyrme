@@ -25,18 +25,17 @@ GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos) {
 
 std::vector<EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, double mun) {
   
-  MultiDimensionalRoot rootFinder(1.e-10, 1000);
+  MultiDimensionalRoot rootFinder(1.e-10, 100);
 
   // Find the zero pressure point for this chemical potential 
-  auto zero_P = [this](double logNp) -> double { 
+  auto zero_P = [this, &T, &mun](std::vector<double> logNp) 
+      -> std::vector<double> { 
     EOSData eOut= mpEos->FromNpMunAndT(
-        EOSData::InputFromTMunNp(T, mun, exp(logNp))); 
-    return eOut.P()/(eOut.Nb()*eOut.T());  
+        EOSData::InputFromTMunNp(T, mun, exp(logNp[0]))); 
+    return {eOut.P()/(eOut.Nb()*eOut.T())};  
   };
-  double lNp_pzero = rootFinder([this](double logNp) -, {log(0.2)}, 1);
+  double lNp_pzero = rootFinder(zero_P, {log(0.2)}, 1)[0];
 
-
-  
   // Using these guesses, search for the phase boundary points 
   auto root_f = [this, &mun, &T](std::vector<double> xx) 
       -> std::vector<double> {
