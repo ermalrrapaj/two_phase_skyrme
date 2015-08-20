@@ -277,8 +277,8 @@ def Ei_rho_y(rho,y,T):
      2.0*b*((1.0-y)*taun+y*taup)))
 
 def Et_rho_y(rho,y,T):
-	taun=tau_N_rho(rho,y,T)
-	taup=tau_P_rho(rho,y,T)
+	taun=tau_N_rho_y(rho,y,T)
+	taup=tau_P_rho_y(rho,y,T)
 	ek=(taun+taup)*hbarc**2/(2.0*M*rho)
 	ei=(-0.25 *t0 *(-1.0+x0 *(1.0-2.0 *y)**2 + 2.0*(-1.0 + y)*y)*\
 	 rho-1.0/24.0*t3*(-1.0+x3*(1.0-2.0*y)**2 \
