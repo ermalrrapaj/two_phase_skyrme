@@ -79,7 +79,7 @@ EOSData EOSSkyrme::FromNpMunAndT(const EOSData& eosIn) const {
   return BaseEOSCall(eosIn.T(), exp(logNn), eosIn.Np());  
 }
 
-EOSData EOSSkyrme::FromMupNnAndT(const EOSData& eosIn) const {
+EOSData EOSSkyrme::FromNnMupAndT(const EOSData& eosIn) const {
   
   auto root_func = [&eosIn, this](double logNp)->double {  
       EOSData out = BaseEOSCall(eosIn.T(), eosIn.Nn(), exp(logNp)); 

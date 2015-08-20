@@ -71,8 +71,8 @@ EOSData EOSData::InputFromTMunMup(const double T, const double mun,
   return out; 
 }
  
-EOSData EOSData::InputFromTMunNp(const double T, const double mun, 
-    const double np) {
+EOSData EOSData::InputFromTNpMun(const double T, const double np, 
+    const double mun) {
   EOSData out;
   
   out.mT.first = T; 
@@ -83,6 +83,22 @@ EOSData EOSData::InputFromTMunNp(const double T, const double mun,
 
   out.mNp.first = np; 
   out.mNp.second = true; 
+
+  return out; 
+}
+
+EOSData EOSData::InputFromTNnMup(const double T, const double nn, 
+    const double mup) {
+  EOSData out;
+  
+  out.mT.first = T; 
+  out.mT.second = true; 
+  
+  out.mMup.first = mup; 
+  out.mMup.second = true; 
+
+  out.mNn.first = nn; 
+  out.mNn.second = true; 
 
   return out; 
 }

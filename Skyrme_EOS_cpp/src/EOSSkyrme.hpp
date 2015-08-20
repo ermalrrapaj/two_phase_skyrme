@@ -34,7 +34,7 @@ public:
   std::vector<EOSData> FromMuAndT(const EOSData& eosIn) const; 
   EOSData FromNAndT(const EOSData& eosIn) const; 
   EOSData FromNpMunAndT(const EOSData& eosIn) const;
-  EOSData FromMupNnAndT(const EOSData& eosIn) const;
+  EOSData FromNnMupAndT(const EOSData& eosIn) const;
   
   std::unique_ptr<EOSBase> MakeUniquePtr() const {
     return std::unique_ptr<EOSBase>(new EOSSkyrme(*this));

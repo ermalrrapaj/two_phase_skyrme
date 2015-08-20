@@ -13,7 +13,6 @@
 #include <limits>
 
 class EOSData {
-
 public:
   
   EOSData();
@@ -21,7 +20,8 @@ public:
   static EOSData InputFromTNnNp(const double T, const double nn, const double np);
   static EOSData InputFromTNbYe(const double T, const double nb, const double ye);
   static EOSData InputFromTMunMup(const double T, const double mun, const double mup);
-  static EOSData InputFromTMunNp(const double T, const double mun, const double np);
+  static EOSData InputFromTNpMun(const double T, const double np, const double mun);
+  static EOSData InputFromTNnMup(const double T, const double nn, const double mun);
   static EOSData Output(const double T, const double nn, const double np, 
       const double mun, const double mup,  
       const double pp = std::numeric_limits<double>::quiet_NaN(), 

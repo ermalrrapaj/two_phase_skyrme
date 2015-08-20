@@ -31,9 +31,9 @@ std::vector<EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, double mun,
   auto root_f = [this, &mun, &T, initial](std::vector<double> xx) 
       -> std::vector<double> {
     EOSData eLo = mpEos->FromNpMunAndT(
-        EOSData::InputFromTMunNp(T, mun, exp(xx[0]))); 
+        EOSData::InputFromTNpMun(T, exp(xx[0]), mun)); 
     EOSData eHi = mpEos->FromNpMunAndT(
-        EOSData::InputFromTMunNp(T, mun, exp(xx[0]) + exp(xx[1])));
+        EOSData::InputFromTNpMun(T, exp(xx[0]) + exp(xx[1]), mun));
     if (initial) {
       return {eHi.P() - eLo.P(), eHi.Mup() - eLo.Mup()}; 
     } else {  
@@ -53,9 +53,9 @@ std::vector<EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, double mun,
   logNp = rootFinder(root_f, logNp, 2);
   
   EOSData eosLo = mpEos->FromNpMunAndT(
-      EOSData::InputFromTMunNp(T, mun, exp(logNp[0])));
+      EOSData::InputFromTNpMun(T, exp(logNp[0]), mun));
   EOSData eosHi = mpEos->FromNpMunAndT(
-      EOSData::InputFromTMunNp(T, mun, exp(logNp[0]) + exp(logNp[1])));
+      EOSData::InputFromTNpMun(T, exp(logNp[0]) + exp(logNp[1]), mun));
   
   if (fabs(eosHi.Np()/eosLo.Np()-1.0) < 1.e-4 &&
       fabs(eosHi.Nn()/eosLo.Nn()-1.0) < 1.e-4) {
