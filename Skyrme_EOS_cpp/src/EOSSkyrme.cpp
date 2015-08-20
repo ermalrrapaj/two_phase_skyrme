@@ -65,12 +65,16 @@ EOSData EOSSkyrme::FromNpMunAndT(const EOSData& eosIn) const {
   
   auto root_func = [&eosIn, this](double logNn)->double {  
       EOSData out = BaseEOSCall(eosIn.T(), exp(logNn), eosIn.Np()); 
-      return (out.Mun() - eosIn.Mun()) / (eosIn.Mun() + 1.e-30);
+      return (out.Mun() - eosIn.Mun()) / (eosIn.Mun() + eosIn.T() + 1.e-7);
   }; 
   
+  //for (double lN = log(1.e-120); lN < log(1.e5); lN += 2.0) {
+  //  std::cout << exp(lN) << " " << root_func(lN) << " " << eosIn.Mun() << " " << eosIn.Np()  << std::endl;
+  //}
+
   OneDimensionalRoot rootFinder(1.e-10);
-  double nn_lo = log(1.e-80);
-  double nn_hi = log(1.e3);
+  double nn_lo = log(1.e-120);
+  double nn_hi = log(1.e5);
   double logNn = rootFinder(root_func, nn_lo, nn_hi);
   
   return BaseEOSCall(eosIn.T(), exp(logNn), eosIn.Np());  
@@ -93,8 +97,7 @@ EOSSkyrme EOSSkyrme:: FromErmalSkyrme(const double a, const double b,
 	delta = alpha+1.0;
 	// If needed to verify conversion!
 	//std::cout<<A<<", "<<B<<", "<<C<<", "<<D<<", "<<F<<", "<<G<<", "<<delta<<"\n";
-	EOSSkyrme out(A,B,C,D,F,G,delta);
-	return out;
+	return EOSSkyrme(A,B,C,D,F,G,delta);
 } 
 
 EOSSkyrme EOSSkyrme:: FromErmalSkyrme(std::vector<double>& param) {
@@ -108,8 +111,7 @@ EOSSkyrme EOSSkyrme:: FromErmalSkyrme(std::vector<double>& param) {
 	delta = param[6]+1.0;
 	// If needed to verify conversion!
 	//std::cout<<A<<", "<<B<<", "<<C<<", "<<D<<", "<<F<<", "<<G<<", "<<delta<<"\n";
-	EOSSkyrme out(A,B,C,D,F,G,delta);
-	return out;
+	return EOSSkyrme(A,B,C,D,F,G,delta);
 }
 
 EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn, 
