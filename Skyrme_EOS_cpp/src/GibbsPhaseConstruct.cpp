@@ -16,7 +16,7 @@
 GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos) {
   mpEos = eos.MakeUniquePtr();   
 }
-
+ 
 std::vector<EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, double mun, 
     double NpLoG, double NpHiG) {
   
@@ -25,15 +25,19 @@ std::vector<EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, double mun,
     NpHiG = NpLoG;
     NpLoG = tmp;  
   }
-   
+  // Declare pointers so we can switch between neutron and proton chemical
+  // potentials 
+  EOSData (EOSBase::*eosCall)(const EOSData&) const;
+  EOSData (*eosDat)(double, double, double);
+  eosDat = EOSData::InputFromTNpMun;
+  eosCall = &EOSBase::FromNpMunAndT;
+    
   // Using these guesses, search for the phase boundary points
   bool initial;
-  auto root_f = [this, &mun, &T, initial](std::vector<double> xx) 
-      -> std::vector<double> {
-    EOSData eLo = mpEos->FromNpMunAndT(
-        EOSData::InputFromTNpMun(T, exp(xx[0]), mun)); 
-    EOSData eHi = mpEos->FromNpMunAndT(
-        EOSData::InputFromTNpMun(T, exp(xx[0]) + exp(xx[1]), mun));
+  auto root_f = [this, &mun, &T, initial, &eosCall, &eosDat]
+      (std::vector<double> xx) -> std::vector<double> {
+    EOSData eLo = (mpEos.get()->*eosCall)(eosDat(T, exp(xx[0]), mun)); 
+    EOSData eHi = (mpEos.get()->*eosCall)(eosDat(T, exp(xx[0]) + exp(xx[1]), mun));
     if (initial) {
       return {eHi.P() - eLo.P(), eHi.Mup() - eLo.Mup()}; 
     } else {  
@@ -41,7 +45,7 @@ std::vector<EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, double mun,
           (eHi.Mup() - eLo.Mup())/(eHi.Mup() + 1.e-8)}; 
     }
   };
-   
+
   // First get close with linear equations  
   MultiDimensionalRoot rootFinder(1.e-10, 200);
   initial = true;
@@ -52,10 +56,8 @@ std::vector<EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, double mun,
   initial = false;
   logNp = rootFinder(root_f, logNp, 2);
   
-  EOSData eosLo = mpEos->FromNpMunAndT(
-      EOSData::InputFromTNpMun(T, exp(logNp[0]), mun));
-  EOSData eosHi = mpEos->FromNpMunAndT(
-      EOSData::InputFromTNpMun(T, exp(logNp[0]) + exp(logNp[1]), mun));
+  EOSData eosLo = (mpEos.get()->*eosCall)(eosDat(T, exp(logNp[0]), mun)); 
+  EOSData eosHi = (mpEos.get()->*eosCall)(eosDat(T, exp(logNp[0]) + exp(logNp[1]), mun));
   
   if (fabs(eosHi.Np()/eosLo.Np()-1.0) < 1.e-4 &&
       fabs(eosHi.Nn()/eosLo.Nn()-1.0) < 1.e-4) {
