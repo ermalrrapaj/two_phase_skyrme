@@ -39,7 +39,13 @@ OBJS_ := ${OBJS_:.cpp=.o}
 OBJS = $(patsubst %,$(OBJDIR)/%,$(OBJS_)) 
 SRCS = $(patsubst %,$(SRCDIR)/%,$(SRCS_)) 
  
-all: create_dirs skyrme
+all: create_dirs skyrme gibbs_test
+
+skyrme: $(OBJS) $(OBJDIR)/skyrme_exe.o
+	$(CXX) $(INCLUDE) -o $(EXEDIR)/$@ $^ $(LIBS)
+
+gibbs_test: $(OBJS) $(OBJDIR)/gibbs_test.o
+	$(CXX) $(INCLUDE) -o $(EXEDIR)/$@ $^ $(LIBS)
 
 create_dirs:
 	@ if test ! -d $(OBJDIR); then mkdir $(OBJDIR); fi
@@ -49,9 +55,6 @@ create_dirs:
 	@ if test ! -d $(OBJDIR)/$(NRDIR); then mkdir $(OBJDIR)/$(NRDIR); fi
 	@ if test ! -d $(OBJDIR)/$(EOSDIR); then mkdir $(OBJDIR)/$(EOSDIR); fi
 	@ if test ! -d $(OBJDIR)/$(UTILDIR); then mkdir $(OBJDIR)/$(UTILDIR); fi
-
-skyrme: $(OBJS) $(OBJDIR)/skyrme_exe.o
-	$(CXX) $(INCLUDE) -o $(EXEDIR)/$@ $^ $(LIBS)
 
 clean:
 	find $(OBJDIR) -name \*.[o,a] -delete	

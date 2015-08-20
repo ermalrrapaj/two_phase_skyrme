@@ -15,39 +15,34 @@
 
 GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos) {
   mpEos = eos.MakeUniquePtr();   
-  auto outDat = FindPhasePoint(2.0/197.3, 0.0); 
-  std::cout << std::endl;
-  std::cout << outDat[0].Nn() << " " << outDat[1].Nn() << std::endl;
-  std::cout << outDat[0].Np() << " " << outDat[1].Np() << std::endl;
-  std::cout << outDat[0].P() << " " << outDat[1].P() << std::endl;
-  std::cout << outDat[0].Mup() << " " << outDat[1].Mup() << std::endl;
 }
 
 std::vector<EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, double mun) {
   
-  MultiDimensionalRoot rootFinder(1.e-10, 100);
-
-  // Find the zero pressure point for this chemical potential 
-  auto zero_P = [this, &T, &mun](std::vector<double> logNp) 
-      -> std::vector<double> { 
-    EOSData eOut= mpEos->FromNpMunAndT(
-        EOSData::InputFromTMunNp(T, mun, exp(logNp[0]))); 
-    return {eOut.P()/(eOut.Nb()*eOut.T())};  
-  };
-  double lNp_pzero = rootFinder(zero_P, {log(0.2)}, 1)[0];
-
-  // Using these guesses, search for the phase boundary points 
-  auto root_f = [this, &mun, &T](std::vector<double> xx) 
+  // Using these guesses, search for the phase boundary points
+  bool initial;
+  auto root_f = [this, &mun, &T, initial](std::vector<double> xx) 
       -> std::vector<double> {
-    std::cout << exp(xx[0]) << " " << exp(xx[1]) << std::endl;
     EOSData eLo = mpEos->FromNpMunAndT(
         EOSData::InputFromTMunNp(T, mun, exp(xx[0]))); 
     EOSData eHi = mpEos->FromNpMunAndT(
         EOSData::InputFromTMunNp(T, mun, exp(xx[0]) + exp(xx[1])));
-    return {eHi.P() - eLo.P(), eHi.Mup() - eLo.Mup()}; 
-  };  
-  
+    if (initial) {
+      return {eHi.P() - eLo.P(), eHi.Mup() - eLo.Mup()}; 
+    } else {  
+      return {(eHi.P() - eLo.P())/(eLo.P() + 1.e-8), 
+          (eHi.Mup() - eLo.Mup())/(eHi.Mup() + 1.e-8)}; 
+    }
+  };
+   
+  // First get close with linear equations  
+  MultiDimensionalRoot rootFinder(1.e-10, 100);
+  initial = true;
   std::vector<double> logNp = rootFinder(root_f, {log(1.e-80), log(0.08)}, 2); 
+  
+  // Now get to high precision with non-linear scaled version of equations
+  initial = false;
+  logNp = rootFinder(root_f, logNp, 2); 
   
   return {mpEos->FromNpMunAndT(EOSData::InputFromTMunNp(T, mun, exp(logNp[0]))),
           mpEos->FromNpMunAndT(EOSData::InputFromTMunNp(T, mun, 
