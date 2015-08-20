@@ -19,9 +19,11 @@ class GibbsPhaseConstruct {
 public: 
   GibbsPhaseConstruct(const EOSBase& eos);  
   
-  std::vector<EOSData> FindPhasePoint(double T, double mun);
+  std::vector<EOSData> FindPhasePoint(double T, double mun, double NpLoG, 
+      double NpHiG);
 
 protected: 
   std::unique_ptr<EOSBase> mpEos; 
+
 }; 
 #endif // EOS_GIBBSPHASECONSTRUCT_HPP_
