@@ -6,6 +6,7 @@ LS
 *.out
 *.ou
 *.gz
+.*.swp
 mytov
 eostables
 tov_files
