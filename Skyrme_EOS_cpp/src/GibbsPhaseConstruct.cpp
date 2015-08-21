@@ -62,7 +62,7 @@ std::vector<EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, double mu,
   };
 
   // First get close with linear equations  
-  MultiDimensionalRoot rootFinder(1.e-10, 200);
+  MultiDimensionalRoot rootFinder(1.e-10, 100);
   initial = true;
   std::vector<double> logN = rootFinder(root_f, 
       {log(NLoG), log(NHiG-NLoG)}, 2); 
