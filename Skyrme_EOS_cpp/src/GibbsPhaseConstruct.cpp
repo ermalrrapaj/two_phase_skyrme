@@ -29,35 +29,30 @@ std::vector<EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, double mu,
   // Declare pointers so we can switch between neutron and proton chemical
   // potentials 
   EOSData (EOSBase::*eosCall)(const EOSData&) const;
+  double (EOSData::*getPotential)(void) const;
   EOSData (*eosDat)(double, double, double);
   if (doMun) {
     eosDat = EOSData::InputFromTNpMun;
     eosCall = &EOSBase::FromNpMunAndT;
+    getPotential = &EOSData::Mun;
   } else {
     eosDat = EOSData::InputFromTNnMup;
     eosCall = &EOSBase::FromNnMupAndT;
+    getPotential = &EOSData::Mup;
   }  
   
   // Using these guesses, search for the phase boundary points
   bool initial;
-  auto root_f = [this, &mu, &T, initial, &eosCall, &eosDat, &doMun]
+  auto root_f = [this, &mu, &T, initial, &eosCall, &eosDat, &doMun, &getPotential]
       (std::vector<double> xx) -> std::vector<double> {
     EOSData eLo = (mpEos.get()->*eosCall)(eosDat(T, exp(xx[0]), mu)); 
     EOSData eHi = (mpEos.get()->*eosCall)(eosDat(T, exp(xx[0])+exp(xx[1]), mu));
-    if (doMun) {
-      if (initial) {
-        return {eHi.P() - eLo.P(), eHi.Mup() - eLo.Mup()}; 
-      } else {  
-        return {(eHi.P() - eLo.P())/(eLo.P() + 1.e-8), 
-            (eHi.Mup() - eLo.Mup())/(eHi.Mup() + 1.e-8)}; 
-      }
-    } else {
-      if (initial) {
-        return {eHi.P() - eLo.P(), eHi.Mun() - eLo.Mun()}; 
-      } else {  
-        return {(eHi.P() - eLo.P())/(eLo.P() + 1.e-8), 
-            (eHi.Mun() - eLo.Mun())/(eHi.Mun() + 1.e-8)}; 
-      }
+    if (initial) {
+      return {eHi.P() - eLo.P(), (eHi.*getPotential)() - (eLo.*getPotential)()}; 
+    } else {  
+      return {(eHi.P() - eLo.P())/(eLo.P() + 1.e-8), 
+          ((eHi.*getPotential)() - (eLo.*getPotential)()) 
+          / ((eHi.*getPotential)() + 1.e-8)}; 
     }
   };
 
