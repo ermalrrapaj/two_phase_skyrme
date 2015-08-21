@@ -10,8 +10,10 @@
 #define EOS_EOSSKYRME_HPP_
 
 #include "EOSBase.hpp" 
-//#include "EOSData.hpp"
 
+///
+/// Implements a uniform matter, Skyrme type EOS for with arbitrary parameters.
+/// 
 class EOSSkyrme : public EOSBase {
 public:
   EOSSkyrme();

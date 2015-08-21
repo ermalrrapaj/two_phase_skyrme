@@ -1,5 +1,5 @@
 /// \file GibbsPhaseConstruct.hpp
-/// \authorr lroberts
+/// \author lroberts
 /// \since Aug 18, 2015
 ///
 /// \brief
@@ -15,8 +15,12 @@
 #include "EOSBase.hpp"
 #include "EOSData.hpp"
 
+///
+/// Finds the Gibbs phase boundaries for a given EoS.
+///
 class GibbsPhaseConstruct {
-public: 
+public:
+ 
   GibbsPhaseConstruct(const EOSBase& eos);  
   
   std::vector<EOSData> FindPhasePoint(double T, double mu, double NLoG, 
