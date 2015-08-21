@@ -12,11 +12,12 @@
 #include "EOSSkyrme.hpp" 
 #include "OneDimensionalRoot.hpp"
 #include "MultiDimensionalRoot.hpp"
-#include "Constants.hpp"
- 
-static double HBC = Constants::HBCFmMeV ; 
+
+static double HBC = 197.327; 
 static double MNUC = 938.918/HBC;
-static double PI = Constants::Pi; 
+static double PI = 3.14159; 
+static double ALPHA = 3.0*HBC/(10.0*MNUC)*pow(3.0/2.0*PI*PI,2.0/3.0);
+static double e_ele = sqrt(1.4299764/HBC);
 
 extern "C" {
   double ifermi12_(double* scale_density);
@@ -64,12 +65,12 @@ EOSData EOSSkyrme::FromNpMunAndT(const EOSData& eosIn) const {
   
   auto root_func = [&eosIn, this](double logNn)->double {  
       EOSData out = BaseEOSCall(eosIn.T(), exp(logNn), eosIn.Np()); 
-      return (out.Mun() - eosIn.Mun()) / (eosIn.Mun() + eosIn.T() + 1.e-7);
+      return (out.Mun() - eosIn.Mun()) / (eosIn.Mun() + 1.e-30);
   }; 
   
   OneDimensionalRoot rootFinder(1.e-10);
-  double nn_lo = log(1.e-120);
-  double nn_hi = log(1.e5);
+  double nn_lo = log(1.e-80);
+  double nn_hi = log(1.e3);
   double logNn = rootFinder(root_func, nn_lo, nn_hi);
   
   return BaseEOSCall(eosIn.T(), exp(logNn), eosIn.Np());  
@@ -94,23 +95,9 @@ EOSData EOSSkyrme::FromNAndT(const EOSData& eosIn) const {
   return BaseEOSCall(eosIn.T(), eosIn.Nn(), eosIn.Np()); 
 } 
 
-EOSSkyrme EOSSkyrme:: FromErmalSkyrme(const double a, const double b,
-    const double t0, const double x0, const double t3, 
-    const double x3, const double alpha){  
-    double A, B, C, D, F, G, delta;
-    F = (a+b)*MNUC/4.0/HBC;
-	G = -b*MNUC/4.0/HBC;
-	A = 0.25*t0*(1.0-x0)/HBC; 
-	B = 0.125*t0*(1.0+2.0*x0)/HBC;
-	C = t3*(1.0-x3)/24.0/HBC;
-	D = t3*(1.0+2.0*x3)/48.0/HBC;
-	delta = alpha+1.0;
-	// If needed to verify conversion!
-	//std::cout<<A<<", "<<B<<", "<<C<<", "<<D<<", "<<F<<", "<<G<<", "<<delta<<"\n";
-	return EOSSkyrme(A,B,C,D,F,G,delta);
-} 
-
 EOSSkyrme EOSSkyrme:: FromErmalSkyrme(std::vector<double>& param) {
+	double a= param[0], b = param[1], t0 = param[2], x0 = param[3];
+	double t3=param[4], x3=param[5], alpha = param[6];
     double A, B, C, D, F, G, delta;
     F = (param[0]+param[1])*MNUC/4.0/HBC;
 	G = -param[1]*MNUC/4.0/HBC;
@@ -121,8 +108,35 @@ EOSSkyrme EOSSkyrme:: FromErmalSkyrme(std::vector<double>& param) {
 	delta = param[6]+1.0;
 	// If needed to verify conversion!
 	//std::cout<<A<<", "<<B<<", "<<C<<", "<<D<<", "<<F<<", "<<G<<", "<<delta<<"\n";
-	return EOSSkyrme(A,B,C,D,F,G,delta);
+	EOSSkyrme out(A,B,C,D,F,G,delta);
+	return out;
 }
+
+EOSSkyrme EOSSkyrme:: FromSaturation(std::vector<double>& param){
+	double rho_s = param[0], BE = param[1], MsoM = param[2], KM = param[3];
+	double S = param[4], L = param[5], KS = param[6]; 
+  double A, B, C, D, F, G, a, b, c, d, f, g, delta;
+  f = (1.0- MsoM )/(MsoM *rho_s);
+	delta = ( KM+2.0*pow(rho_s,2.0/3.0)*(1.0-5.0*f*rho_s)*ALPHA )
+	        /( 3.0*pow(rho_s,2.0/3.0)*ALPHA*(1.0-2.0*f*rho_s)-9.0*BE );
+	g = ( 9.0*KS-27.0*(L-3.0*S)*delta +5.0*pow(rho_s,2.0/3.0)*ALPHA
+	    *(2.0-3.0*delta+2.0*F*rho_s*(3.0*delta-5.0)))/(30.0*pow(rho_s,5.0/3.0)*ALPHA*(3.0*delta-5.0)); 
+	d = (5.0*(3.0*L-9.0*S+pow(rho_s,2.0/3.0)*ALPHA)-3.0*KS)/(9.0*(5.0-8.0*delta+3.0*pow(delta,2.0))*pow(rho_s,delta));
+	c = (pow(rho_s,2.0/3.0)*(1.0-2.0*F*rho_s)*ALPHA-3.0*BE)/(3.0*(delta-1)*pow(rho_s,delta))-d;
+	b = (L*(6.0+9.0*delta)+5.0*(ALPHA*pow(rho_s,2.0/3.0)*(3.0*delta-2.0)-9.0*S*delta)-3.0*KS)/(18.0*rho_s*(delta-1.0));
+	a = -(2.0/3.0*ALPHA*pow(rho_s,-1.0/3.0)+b+5.0/3.0*F*ALPHA*pow(rho_s,2.0/3.0)
+	    +(c+d)*delta*pow(rho_s,delta-1.0));
+	A=a/HBC;
+	B=b/HBC;
+	C=c/HBC;
+	D=d/HBC;
+	F=f;
+	G=g;
+	// If needed to verify solution!
+	//std::cout<<A<<", "<<B<<", "<<C<<", "<<D<<", "<<F<<", "<<G<<", "<<delta<<"\n";
+	EOSSkyrme out(A,B,C,D,F,G,delta);
+	return out;
+} 
 
 EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn, 
     const double np) const {
