@@ -17,6 +17,8 @@
 static double HBC = Constants::HBCFmMeV; 
 static double MNUC = 938.918/HBC;
 static double PI = Constants::Pi; 
+static double ALPHA = 3.0*HBC/(10.0*MNUC)*pow(3.0/2.0*PI*PI,2.0/3.0);
+static double e_ele = sqrt(1.4299764/HBC);
 
 extern "C" {
   double ifermi12_(double* scale_density);
