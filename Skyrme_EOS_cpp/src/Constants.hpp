@@ -5,7 +5,7 @@
 /// \brief
 ///
 ///
-
+///
 #ifndef EOS_CONSTANTS_HPP_
 #define EOS_CONSTANTS_HPP_
 
