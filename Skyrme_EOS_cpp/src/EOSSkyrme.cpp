@@ -67,10 +67,6 @@ EOSData EOSSkyrme::FromNpMunAndT(const EOSData& eosIn) const {
       return (out.Mun() - eosIn.Mun()) / (eosIn.Mun() + eosIn.T() + 1.e-7);
   }; 
   
-  //for (double lN = log(1.e-120); lN < log(1.e5); lN += 2.0) {
-  //  std::cout << exp(lN) << " " << root_func(lN) << " " << eosIn.Mun() << " " << eosIn.Np()  << std::endl;
-  //}
-
   OneDimensionalRoot rootFinder(1.e-10);
   double nn_lo = log(1.e-120);
   double nn_hi = log(1.e5);
@@ -86,10 +82,6 @@ EOSData EOSSkyrme::FromNnMupAndT(const EOSData& eosIn) const {
       return (out.Mup() - eosIn.Mup()) / (eosIn.Mup() + eosIn.T() + 1.e-7);
   }; 
   
-  //for (double lN = log(1.e-120); lN < log(1.e5); lN += 2.0) {
-  //  std::cout << exp(lN) << " " << root_func(lN) << " " << eosIn.Mun() << " " << eosIn.Np()  << std::endl;
-  //}
-
   OneDimensionalRoot rootFinder(1.e-10);
   double nn_lo = log(1.e-120);
   double nn_hi = log(1.e5);
