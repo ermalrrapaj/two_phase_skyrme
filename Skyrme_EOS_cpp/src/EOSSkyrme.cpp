@@ -12,12 +12,11 @@
 #include "EOSSkyrme.hpp" 
 #include "OneDimensionalRoot.hpp"
 #include "MultiDimensionalRoot.hpp"
+#include "Constants.hpp" 
 
-static double HBC = 197.327; 
+static double HBC = Constants::HBCFmMeV; 
 static double MNUC = 938.918/HBC;
-static double PI = 3.14159; 
-static double ALPHA = 3.0*HBC/(10.0*MNUC)*pow(3.0/2.0*PI*PI,2.0/3.0);
-static double e_ele = sqrt(1.4299764/HBC);
+static double PI = Constants::Pi; 
 
 extern "C" {
   double ifermi12_(double* scale_density);
@@ -65,12 +64,12 @@ EOSData EOSSkyrme::FromNpMunAndT(const EOSData& eosIn) const {
   
   auto root_func = [&eosIn, this](double logNn)->double {  
       EOSData out = BaseEOSCall(eosIn.T(), exp(logNn), eosIn.Np()); 
-      return (out.Mun() - eosIn.Mun()) / (eosIn.Mun() + 1.e-30);
+      return (out.Mun() - eosIn.Mun()) / (eosIn.Mun() + eosIn.T() + 1.e-7);
   }; 
   
   OneDimensionalRoot rootFinder(1.e-10);
-  double nn_lo = log(1.e-80);
-  double nn_hi = log(1.e3);
+  double nn_lo = log(1.e-120);
+  double nn_hi = log(1.e5);
   double logNn = rootFinder(root_func, nn_lo, nn_hi);
   
   return BaseEOSCall(eosIn.T(), exp(logNn), eosIn.Np());  
