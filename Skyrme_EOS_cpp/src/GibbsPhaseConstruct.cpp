@@ -34,11 +34,11 @@ std::vector<EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, double mu,
   if (doMun) {
     eosDat = EOSData::InputFromTNpMun;
     eosCall = &EOSBase::FromNpMunAndT;
-    getPotential = &EOSData::Mun;
+    getPotential = &EOSData::Mup;
   } else {
     eosDat = EOSData::InputFromTNnMup;
     eosCall = &EOSBase::FromNnMupAndT;
-    getPotential = &EOSData::Mup;
+    getPotential = &EOSData::Mun;
   }  
   
   // Using these guesses, search for the phase boundary points
