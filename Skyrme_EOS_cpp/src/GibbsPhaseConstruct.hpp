@@ -24,14 +24,14 @@ public:
   /// Initialize with an EoS that has a non-convex region
   GibbsPhaseConstruct(const EOSBase& eos);  
   
-  /// Find the phase boundary in the np, nn plane for a fixed temperature 
+  /// Find a phase boundary in the np, nn plane for a fixed temperature 
   std::vector<std::pair<EOSData, EOSData>> FindFixedTPhaseBoundary(double T);
   
+protected:
   /// Find a pair of phase points for a fixed temperature and chemical potential 
-  std::vector<EOSData> FindPhasePoint(double T, double mu, double NLoG, 
+  std::pair<EOSData, EOSData> FindPhasePoint(double T, double mu, double NLoG, 
       double NHiG, bool doMun=true);
 
-protected:
   std::vector<std::pair<EOSData, EOSData>> FindPhaseRange(double T, bool doMun, 
       double muStart, double muEnd, double deltaMu, double NLoG, double NHiG);
   

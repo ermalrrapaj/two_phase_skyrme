@@ -29,7 +29,7 @@ GibbsPhaseConstruct::FindPhaseRange(double T, bool doMun,
   
   for (double mu = muStart; comp_func(mu, muEnd); mu += deltaMu) {
     
-    std::vector<EOSData> outDat;
+    std::pair<EOSData, EOSData> outDat;
     
     try { 
       outDat = FindPhasePoint(T, mu, NLoG, NHiG, doMun); 
@@ -37,16 +37,16 @@ GibbsPhaseConstruct::FindPhaseRange(double T, bool doMun,
       continue;
     }
          
-    if (((outDat[0].Nn()>=outDat[0].Np()) && doMun) 
-        || ((outDat[0].Np()>=outDat[0].Nn()) && !doMun)) 
-      phasePoints.push_back(std::pair<EOSData, EOSData>(outDat[0], outDat[1]));
+    if (((outDat.first.Nn()>=outDat.first.Np()) && doMun) 
+        || ((outDat.first.Np()>=outDat.first.Nn()) && !doMun)) 
+      phasePoints.push_back(outDat);
     
     if (doMun) { 
-      NLoG = outDat[0].Np()*0.95;
-      NHiG = outDat[1].Np()*1.05;
+      NLoG = outDat.first.Np()*0.95;
+      NHiG = outDat.second.Np()*1.05;
     } else { 
-      NLoG = outDat[0].Nn()*0.95;
-      NHiG = outDat[1].Nn()*1.05;
+      NLoG = outDat.first.Nn()*0.95;
+      NHiG = outDat.second.Nn()*1.05;
     }
   }
   
@@ -84,8 +84,8 @@ GibbsPhaseConstruct::FindFixedTPhaseBoundary(double T) {
   return phaseBound; 
 }
  
-std::vector<EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, double mu, 
-    double NLoG, double NHiG, bool doMun) {
+std::pair<EOSData, EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, 
+    double mu, double NLoG, double NHiG, bool doMun) {
   
   if (NLoG>NHiG) {
     double tmp = NHiG;
@@ -141,5 +141,5 @@ std::vector<EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, double mu,
     throw std::runtime_error("GibbsPhaseConstruct converged to the same point.");
   }
   
-  return {eosLo, eosHi}; 
+  return std::pair<EOSData, EOSData>(eosLo, eosHi); 
 }  
