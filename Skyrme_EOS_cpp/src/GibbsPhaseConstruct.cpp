@@ -24,8 +24,10 @@ GibbsPhaseConstruct::FindPhaseRange(double T, bool doMun,
     double muStart, double muEnd, double deltaMu, double NLoG, double NHiG) {
   
   std::vector<std::pair<EOSData, EOSData>> phasePoints; 
-   
-  for (double mu = muStart; mu < muEnd; mu += deltaMu) {
+  auto comp_func = [&](double a, double b) -> bool {
+      if (muStart < muEnd) {return (a<b);} else {return (a>b);}}; 
+  
+  for (double mu = muStart; comp_func(mu, muEnd); mu += deltaMu) {
     
     std::vector<EOSData> outDat;
     
@@ -35,8 +37,8 @@ GibbsPhaseConstruct::FindPhaseRange(double T, bool doMun,
       continue;
     }
          
-    if (((outDat[0].Nn()>outDat[0].Np()) && doMun) 
-        || ((outDat[0].Np()>outDat[0].Nn()) && !doMun)) 
+    if (((outDat[0].Nn()>=outDat[0].Np()) && doMun) 
+        || ((outDat[0].Np()>=outDat[0].Nn()) && !doMun)) 
       phasePoints.push_back(std::pair<EOSData, EOSData>(outDat[0], outDat[1]));
     
     if (doMun) { 
@@ -57,19 +59,21 @@ GibbsPhaseConstruct::FindFixedTPhaseBoundary(double T) {
   
   std::vector<std::pair<EOSData, EOSData>> phaseBound; 
   
-  // Scan over neutron chemical potentials 
-  double NpLoG = 1.e-20;
-  double NpHiG = 0.08;
-  auto phaseRange = FindPhaseRange(T, true, 0.0, 5.0 * T, 0.05, NpLoG, NpHiG);
+  // Scan over chemical potentials 
+  double NLoG = 1.e-20;
+  double NHiG = 0.08;
+  double deltaMu = 0.025 * T;
+  
+  auto phaseRange = FindPhaseRange(T, true, 0.0, 4.4 * T, deltaMu, NLoG, NHiG);
   phaseBound.insert(phaseBound.end(), phaseRange.begin(), phaseRange.end()); 
   
-  phaseRange = FindPhaseRange(T, true, 0.0, -15.0 * T, -0.05, NpLoG, NpHiG);
+  phaseRange = FindPhaseRange(T, false, 0.0, 4.4 * T, deltaMu, NLoG, NHiG);
   phaseBound.insert(phaseBound.end(), phaseRange.begin(), phaseRange.end()); 
   
-  phaseRange = FindPhaseRange(T, false, 0.0, 5.0 * T, 0.05, NpLoG, NpHiG);
+  phaseRange = FindPhaseRange(T, true,  0.0, -7.5 * T, -deltaMu, NLoG, NHiG);
   phaseBound.insert(phaseBound.end(), phaseRange.begin(), phaseRange.end()); 
   
-  phaseRange = FindPhaseRange(T, false, 0.0, -15.0 * T, -0.05, NpLoG, NpHiG);
+  phaseRange = FindPhaseRange(T, false, 0.0, -7.5 * T, -deltaMu, NLoG, NHiG);
   phaseBound.insert(phaseBound.end(), phaseRange.begin(), phaseRange.end()); 
   
   // Sort the phase boundary data by the neutron chemical potential

@@ -12,21 +12,25 @@
 int main() {
   EOSSkyrme eos;
   GibbsPhaseConstruct gibbs(eos);
-  double TMeV = 2.0; 
+  double TMeV = 2.0/Constants::HBCFmMeV; 
   double delta = 0.05;
-
+  double HBC = 1.0; //Constants::HBCFmMeV;
+  delta = 0.025 * TMeV;
+  
+  auto phaseBound2 = gibbs.FindFixedTPhaseBoundary(TMeV/HBC); 
+  
   std::vector<std::pair<EOSData,EOSData>> phaseBound;
   
   // Scan over neutron chemical potentials 
   double NpLoG = 1.e-20;
   double NpHiG = 0.08;
-  for (double mun = 0.0; mun < 8.8; mun += delta) {
+  for (double mun = 0.0; mun < 4.4 * TMeV; mun += delta) {
     
     std::vector<EOSData> outDat;
-    
+    double T =  TMeV/HBC; 
+    double mu = mun/HBC;
     try { 
-      outDat = gibbs.FindPhasePoint(TMeV/Constants::HBCFmMeV, 
-          mun/Constants::HBCFmMeV, NpLoG, NpHiG); 
+      outDat = gibbs.FindPhasePoint(T, mu, NpLoG, NpHiG); 
     } catch (...) {
       //std::cerr << mun <<  " failed.\n";
       continue;
@@ -41,13 +45,13 @@ int main() {
   
   NpLoG = 1.e-20;
   NpHiG = 0.08;
-  for (double mun = 0.0; mun > -15.0; mun -= delta) {
+  for (double mun = 0.0; mun > -7.5 * TMeV; mun -= delta) {
     
     std::vector<EOSData> outDat;
-    
+    double T =  TMeV/HBC; 
+    double mu = mun/HBC;
     try { 
-      outDat = gibbs.FindPhasePoint(TMeV/Constants::HBCFmMeV, 
-          mun/Constants::HBCFmMeV, NpLoG, NpHiG); 
+      outDat = gibbs.FindPhasePoint(T, mu, NpLoG, NpHiG); 
     } catch (...) {
       //std::cerr << mun <<  " failed.\n";
       continue;
@@ -59,17 +63,19 @@ int main() {
     NpLoG = outDat[0].Np()*0.95;
     NpHiG = outDat[1].Np()*1.05;
   } 
+  std::cerr << phaseBound.size() << std::endl; 
   
   // Scan over proton chemical potentials
   double NnLoG = 1.e-20;
   double NnHiG = 0.08;
-  for (double mup = 0.0; mup < 8.8; mup += delta) {
+  for (double mup = 0.0; mup < 4.4 * TMeV; mup += delta) {
     
     std::vector<EOSData> outDat;
     
+    double T =  TMeV/HBC; 
+    double mu = mup/HBC;
     try { 
-      outDat = gibbs.FindPhasePoint(TMeV/Constants::HBCFmMeV, 
-          mup/Constants::HBCFmMeV, NnLoG, NnHiG, false); 
+      outDat = gibbs.FindPhasePoint(T, mu, NnLoG, NnHiG, false); 
     } catch (...) {
       //std::cerr << mup <<  " failed.\n";
       continue;
@@ -83,13 +89,14 @@ int main() {
   
   NnLoG = 1.e-20;
   NnHiG = 0.08;
-  for (double mup = 0.0; mup > -15.0; mup -= delta) {
+  for (double mup = 0.0; mup > -7.5 * TMeV; mup -= delta) {
     
     std::vector<EOSData> outDat;
     
+    double T =  TMeV/HBC; 
+    double mu = mup/HBC;
     try { 
-      outDat = gibbs.FindPhasePoint(TMeV/Constants::HBCFmMeV, 
-          mup/Constants::HBCFmMeV, NnLoG, NnHiG, false); 
+      outDat = gibbs.FindPhasePoint(T, mu, NnLoG, NnHiG, false); 
     } catch (...) {
       //std::cerr << mup <<  " failed.\n";
       continue;
@@ -101,21 +108,24 @@ int main() {
     NnLoG = outDat[0].Nn()*0.95;
     NnHiG = outDat[1].Nn()*1.05;
   }
+  std::cerr << phaseBound.size() << std::endl; 
+  std::cerr << phaseBound2.size() << std::endl; 
   
   std::sort (phaseBound.begin(), phaseBound.end(), 
       [](std::pair<EOSData, EOSData> a, std::pair<EOSData, EOSData> b) { 
         return ((a.first).Mun() < (b.first).Mun());});
   
-  for (auto &a : phaseBound) {
+  for (auto &a : phaseBound2) {
     std::cout << (a.first).Nn() << " "; 
     std::cout << (a.second).Nn() << " "; 
     std::cout << (a.first).Np() << " "; 
     std::cout << (a.second).Np() << " ";
-    std::cout << (a.first).P()*Constants::HBCFmMeV << " ";
-    std::cout << (a.first).Mun()*Constants::HBCFmMeV << " ";
-    std::cout << (a.first).Mup()*Constants::HBCFmMeV << std::endl;
+    std::cout << (a.first).P()*HBC << " ";
+    std::cout << (a.first).Mun()*HBC << " ";
+    std::cout << (a.first).Mup()*HBC << std::endl;
   }  
    
+    
   return 0;
 }
 
