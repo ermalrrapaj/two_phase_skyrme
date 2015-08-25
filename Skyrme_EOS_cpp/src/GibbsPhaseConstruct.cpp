@@ -23,30 +23,68 @@ std::vector<std::pair<EOSData, EOSData>>
 GibbsPhaseConstruct::FindPhaseRange(double T, bool doMun, 
     double muStart, double muEnd, double deltaMu, double NLoG, double NHiG) {
   
-  std::vector<std::pair<EOSData, EOSData>> phasePoints; 
+  std::vector<std::pair<EOSData, EOSData>> phasePoints;
+   
   auto comp_func = [&](double a, double b) -> bool {
-      if (muStart < muEnd) {return (a<b);} else {return (a>b);}}; 
+      if (muStart < muEnd) {return (a<b);} else {return (a>b);}};
   
-  for (double mu = muStart; comp_func(mu, muEnd); mu += deltaMu) {
-    
-    std::pair<EOSData, EOSData> outDat;
-    
-    try { 
-      outDat = FindPhasePoint(T, mu, NLoG, NHiG, doMun); 
-    } catch (...) {
-      continue;
-      std::cerr << mu << " " << doMun << std::endl; 
+  auto iter_func = [&](double dmu) -> void { 
+    for (double mu = muStart; comp_func(mu, muEnd); mu += dmu) {
+      
+      std::pair<EOSData, EOSData> outDat;
+      try { 
+        outDat = FindPhasePoint(T, mu, NLoG, NHiG, doMun); 
+      } catch (...) {
+        continue;
+      }
+
+      phasePoints.push_back(outDat);
+      
+      if (doMun) { 
+        NLoG = outDat.first.Np()*0.95;
+        NHiG = outDat.second.Np()*1.05;
+      } else { 
+        NLoG = outDat.first.Nn()*0.95;
+        NHiG = outDat.second.Nn()*1.05;
+      }
     }
-    phasePoints.push_back(outDat);
-    
-    if (doMun) { 
-      NLoG = outDat.first.Np()*0.95;
-      NHiG = outDat.second.Np()*1.05;
-    } else { 
-      NLoG = outDat.first.Nn()*0.95;
-      NHiG = outDat.second.Nn()*1.05;
-    }
+    return;
+  };
+  
+  // Do the basic iteration 
+  iter_func(deltaMu); 
+
+  // ok, that was a total failure 
+  if (phasePoints.size() == 0) return phasePoints; 
+  
+  // Work forward with smaller steps from the last point 
+  double muStartOld = muStart; 
+  double muEndOld = muEnd; 
+  if (doMun) {
+    muStart = phasePoints.back().first.Mun();
+  } else {
+    muStart = phasePoints.back().first.Mup();
   }
+  muEnd = muStart + 5.0 * deltaMu;
+  iter_func(deltaMu*0.1); 
+  muStart = muStartOld;
+  muEnd = muEndOld;
+   
+  // Now work back towards muStart from the first succesful point 
+  muEnd = muStart; 
+  if (doMun) {
+    muStart = phasePoints[0].first.Mun(); 
+    NLoG = phasePoints[0].first.Np(); 
+    NHiG = phasePoints[0].second.Np(); 
+  } else { 
+    muStart = phasePoints[0].first.Mup();
+    NLoG = phasePoints[0].first.Nn(); 
+    NHiG = phasePoints[0].second.Nn(); 
+  } 
+  
+  if ((muStart-muEnd)/(muEnd + 1.e-4) < -0.02
+      || (muStart-muEnd)/(muEnd + 1.e-4) > 0.02) 
+      iter_func(-deltaMu);
   
   return phasePoints; 
 
@@ -60,7 +98,7 @@ GibbsPhaseConstruct::FindFixedTPhaseBoundary(double T, double NLoG,
   
   // Scan over chemical potentials 
   deltaMu = deltaMu * T;
-  double murange = 15.0 * T;  
+  double murange = 25.0 * T;  
   auto phaseRange = FindPhaseRange(T, true, 0.0, murange, deltaMu, NLoG, NHiG);
   phaseBound.insert(phaseBound.end(), phaseRange.begin(), phaseRange.end()); 
   
@@ -139,7 +177,7 @@ std::pair<EOSData, EOSData> GibbsPhaseConstruct::FindPhasePoint(double T,
 
   // Now get to high precision with non-linear scaled version of equations
   initial = false;
-  rootFinder = MultiDimensionalRoot(1.e-12, 100);
+  rootFinder = MultiDimensionalRoot(1.e-11, 100);
   logN = rootFinder(root_f, logN, 2);
   
   EOSData eosLo = (mpEos.get()->*eosCall)(eosDat(T, exp(logN[0]), mu)); 
