@@ -26,7 +26,7 @@ public:
   
   /// Find a phase boundary in the np, nn plane for a fixed temperature 
   std::vector<std::pair<EOSData, EOSData>> FindFixedTPhaseBoundary(double T,
-      double NLoG=1.e-20, double NHiG=0.08, double deltaMu=0.05);
+      double NLoG=1.e-20, double NHiG=0.08, double deltaMu=0.025);
   
 protected:
   /// Find a pair of phase points for a fixed temperature and chemical potential 
