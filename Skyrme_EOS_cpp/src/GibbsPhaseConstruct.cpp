@@ -25,43 +25,45 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
   double np = eosIn.Np();
   
   // Check if a close by temperature phase boundary has been calculated 
-  //std::vector<std::pair<EOSData, EOSData>> *phaseBound = NULL;
-  //for (auto& pBound : mPhaseBounds) {
-  //  if ((pBound[0].first.T()/T < 1.3) && (pBound[0].first.T/T > 0.7)) {
-  //    phaseBound = &pBound;
-  //}
-
-  //// Didn't find a phase boundary that was close enough, recalculate 
-  //if (!phaseBound) { 
-  //  mPhaseBounds.push_back(FindFixedTPhaseBoundary(T)); 
-  //  phaseBound = &mPhaseBounds.back(); 
-  //} 
-  auto phaseBound = FindFixedTPhaseBoundary(T);
-  // Check to see if we are in or out of the mixed phase region
-  std::vector<double> bracketNn;
-  for (int i = 1; i < phaseBound.size(); ++i) {
-    if ( (phaseBound[i].first.Np() < np) && (phaseBound[i-1].first.Np() > np) 
-        || (phaseBound[i-1].first.Np() < np) && (phaseBound[i].first.Np() > np)) {
-      bracketNn.push_back(phaseBound[i].first.Nn());
-      bracketNn.push_back(phaseBound[i-1].first.Nn());
-    }  
-    if ( (phaseBound[i].second.Np() < np) && (phaseBound[i-1].second.Np() > np) 
-        || (phaseBound[i-1].second.Np() < np) && (phaseBound[i].second.Np() > np)) {
-      bracketNn.push_back(phaseBound[i].second.Nn());
-      bracketNn.push_back(phaseBound[i-1].second.Nn());
-    }  
+  std::vector<std::pair<EOSData, EOSData>> *phaseBound = NULL;
+  for (auto& pBound : mPhaseBounds) {
+    if ((pBound[0].first.T()/T < 1.3) && (pBound[0].first.T()/T > 0.7)) 
+      phaseBound = &pBound;
   }
 
+  // Didn't find a phase boundary that was close enough, bite the bullet and 
+  // calculate a new one 
+  if (!phaseBound) { 
+    mPhaseBounds.push_back(FindFixedTPhaseBoundary(T)); 
+    phaseBound = &mPhaseBounds.back(); 
+  } 
+  
+  // Check to see if we are in or out of the mixed phase region
+  std::vector<double> bracketNn;
+  for (int i = 1; i < phaseBound->size(); ++i) {
+    if ( ((*phaseBound)[i].first.Np() < np) && ((*phaseBound)[i-1].first.Np() > np) 
+        || ((*phaseBound)[i-1].first.Np() < np) && ((*phaseBound)[i].first.Np() > np)) {
+      bracketNn.push_back((*phaseBound)[i].first.Nn());
+      bracketNn.push_back((*phaseBound)[i-1].first.Nn());
+    }  
+    if ( ((*phaseBound)[i].second.Np() < np) && ((*phaseBound)[i-1].second.Np() > np) 
+        || ((*phaseBound)[i-1].second.Np() < np) && ((*phaseBound)[i].second.Np() > np)) {
+      bracketNn.push_back((*phaseBound)[i].second.Nn());
+      bracketNn.push_back((*phaseBound)[i-1].second.Nn());
+    }  
+  }
+  if (bracketNn.size() < 1) 
+    return mpEos->FromNAndT(eosIn); 
   std::sort(bracketNn.begin(), bracketNn.end()); 
   if (eosIn.Nn() < bracketNn[0] || eosIn.Nn() > bracketNn.back()) 
     return mpEos->FromNAndT(eosIn); 
-  
+   
   // Ok, we are inside the phase boundary so find a guess for the up and down 
   // densities and fraction in each phase  
   std::vector<double> u, npArr;
-  u.reserve(phaseBound.size()); 
-  npArr.reserve(phaseBound.size()); 
-  for (auto &p : phaseBound) {
+  u.reserve(phaseBound->size()); 
+  npArr.reserve(phaseBound->size()); 
+  for (auto &p : *phaseBound) {
     double uC = (nb - p.first.Nb())/(p.second.Nb() - p.first.Nb());
     double npC = (1.0 - uC)*p.first.Np() + uC*p.second.Np(); 
     u.push_back(uC);
@@ -82,7 +84,8 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
     } 
   }
   
-  return GetState(eosIn, phaseBound[lo].first, phaseBound[lo].second, u[lo]);
+  return GetState(eosIn, (*phaseBound)[lo].first, (*phaseBound)[lo].second, 
+      u[lo]);
 }
 
 std::vector<std::pair<EOSData, EOSData>>
@@ -199,25 +202,36 @@ GibbsPhaseConstruct::FindFixedTPhaseBoundary(double T, double NLoG,
 EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn, 
     const EOSData& lo, const EOSData& hi, double ug) const { 
   double T = eosIn.T();
-  
-  auto root_f = [this, T, &eosIn]
+  bool linear = true; 
+  auto root_f = [this, T, &eosIn, &linear]
       (std::vector<double> xx) -> std::vector<double> {
     
     EOSData eLo = mpEos->FromNAndT(
         EOSData::InputFromTNnNp(T, exp(xx[0]), exp(xx[1]))); 
     EOSData eHi = mpEos->FromNAndT(
         EOSData::InputFromTNnNp(T, exp(xx[2]), exp(xx[3])));
-    return { (eHi.P() - eLo.P()) / (eLo.P() + 1.e-10),
-         (eHi.Mun() - eLo.Mun()) / (eLo.Mun() + 1.e-10),
-         (eHi.Mup() - eLo.Mup()) / (eLo.Mup() + 1.e-10),
-         ((1.0 - xx[4])*eLo.Np() + xx[4]*eHi.Np())/eosIn.Np() - 1.0,
-         ((1.0 - xx[4])*eLo.Nn() + xx[4]*eHi.Nn())/eosIn.Nn() - 1.0};
+    if (linear) {
+      return { (eHi.P() - eLo.P()),
+           (eHi.Mun() - eLo.Mun()),
+           (eHi.Mup() - eLo.Mup()),
+           ((1.0 - xx[4])*eLo.Np() + xx[4]*eHi.Np())/eosIn.Np() - 1.0,
+           ((1.0 - xx[4])*eLo.Nn() + xx[4]*eHi.Nn())/eosIn.Nn() - 1.0};
+    } else {
+      return { (eHi.P() - eLo.P()) / (eLo.P() + 1.e-10),
+           (eHi.Mun() - eLo.Mun()) / (eLo.Mun() + 1.e-10),
+           (eHi.Mup() - eLo.Mup()) / (eLo.Mup() + 1.e-10),
+           ((1.0 - xx[4])*eLo.Np() + xx[4]*eHi.Np())/eosIn.Np() - 1.0,
+           ((1.0 - xx[4])*eLo.Nn() + xx[4]*eHi.Nn())/eosIn.Nn() - 1.0};
+    }
   };
   
-  MultiDimensionalRoot rootFinder = MultiDimensionalRoot(1.e-11, 100);
+  MultiDimensionalRoot rootFinder = MultiDimensionalRoot(1.e-9, 200);
   
   auto pars = rootFinder(root_f, {log(lo.Nn()), log(lo.Np()), log(hi.Nn()), 
       log(hi.Np()), ug}, 5);
+  linear = false; 
+  pars = rootFinder(root_f, pars, 5);
+
   EOSData eLo = mpEos->FromNAndT(
       EOSData::InputFromTNnNp(T, exp(pars[0]), exp(pars[1]))); 
   EOSData eHi = mpEos->FromNAndT(

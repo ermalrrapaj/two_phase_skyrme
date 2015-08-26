@@ -15,14 +15,18 @@ int main() {
   EOSSkyrme eos;
   GibbsPhaseConstruct gibbs(eos);
   
-  EOSData stateGibbs = 
-      gibbs.FromNAndT(EOSData::InputFromTNnNp(3.0/HBC, 1.e-3, 1.e-3));
-  
-  EOSData stateBulk = 
-      eos.FromNAndT(EOSData::InputFromTNnNp(3.0/HBC, 1.e-3, 1.e-3));
-  
-  std::cout << stateGibbs.P() << " " << stateBulk.P() << std::endl; 
-  
+  double ye = 0.45; 
+
+  for (double lnb = -8.0; lnb<0.5; lnb += 0.1) {  
+    double nb = pow(10.0, lnb); 
+    EOSData stateGibbs = 
+        gibbs.FromNAndT(EOSData::InputFromTNbYe(3.0/HBC, nb, ye));
+    
+    EOSData stateBulk = 
+        eos.FromNAndT(EOSData::InputFromTNbYe(3.0/HBC, nb, ye));
+    
+    std::cout << nb << " " << stateGibbs.P() << " " << stateBulk.P() << std::endl; 
+  }
   return 0;
    
   for (double T = 1.0/HBC; T < 22.0/HBC; T += 0.5/HBC) {
