@@ -9,6 +9,7 @@
 #include <math.h>
 #include <iostream> 
 #include <algorithm> 
+#include <iterator> 
 
 #include "GibbsPhaseConstruct.hpp" 
 #include "MultiDimensionalRoot.hpp"
@@ -18,10 +19,40 @@ GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos) {
   mpEos = eos.MakeUniquePtr();   
 }
 
+EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) const {
+  double T = eosIn.T(); 
+  double nb = eosIn.Nb();
+  double np = eosIn.Np(); 
+
+  auto phaseBound = FindFixedTPhaseBoundary(T); 
+  
+  std::vector<double> u, npArr;
+  u.reserve(phaseBound.size()); 
+  npArr.reserve(phaseBound.size()); 
+  
+  for (auto &p : phaseBound) {
+    double uC = (nb - p.first.Nb())/(p.second.Nb() - p.first.Nb());
+    u.push_back(uC);
+    npArr.push_back((1.0 - uC)*p.first.Np() + uC*p.second.Np()); 
+  }
+
+  // Find the bracketing points
+  std::vector<double>::iterator lo = npArr.begin();
+  std::vector<double>::iterator up = npArr.end();
+  while (lo+1 != up) {
+    auto mid = std::distance(lo, up)/2 + lo; 
+    if (*mid > np) {
+      up = mid;
+    } else { 
+      lo = mid;
+    } 
+  } 
+
+}
 
 std::vector<std::pair<EOSData, EOSData>>
 GibbsPhaseConstruct::FindPhaseRange(double T, bool doMun, 
-    double muStart, double muEnd, double deltaMu, double NLoG, double NHiG) {
+    double muStart, double muEnd, double deltaMu, double NLoG, double NHiG) const {
   
   std::vector<std::pair<EOSData, EOSData>> phasePoints;
    
@@ -92,7 +123,7 @@ GibbsPhaseConstruct::FindPhaseRange(double T, bool doMun,
 
 std::vector<std::pair<EOSData, EOSData>>
 GibbsPhaseConstruct::FindFixedTPhaseBoundary(double T, double NLoG, 
-    double NHiG, double deltaMu) {
+    double NHiG, double deltaMu) const {
   
   std::vector<std::pair<EOSData, EOSData>> phaseBound; 
   
@@ -129,9 +160,36 @@ GibbsPhaseConstruct::FindFixedTPhaseBoundary(double T, double NLoG,
 
   return phaseBound; 
 }
+
+EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn, 
+    const EOSData& lo, const EOSData& hi, double ug) const { 
+  double T = eosIn.T();
+   
+  auto root_f = [this, T, &eosIn]
+      (std::vector<double> xx) -> std::vector<double> {
+    
+    EOSData eLo = mpEos->FromNAndT(
+        EOSData::InputFromTNnNp(T, exp(xx[0]), exp(xx[1]))); 
+    EOSData eHi = mpEos->FromNAndT(
+        EOSData::InputFromTNnNp(T, exp(xx[2]), exp(xx[3])));
+    
+    return { (eHi.P() - eLo.P()) / (eLo.P() + 1.e-10),
+         (eHi.Mun() - eLo.Mun()) / (eLo.Mun() + 1.e-10),
+         (eHi.Mup() - eLo.Mup()) / (eLo.Mup() + 1.e-10),
+         ((1.0 - xx[4])*eLo.Np() + xx[4]*eHi.Np())/eosIn.Np() - 1.0,
+         ((1.0 - xx[4])*eLo.Nn() + xx[4]*eHi.Nn())/eosIn.Nn() - 1.0};
+  };
+  
+  MultiDimensionalRoot rootFinder = MultiDimensionalRoot(1.e-11, 100);
+  
+  auto pars = rootFinder(root_f, {log(lo.Nn()), log(lo.Np()), log(hi.Nn()), 
+      log(hi.Np()), ug}, 2);
+
+  return EOSData();
+} 
  
 std::pair<EOSData, EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, 
-    double mu, double NLoG, double NHiG, bool doMun) {
+    double mu, double NLoG, double NHiG, bool doMun) const {
   
   if (NLoG>NHiG) {
     double tmp = NHiG;
@@ -198,3 +256,4 @@ std::pair<EOSData, EOSData> GibbsPhaseConstruct::FindPhasePoint(double T,
 
   return std::pair<EOSData, EOSData>(eosLo, eosHi); 
 }  
+
