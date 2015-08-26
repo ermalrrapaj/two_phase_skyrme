@@ -24,7 +24,7 @@ public:
   static EOSSkyrme FromSaturation(std::vector<double>& param);
   
   std::vector<EOSData> FromMuAndT(const EOSData& eosIn) const; 
-  EOSData FromNAndT(const EOSData& eosIn) const; 
+  EOSData FromNAndT(const EOSData& eosIn); 
   EOSData FromNpMunAndT(const EOSData& eosIn) const;
   EOSData FromNnMupAndT(const EOSData& eosIn) const;
   

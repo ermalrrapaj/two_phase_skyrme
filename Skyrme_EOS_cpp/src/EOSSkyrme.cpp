@@ -92,7 +92,7 @@ EOSData EOSSkyrme::FromNnMupAndT(const EOSData& eosIn) const {
   return BaseEOSCall(eosIn.T(), eosIn.Nn(), exp(logNp));  
 }
 
-EOSData EOSSkyrme::FromNAndT(const EOSData& eosIn) const {
+EOSData EOSSkyrme::FromNAndT(const EOSData& eosIn) {
   return BaseEOSCall(eosIn.T(), eosIn.Nn(), eosIn.Np()); 
 } 
 

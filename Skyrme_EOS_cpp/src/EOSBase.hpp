@@ -31,7 +31,7 @@ public:
   /// Get the state of the material from the temperature, neutron density,
   /// and proton density.  This routine will also work if the input EOSData 
   /// has been set using the baryon number density and the electron fraction.
-  virtual EOSData FromNAndT(const EOSData& eosIn) const =0; 
+  virtual EOSData FromNAndT(const EOSData& eosIn) =0; 
   
   /// Get the state of the material from the temperature, neutron chemical 
   /// potential, and proton density.  This is guaranteed to be single 
