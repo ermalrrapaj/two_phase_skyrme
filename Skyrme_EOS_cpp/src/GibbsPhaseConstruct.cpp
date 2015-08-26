@@ -22,32 +22,56 @@ GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos) {
 EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) const {
   double T = eosIn.T(); 
   double nb = eosIn.Nb();
-  double np = eosIn.Np(); 
-
+  double np = eosIn.Np();
+   
+  // This is going to be really slow if we recalculate the phase boundary 
+  // for every point 
   auto phaseBound = FindFixedTPhaseBoundary(T); 
   
+  // Check to see if we are in or out of the mixed phase region
+  std::vector<double> bracketNn;
+  for (int i = 1; i < phaseBound.size(); ++i) {
+    if ( (phaseBound[i].first.Np() < np) && (phaseBound[i-1].first.Np() > np) 
+        || (phaseBound[i].first.Np() < np) && (phaseBound[i-1].first.Np() > np)) {
+      bracketNn.push_back(phaseBound[i].first.Nn());
+      bracketNn.push_back(phaseBound[i-1].first.Nn());
+    }  
+    if ( (phaseBound[i].second.Np() < np) && (phaseBound[i-1].second.Np() > np) 
+        || (phaseBound[i].second.Np() < np) && (phaseBound[i-1].second.Np() > np)) {
+      bracketNn.push_back(phaseBound[i].second.Nn());
+      bracketNn.push_back(phaseBound[i-1].second.Nn());
+    }  
+  }
+  std::sort(bracketNn.begin(), bracketNn.end()); 
+  if (eosIn.Nn() < bracketNn[0] || eosIn.Nn() > bracketNn.back()) 
+    return mpEos->FromNAndT(eosIn); 
+  
+  // Ok, we are inside the phase boundary so find a guess for the up and down 
+  // densities and fraction in each phase  
   std::vector<double> u, npArr;
   u.reserve(phaseBound.size()); 
   npArr.reserve(phaseBound.size()); 
-  
+  bool inMixedRegion = false;
   for (auto &p : phaseBound) {
     double uC = (nb - p.first.Nb())/(p.second.Nb() - p.first.Nb());
+    double npC = (1.0 - uC)*p.first.Np() + uC*p.second.Np(); 
     u.push_back(uC);
     npArr.push_back((1.0 - uC)*p.first.Np() + uC*p.second.Np()); 
   }
 
   // Find the bracketing points
-  std::vector<double>::iterator lo = npArr.begin();
-  std::vector<double>::iterator up = npArr.end();
-  while (lo+1 != up) {
-    auto mid = std::distance(lo, up)/2 + lo; 
-    if (*mid > np) {
+  int lo = 0;
+  int up = npArr.size()-1;
+  while (lo+1 < up) {
+    int mid = (lo + up)/2; 
+    if (npArr[mid] > np) {
       up = mid;
     } else { 
       lo = mid;
     } 
-  } 
-
+  }
+  
+  return GetState(eosIn, phaseBound[lo].first, phaseBound[lo].second, u[lo]);
 }
 
 std::vector<std::pair<EOSData, EOSData>>
@@ -184,8 +208,15 @@ EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn,
   
   auto pars = rootFinder(root_f, {log(lo.Nn()), log(lo.Np()), log(hi.Nn()), 
       log(hi.Np()), ug}, 2);
-
-  return EOSData();
+  EOSData eLo = mpEos->FromNAndT(
+      EOSData::InputFromTNnNp(T, exp(pars[0]), exp(pars[1]))); 
+  EOSData eHi = mpEos->FromNAndT(
+      EOSData::InputFromTNnNp(T, exp(pars[2]), exp(pars[3])));
+  
+  return EOSData::Output(T, eosIn.Np(), eosIn.Nn(), eHi.Mun(), eHi.Mup(),
+      eHi.P(), 
+      ((1.0 - pars[4])*eLo.S()*eLo.Nb() + pars[4]*eHi.S()*eHi.Nb())/eosIn.Nb(),
+      ((1.0 - pars[4])*eLo.E()*eLo.Nb() + pars[4]*eHi.E()*eHi.Nb())/eosIn.Nb());
 } 
  
 std::pair<EOSData, EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, 
