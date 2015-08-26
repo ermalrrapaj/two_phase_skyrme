@@ -41,23 +41,43 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
   // Check to see if we are in or out of the mixed phase region
   std::vector<double> bracketNn;
   for (int i = 1; i < phaseBound->size(); ++i) {
-    if ( ((*phaseBound)[i].first.Np() < np) && ((*phaseBound)[i-1].first.Np() > np) 
-        || ((*phaseBound)[i-1].first.Np() < np) && ((*phaseBound)[i].first.Np() > np)) {
+    if ( ((*phaseBound)[i].first.Np() <= np) && ((*phaseBound)[i-1].first.Np() > np) 
+        || ((*phaseBound)[i-1].first.Np() <= np) && ((*phaseBound)[i].first.Np() > np)) {
       bracketNn.push_back((*phaseBound)[i].first.Nn());
       bracketNn.push_back((*phaseBound)[i-1].first.Nn());
     }  
-    if ( ((*phaseBound)[i].second.Np() < np) && ((*phaseBound)[i-1].second.Np() > np) 
-        || ((*phaseBound)[i-1].second.Np() < np) && ((*phaseBound)[i].second.Np() > np)) {
+    if ( ((*phaseBound)[i].second.Np() <= np) && ((*phaseBound)[i-1].second.Np() > np) 
+        || ((*phaseBound)[i-1].second.Np() <= np) && ((*phaseBound)[i].second.Np() > np)) {
       bracketNn.push_back((*phaseBound)[i].second.Nn());
       bracketNn.push_back((*phaseBound)[i-1].second.Nn());
     }  
   }
-  if (bracketNn.size() < 1) 
+
+  if ( ((*phaseBound)[0].first.Np() <= np) && ((*phaseBound)[0].second.Np() > np) 
+      || ((*phaseBound)[0].second.Np() <= np) && ((*phaseBound)[0].first.Np() > np)) {     
+    bracketNn.push_back((*phaseBound)[0].first.Nn());
+    bracketNn.push_back((*phaseBound)[0].second.Nn());
+  }  
+
+  if ( ((*phaseBound).back().first.Np() <= np) && ((*phaseBound).back().second.Np() > np) 
+      || ((*phaseBound).back().second.Np() <= np) && ((*phaseBound).back().first.Np() > np)) {     
+    bracketNn.push_back((*phaseBound).back().first.Nn());
+    bracketNn.push_back((*phaseBound).back().second.Nn());
+  }  
+
+  if (bracketNn.size() < 1) { 
+    std::cout << "# Next point found no bracketing proton fractions \n";
     return mpEos->FromNAndT(eosIn); 
+  }
+
   std::sort(bracketNn.begin(), bracketNn.end()); 
-  if (eosIn.Nn() < bracketNn[0] || eosIn.Nn() > bracketNn.back()) 
+  
+  if (eosIn.Nn() < bracketNn[0] || eosIn.Nn() > bracketNn.back()) {
+    std::cout << "# Next point outside of neutron brackets " << bracketNn[0]
+        << " " << bracketNn.back() << std::endl;
     return mpEos->FromNAndT(eosIn); 
-   
+  }
+  
   // Ok, we are inside the phase boundary so find a guess for the up and down 
   // densities and fraction in each phase  
   std::vector<double> u, npArr;
@@ -84,8 +104,23 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
     } 
   }
   
-  return GetState(eosIn, (*phaseBound)[lo].first, (*phaseBound)[lo].second, 
-      u[lo]);
+  double del = (np - npArr[lo]) / (npArr[up] - npArr[lo]);
+  double nnLo = del * (*phaseBound)[up].first.Nn() 
+      + (1.0 - del) * (*phaseBound)[lo].first.Nn(); 
+  double npLo = del * (*phaseBound)[up].first.Np() 
+      + (1.0 - del) * (*phaseBound)[lo].first.Np(); 
+  double nnHi = del * (*phaseBound)[up].second.Nn() 
+      + (1.0 - del) * (*phaseBound)[lo].second.Nn(); 
+  double npHi = del * (*phaseBound)[up].second.Np() 
+      + (1.0 - del) * (*phaseBound)[lo].second.Np(); 
+  double uu = del * u[up] + (1.0 - del) * u[lo]; 
+  
+  std::cout << "# Next point is mixed phase \n";
+  
+  return GetState(eosIn, 
+      EOSData::InputFromTNnNp(T, nnLo, npLo), 
+      EOSData::InputFromTNnNp(T, nnHi, npHi), 
+      uu);
 }
 
 std::vector<std::pair<EOSData, EOSData>>
@@ -209,7 +244,8 @@ EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn,
     EOSData eLo = mpEos->FromNAndT(
         EOSData::InputFromTNnNp(T, exp(xx[0]), exp(xx[1]))); 
     EOSData eHi = mpEos->FromNAndT(
-        EOSData::InputFromTNnNp(T, exp(xx[2]), exp(xx[3])));
+        EOSData::InputFromTNnNp(T, exp(xx[2]) + exp(xx[0]), 
+        exp(xx[3])+exp(xx[1])));
     if (linear) {
       return { (eHi.P() - eLo.P()),
            (eHi.Mun() - eLo.Mun()),
@@ -225,18 +261,23 @@ EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn,
     }
   };
   
-  MultiDimensionalRoot rootFinder = MultiDimensionalRoot(1.e-9, 200);
+  MultiDimensionalRoot rootFinder = MultiDimensionalRoot(1.e-6, 200);
   
-  auto pars = rootFinder(root_f, {log(lo.Nn()), log(lo.Np()), log(hi.Nn()), 
-      log(hi.Np()), ug}, 5);
+  auto pars = rootFinder(root_f, {log(lo.Nn()), log(lo.Np()), log(hi.Nn()-lo.Nn()), 
+      log(hi.Np()-lo.Np()), ug}, 5);
+  rootFinder = MultiDimensionalRoot(1.e-10, 100);
   linear = false; 
   pars = rootFinder(root_f, pars, 5);
 
   EOSData eLo = mpEos->FromNAndT(
       EOSData::InputFromTNnNp(T, exp(pars[0]), exp(pars[1]))); 
   EOSData eHi = mpEos->FromNAndT(
-      EOSData::InputFromTNnNp(T, exp(pars[2]), exp(pars[3])));
-  
+      EOSData::InputFromTNnNp(T, exp(pars[2]) + exp(pars[0]), 
+      exp(pars[3])+exp(pars[1])));
+  if ((exp(pars[2]) < 1.e-3*exp(pars[0])) 
+      && (exp(pars[3]) < 1.e-3*exp(pars[1]))) {
+    std::cerr << "Failed to converge to separate points." << std::endl;
+  }
   return EOSData::Output(T, eosIn.Np(), eosIn.Nn(), eHi.Mun(), eHi.Mup(), eHi.P(), 
       ((1.0 - pars[4])*eLo.S()*eLo.Nb() + pars[4]*eHi.S()*eHi.Nb())/eosIn.Nb(),
       ((1.0 - pars[4])*eLo.E()*eLo.Nb() + pars[4]*eHi.E()*eHi.Nb())/eosIn.Nb());
