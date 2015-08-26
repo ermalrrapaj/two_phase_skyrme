@@ -10,10 +10,21 @@
 #include "GibbsPhaseConstruct.hpp"
 
 int main() {
-  EOSSkyrme eos;
-  GibbsPhaseConstruct gibbs(eos);
   double HBC = Constants::HBCFmMeV;
   
+  EOSSkyrme eos;
+  GibbsPhaseConstruct gibbs(eos);
+  
+  EOSData stateGibbs = 
+      gibbs.FromNAndT(EOSData::InputFromTNnNp(3.0/HBC, 1.e-3, 1.e-3));
+  
+  EOSData stateBulk = 
+      eos.FromNAndT(EOSData::InputFromTNnNp(3.0/HBC, 1.e-3, 1.e-3));
+  
+  std::cout << stateGibbs.P() << " " << stateBulk.P() << std::endl; 
+  
+  return 0;
+   
   for (double T = 1.0/HBC; T < 22.0/HBC; T += 0.5/HBC) {
     auto phaseBound = gibbs.FindFixedTPhaseBoundary(T); 
     

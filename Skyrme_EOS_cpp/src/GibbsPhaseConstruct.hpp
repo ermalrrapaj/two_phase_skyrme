@@ -24,8 +24,7 @@ public:
   /// Initialize with an EoS that has a non-convex region
   GibbsPhaseConstruct(const EOSBase& eos);  
   
-  
-  EOSData FromNAndT(const EOSData& eosIn) const;
+  EOSData FromNAndT(const EOSData& eosIn);
   
   /// This function is not implemented and will throw an error if called 
   std::vector<EOSData> FromMuAndT(const EOSData& eosIn) const {
@@ -68,6 +67,10 @@ protected:
   
   /// Copy of the input bulk EOS 
   std::unique_ptr<EOSBase> mpEos; 
+  
+  /// Vector of constant temperature phase boundaries that have already been 
+  /// calculated 
+  std::vector<std::vector<std::pair<EOSData, EOSData>>> mPhaseBounds;
 
 }; 
 #endif // EOS_GIBBSPHASECONSTRUCT_HPP_
