@@ -15,21 +15,25 @@ int main() {
   EOSSkyrme eos;
   GibbsPhaseConstruct gibbs(eos);
   
-  double ye = 0.45; 
-
-  for (double lnb = -8.0; lnb<0.5; lnb += 0.1) {  
-    double nb = pow(10.0, lnb); 
-    EOSData stateGibbs = 
-        gibbs.FromNAndT(EOSData::InputFromTNbYe(3.0/HBC, nb, ye));
-    
-    EOSData stateBulk = 
-        eos.FromNAndT(EOSData::InputFromTNbYe(3.0/HBC, nb, ye));
-    
-    std::cout << nb << " " << stateGibbs.P() << " " << stateBulk.P() << std::endl; 
+  double ye = 0.3; 
+  
+  for (double T = 0.1/HBC; T < 10.0/HBC; T += 1.0/HBC) {
+    for (double lnb = -8.0; lnb<0.5; lnb += 0.01) {  
+      double nb = pow(10.0, lnb); 
+      EOSData stateGibbs = 
+          gibbs.FromNAndT(EOSData::InputFromTNbYe(T, nb, ye));
+      
+      EOSData stateBulk = 
+          eos.FromNAndT(EOSData::InputFromTNbYe(T, nb, ye));
+      
+      std::cout << nb << " " << stateGibbs.P() << " " << stateBulk.P() << std::endl; 
+    }
+  std::cout << std::endl;
+  std::cerr << T*HBC << " done \n";
   }
   return 0;
    
-  for (double T = 1.0/HBC; T < 22.0/HBC; T += 0.5/HBC) {
+  for (double T = 0.1/HBC; T < 22.0/HBC; T += 1.0/HBC) {
     auto phaseBound = gibbs.FindFixedTPhaseBoundary(T); 
     
     std::cerr << T * HBC << " " << phaseBound.size() << std::endl; 
@@ -56,26 +60,26 @@ int main() {
       }
       
        
-      std::reverse(phaseBound.begin(), phaseBound.end());  
-      
-      for (auto &a : phaseBound) {
-        std::cout << (a.second).Nn() << " "; 
-        std::cout << (a.first).Nn() << " "; 
-        std::cout << (a.second).Np() << " ";
-        std::cout << (a.first).Np() << " "; 
-        std::cout << (a.first).P()*HBC << " ";
-        std::cout << (a.first).Mun()*HBC << " ";
-        std::cout << (a.first).Mup()*HBC << " ";
-        std::cout << (a.first).T()*HBC << std::endl;
-      }
-      std::cout << (phaseBound.back().first).Nn() << " "; 
-      std::cout << (phaseBound.back().second).Nn() << " "; 
-      std::cout << (phaseBound.back().first).Np() << " ";
-      std::cout << (phaseBound.back().second).Np() << " "; 
-      std::cout << (phaseBound.back().first).P()*HBC << " ";
-      std::cout << (phaseBound.back().first).Mun()*HBC << " ";
-      std::cout << (phaseBound.back().first).Mup()*HBC << " ";
-      std::cout << (phaseBound.back().first).T()*HBC << std::endl;
+      //std::reverse(phaseBound.begin(), phaseBound.end());  
+      //
+      //for (auto &a : phaseBound) {
+      //  std::cout << (a.second).Nn() << " "; 
+      //  std::cout << (a.first).Nn() << " "; 
+      //  std::cout << (a.second).Np() << " ";
+      //  std::cout << (a.first).Np() << " "; 
+      //  std::cout << (a.first).P()*HBC << " ";
+      //  std::cout << (a.first).Mun()*HBC << " ";
+      //  std::cout << (a.first).Mup()*HBC << " ";
+      //  std::cout << (a.first).T()*HBC << std::endl;
+      //}
+      //std::cout << (phaseBound.back().first).Nn() << " "; 
+      //std::cout << (phaseBound.back().second).Nn() << " "; 
+      //std::cout << (phaseBound.back().first).Np() << " ";
+      //std::cout << (phaseBound.back().second).Np() << " "; 
+      //std::cout << (phaseBound.back().first).P()*HBC << " ";
+      //std::cout << (phaseBound.back().first).Mun()*HBC << " ";
+      //std::cout << (phaseBound.back().first).Mup()*HBC << " ";
+      //std::cout << (phaseBound.back().first).T()*HBC << std::endl;
       
       std::cout << std::endl; 
     } 
