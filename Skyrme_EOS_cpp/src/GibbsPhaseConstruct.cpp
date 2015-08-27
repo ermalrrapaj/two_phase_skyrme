@@ -278,9 +278,17 @@ EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn,
   };
   
   MultiDimensionalRoot rootFinder = MultiDimensionalRoot(1.e-14, 200);
-  
-  auto pars = rootFinder(root_f, {log(lo.Nn()), log(lo.Np()), log(hi.Nn()-lo.Nn()), 
+ 
+  std::vector<double> pars; 
+  try {  
+    pars = rootFinder(root_f, {log(lo.Nn()), log(lo.Np()), log(hi.Nn()-lo.Nn()), 
       log(hi.Np()-lo.Np()), ug}, 5);
+  } catch (MultiDRootException& e) {
+    pars = e.GetX();
+  } catch (...) {
+    return mpEos->FromNAndT(
+        EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np())); 
+  }
   
   EOSData eLo = mpEos->FromNAndT(
       EOSData::InputFromTNnNp(T, exp(pars[0]), exp(pars[1]))); 
@@ -292,21 +300,29 @@ EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn,
   PScale = std::max(1.e0*fabs(eHi.P()), 1.e-6);
   MunScale = fabs(eHi.Mup());
   MupScale = fabs(eHi.Mun());
-  pars = rootFinder(root_f, pars, 5);
+  try {
+    pars = rootFinder(root_f, pars, 5);
+  } catch (std::exception& e) {
+    std::cerr << e.what(); 
+    std::cerr << " in second try." << std::endl;
+    return mpEos->FromNAndT(
+        EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np())); 
+  }
 
   eLo = mpEos->FromNAndT(
       EOSData::InputFromTNnNp(T, exp(pars[0]), exp(pars[1]))); 
   eHi = mpEos->FromNAndT(
       EOSData::InputFromTNnNp(T, exp(pars[2]) + exp(pars[0]), 
       exp(pars[3])+exp(pars[1])));
+
   if ((exp(pars[2]) < 1.e-1*exp(pars[0]) ) 
       && (exp(pars[3]) < 1.e-1*exp(pars[1]))) {
     std::cerr << "Failed to converge to separate points." << std::endl;
     return mpEos->FromNAndT(
         EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np())); 
   }
+  
   if (pars[4]<0.0 || pars[4]>1.0) {
-    //std::cerr << "Converged to disallowed value of u." << std::endl;
     return mpEos->FromNAndT(
         EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np())); 
   }
