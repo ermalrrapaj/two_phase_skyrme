@@ -27,7 +27,7 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
   // Check if a close by temperature phase boundary has been calculated 
   std::vector<std::pair<EOSData, EOSData>> *phaseBound = NULL;
   for (auto& pBound : mPhaseBounds) {
-    if ((pBound[0].first.T()/T < 1.15) && (pBound[0].first.T()/T > 0.85)) 
+    if ((pBound[0].first.T()/T < 1.3) && (pBound[0].first.T()/T > 0.70)) 
       phaseBound = &pBound;
   }
 
@@ -37,7 +37,11 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
     mPhaseBounds.push_back(FindFixedTPhaseBoundary(T)); 
     phaseBound = &mPhaseBounds.back(); 
   } 
-  
+  if (phaseBound->size()<1) {
+    std::cout << "# There are not two phases for this temperature \n";
+    return mpEos->FromNAndT(eosIn); 
+  }
+   
   // Check to see if we are in or out of the mixed phase region
   std::vector<double> bracketNn;
   for (int i = 1; i < phaseBound->size(); ++i) {
