@@ -287,9 +287,9 @@ EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn,
   EOSData eHi = mpEos->FromNAndT(
       EOSData::InputFromTNnNp(T, exp(pars[2]) + exp(pars[0]), 
       exp(pars[3])+exp(pars[1])));
-  rootFinder = MultiDimensionalRoot(1.e-8, 200);
+  rootFinder = MultiDimensionalRoot(1.e-10, 200);
   linear = false; 
-  PScale = std::max(1.e5*fabs(eHi.P()), 1.e-10);
+  PScale = std::max(1.e0*fabs(eHi.P()), 1.e-6);
   MunScale = fabs(eHi.Mup());
   MupScale = fabs(eHi.Mun());
   pars = rootFinder(root_f, pars, 5);
@@ -299,10 +299,18 @@ EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn,
   eHi = mpEos->FromNAndT(
       EOSData::InputFromTNnNp(T, exp(pars[2]) + exp(pars[0]), 
       exp(pars[3])+exp(pars[1])));
-  if ((exp(pars[2]) < 1.e-3*exp(pars[0])) 
-      && (exp(pars[3]) < 1.e-3*exp(pars[1]))) {
+  if ((exp(pars[2]) < 1.e-1*exp(pars[0]) ) 
+      && (exp(pars[3]) < 1.e-1*exp(pars[1]))) {
     std::cerr << "Failed to converge to separate points." << std::endl;
+    return mpEos->FromNAndT(
+        EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np())); 
   }
+  if (pars[4]<0.0 || pars[4]>1.0) {
+    //std::cerr << "Converged to disallowed value of u." << std::endl;
+    return mpEos->FromNAndT(
+        EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np())); 
+  }
+
   return EOSData::Output(T, eosIn.Np(), eosIn.Nn(), eHi.Mun(), eHi.Mup(), eHi.P(), 
       ((1.0 - pars[4])*eLo.S()*eLo.Nb() + pars[4]*eHi.S()*eHi.Nb())/eosIn.Nb(),
       ((1.0 - pars[4])*eLo.E()*eLo.Nb() + pars[4]*eHi.E()*eHi.Nb())/eosIn.Nb());
