@@ -14,8 +14,27 @@
 #include <stdexcept> 
 #include <iostream>
 #include <cstdio>
+#include <string>
 #include <gsl/gsl_vector.h>
 #include <gsl/gsl_multiroots.h> 
+
+class MultiDRootException : public std::invalid_argument {
+public:
+  MultiDRootException(std::string message, int iter, int status, 
+      std::vector<double> x, std::vector<double> f) : 
+      mXfin(x), mFfin(f), mIter(iter), mStatus(status), 
+      std::invalid_argument(message) {}
+  std::vector<double> GetF() const { return mFfin;}; 
+  std::vector<double> GetX() const { return mXfin;}; 
+  int GetIterations() const { return mIter;}; 
+  int GetStatus() const { return mStatus;};
+   
+protected: 
+  std::vector<double> mXfin;
+  std::vector<double> mFfin;    
+  int mIter, mStatus;
+
+}; 
 
 class MultiDimensionalRoot { 
 public:
@@ -69,8 +88,15 @@ public:
     
     gsl_set_error_handler(NULL);
     
-    if (iter >= mMaxIter || status) 
-        throw std::runtime_error("Multi root find did not converge.");
+    if (iter >= mMaxIter || status) {
+        std::vector<double> ferr, xx;  
+        for (int i=0; i<nFunc; i++) {
+          ferr.push_back(gsl_vector_get(s->f, i));
+          xx.push_back(gsl_vector_get(s->x, i));
+        } 
+        throw MultiDRootException("Multi root find did not converge", iter,
+            status, xx, ferr);
+    }
     
     std::vector<double> out; 
     for (unsigned int i=0; i<nFunc; ++i) {
