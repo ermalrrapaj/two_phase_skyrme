@@ -17,8 +17,9 @@ int main() {
   
   double ye = 0.3; 
   
-  for (double T = 0.1/HBC; T < 10.0/HBC; T += 1.0/HBC) {
-    for (double lnb = -8.0; lnb<0.5; lnb += 0.01) {  
+  for (double lT = log10(0.1); lT < log10(30.0); lT += 0.05) {
+    double T  = pow(10.0, lT)/HBC;
+    for (double lnb = -8.0; lnb<0.5; lnb += 0.005) {  
       double nb = pow(10.0, lnb); 
       EOSData stateGibbs = 
           gibbs.FromNAndT(EOSData::InputFromTNbYe(T, nb, ye));
@@ -26,14 +27,15 @@ int main() {
       EOSData stateBulk = 
           eos.FromNAndT(EOSData::InputFromTNbYe(T, nb, ye));
       
-      std::cout << nb << " " << stateGibbs.P() << " " << stateBulk.P() << std::endl; 
+      std::cout << nb << " " << T << " " << stateGibbs.P() << " " << stateBulk.P(); 
+      std::cout << " " << stateGibbs.S() << " " << stateBulk.S() << std::endl;
     }
-  std::cout << std::endl;
-  std::cerr << T*HBC << " done \n";
+    std::cout << std::endl;
+    std::cerr << T*HBC << " done \n";
   }
   return 0;
    
-  for (double T = 0.1/HBC; T < 22.0/HBC; T += 1.0/HBC) {
+  for (double T = 0.01/HBC; T <= 0.1/HBC; T += 0.01/HBC) {
     auto phaseBound = gibbs.FindFixedTPhaseBoundary(T); 
     
     std::cerr << T * HBC << " " << phaseBound.size() << std::endl; 
