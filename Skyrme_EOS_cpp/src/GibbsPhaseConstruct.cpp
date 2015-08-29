@@ -16,15 +16,24 @@
 #include "MultiDimensionalRoot.hpp"
 #include "OneDimensionalRoot.hpp"
 
-GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos) {
-  mpEos = eos.MakeUniquePtr(); 
-  mTMult = 1.25; 
+GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos) : 
+    mTMult(1.25),
+    mpEos(eos.MakeUniquePtr()), 
+    mVerbose(true),
+    mTMin(0.1/Constants::HBCFmMeV) {
+  FindPhaseBoundary();
+}
+
+void GibbsPhaseConstruct::FindPhaseBoundary() {
+  
+  // Do a first pass for finding phase boundaries  
   double TFail = 0.0;
-  for (double lT = log10(0.1); lT < log10(50.0); lT +=  log10(mTMult)) {
-    std::cerr << pow(10.0, lT) << " ";
-    auto phaseBound = FindFixedTPhaseBoundary(pow(10.0, lT)/Constants::HBCFmMeV);
-    std::cerr << phaseBound.size() << std::endl;
-    if (phaseBound.size()>50) {
+  double TMax = 50.0/Constants::HBCFmMeV;
+  for (double lT = log10(mTMin); lT < log10(TMax); lT +=  log10(mTMult)) {
+    if (mVerbose) std::cerr << pow(10.0, lT)*Constants::HBCFmMeV << " ";
+    auto phaseBound = FindFixedTPhaseBoundary(pow(10.0, lT));
+    if (mVerbose) std::cerr << phaseBound.size() << std::endl;
+    if (phaseBound.size()>10) {
       mPhaseBounds.push_back(phaseBound);
       mTCrit = 1.01 * pow(10.0, lT);
     } else {
@@ -32,16 +41,17 @@ GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos) {
       break;
     }
   }
-  
+
+  // Now bisect to get close to the critical temperature
   double Tlo = mTCrit;
   double Thi = TFail;
   double Tmid = 0.0;
-  for (int i=0; i<6; i++) {
+  for (int i=0; i<8; i++) {
     Tmid = 0.5*(Tlo + Thi); 
-    std::cerr << Tmid << " ";
-    auto phaseBound = FindFixedTPhaseBoundary(Tmid/Constants::HBCFmMeV);
-    std::cerr << phaseBound.size() << std::endl;
-    if (phaseBound.size()>50) { 
+    if (mVerbose) std::cerr << Tmid*Constants::HBCFmMeV << " ";
+    auto phaseBound = FindFixedTPhaseBoundary(Tmid);
+    if (mVerbose) std::cerr << phaseBound.size() << std::endl;
+    if (phaseBound.size()>10) { 
       mPhaseBounds.push_back(phaseBound);
       Tlo = Tmid; 
     } else { 
@@ -50,10 +60,10 @@ GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos) {
   }
   mTCrit = Tmid;
    
-  std::cerr << "Tcritical : " << mTCrit << std::endl;
-  
-  mTCrit = mTCrit/Constants::HBCFmMeV;
-  
+  if (mVerbose) std::cerr << "Tcritical : " << mTCrit*Constants::HBCFmMeV 
+      << std::endl;
+
+  // Sort the phase boundaries in terms of temperature 
   std::sort (mPhaseBounds.begin(), mPhaseBounds.end(), 
       [](std::vector<std::pair<EOSData, EOSData>> a, 
       std::vector<std::pair<EOSData, EOSData>> b) { 
@@ -64,8 +74,12 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
   double T = eosIn.T(); 
   double nb = eosIn.Nb();
   double np = eosIn.Np();
-  
-  if (T > mTCrit*0.95) {
+
+  // Check that we are within the temperature bounds. 
+  if (T < mTMin) 
+    throw std::logic_error("Trying to call the EoS below the minimum allowed T.");
+   
+  if (T > mTCrit) {
     std::cout << "# We are above the critical temperature \n";
     return mpEos->FromNAndT(eosIn); 
   } 
@@ -80,11 +94,10 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
     }
   }
   
-  
   // Didn't find a phase boundary that was close enough, bite the bullet and 
   // calculate a new one 
   if (!phaseBound) {
-    std::cerr << "Calculating new phase boundary." << std::endl;
+    if (mVerbose) std::cerr << "Calculating new phase boundary." << std::endl;
     mPhaseBounds.push_back(FindFixedTPhaseBoundary(T)); 
     phaseBound = &mPhaseBounds.back(); 
   } 
@@ -373,7 +386,8 @@ EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn,
 
   if ((exp(pars[2]) < 1.e-1*exp(pars[0]) ) 
       && (exp(pars[3]) < 1.e-1*exp(pars[1]))) {
-    std::cerr << "Failed to converge to separate points." << std::endl;
+    if (mVerbose) std::cerr << "Failed to converge to separate points." 
+        << std::endl;
     return mpEos->FromNAndT(
         EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np())); 
   }

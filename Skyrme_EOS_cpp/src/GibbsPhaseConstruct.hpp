@@ -26,6 +26,9 @@ public:
   
   EOSData FromNAndT(const EOSData& eosIn);
   
+  /// Get the critical temperature for this EoS.
+  double GetCriticalT() const {return mTCrit;};
+   
   /// This function is not implemented and will throw an error if called 
   std::vector<EOSData> FromMuAndT(const EOSData& eosIn) const {
     throw std::logic_error("FromMuAndT has not been implemented.");
@@ -47,6 +50,9 @@ public:
   std::unique_ptr<EOSBase> MakeUniquePtr() const {
     return std::unique_ptr<EOSBase>(new GibbsPhaseConstruct(*mpEos));
   } 
+  
+  /// Calculate the entire phase boundary and store in mPhaseBounds 
+  void FindPhaseBoundary();
    
   /// Find a phase boundary in the np, nn plane for a fixed temperature 
   std::vector<std::pair<EOSData, EOSData>> FindFixedTPhaseBoundary(double T,
@@ -61,7 +67,9 @@ protected:
   /// Find a pair of phase points for a fixed temperature and chemical potential 
   std::pair<EOSData, EOSData> FindPhasePoint(double T, double mu, double NLoG, 
       double NHiG, bool doMun=true) const;
-
+  
+  /// Try to find the phase boundary over a range of chemical potentials.  This 
+  /// routine is used by FindFixedTPHaseBoundary. 
   std::vector<std::pair<EOSData, EOSData>> FindPhaseRange(double T, bool doMun, 
       double muStart, double muEnd, double deltaMu, double NLoG, double NHiG) const;
   
@@ -72,7 +80,9 @@ protected:
   /// calculated 
   std::vector<std::vector<std::pair<EOSData, EOSData>>> mPhaseBounds;
   
-  double mTMult;
-  double mTCrit; 
+  double mTMin;  ///< Minimum temperature calculated for the EoS 
+  double mTMult; ///< How close together are the phase boundaries
+  double mTCrit; ///< The critical temperature 
+  bool mVerbose; ///< How verbose should I be?
 }; 
 #endif // EOS_GIBBSPHASECONSTRUCT_HPP_
