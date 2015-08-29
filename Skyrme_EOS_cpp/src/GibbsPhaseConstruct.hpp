@@ -50,7 +50,7 @@ public:
    
   /// Find a phase boundary in the np, nn plane for a fixed temperature 
   std::vector<std::pair<EOSData, EOSData>> FindFixedTPhaseBoundary(double T,
-      double NLoG=1.e-20, double NHiG=0.08, double deltaMu=0.02) const;
+      double NLoG=1.e-20, double NHiG=0.08, double deltaMu=0.03) const;
   
 protected:
   /// Solve the three Gibbs equilibrium equations and the constraint equations 
@@ -71,6 +71,8 @@ protected:
   /// Vector of constant temperature phase boundaries that have already been 
   /// calculated 
   std::vector<std::vector<std::pair<EOSData, EOSData>>> mPhaseBounds;
-
+  
+  double mTMult;
+  double mTCrit; 
 }; 
 #endif // EOS_GIBBSPHASECONSTRUCT_HPP_

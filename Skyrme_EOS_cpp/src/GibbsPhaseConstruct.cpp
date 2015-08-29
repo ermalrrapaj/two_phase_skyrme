@@ -11,12 +11,53 @@
 #include <algorithm> 
 #include <iterator> 
 
+#include "Constants.hpp"
 #include "GibbsPhaseConstruct.hpp" 
 #include "MultiDimensionalRoot.hpp"
 #include "OneDimensionalRoot.hpp"
 
 GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos) {
-  mpEos = eos.MakeUniquePtr();   
+  mpEos = eos.MakeUniquePtr(); 
+  mTMult = 1.25; 
+  double TFail = 0.0;
+  for (double lT = log10(0.1); lT < log10(50.0); lT +=  log10(mTMult)) {
+    std::cerr << pow(10.0, lT) << " ";
+    auto phaseBound = FindFixedTPhaseBoundary(pow(10.0, lT)/Constants::HBCFmMeV);
+    std::cerr << phaseBound.size() << std::endl;
+    if (phaseBound.size()>50) {
+      mPhaseBounds.push_back(phaseBound);
+      mTCrit = 1.01 * pow(10.0, lT);
+    } else {
+      TFail = pow(10.0, lT);
+      break;
+    }
+  }
+  
+  double Tlo = mTCrit;
+  double Thi = TFail;
+  double Tmid = 0.0;
+  for (int i=0; i<6; i++) {
+    Tmid = 0.5*(Tlo + Thi); 
+    std::cerr << Tmid << " ";
+    auto phaseBound = FindFixedTPhaseBoundary(Tmid/Constants::HBCFmMeV);
+    std::cerr << phaseBound.size() << std::endl;
+    if (phaseBound.size()>50) { 
+      mPhaseBounds.push_back(phaseBound);
+      Tlo = Tmid; 
+    } else { 
+      Thi = Tmid;
+    }
+  }
+  mTCrit = Tmid;
+   
+  std::cerr << "Tcritical : " << mTCrit << std::endl;
+  
+  mTCrit = mTCrit/Constants::HBCFmMeV;
+  
+  std::sort (mPhaseBounds.begin(), mPhaseBounds.end(), 
+      [](std::vector<std::pair<EOSData, EOSData>> a, 
+      std::vector<std::pair<EOSData, EOSData>> b) { 
+      return ((a[0].first).T() < (b[0].first).T());});
 }
 
 EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
@@ -24,19 +65,30 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
   double nb = eosIn.Nb();
   double np = eosIn.Np();
   
+  if (T > mTCrit*0.95) {
+    std::cout << "# We are above the critical temperature \n";
+    return mpEos->FromNAndT(eosIn); 
+  } 
+    
   // Check if a close by temperature phase boundary has been calculated 
   std::vector<std::pair<EOSData, EOSData>> *phaseBound = NULL;
-  for (auto& pBound : mPhaseBounds) {
-    if ((pBound[0].first.T()/T < 1.3) && (pBound[0].first.T()/T > 0.70)) 
-      phaseBound = &pBound;
+  phaseBound = &mPhaseBounds.back();
+  for (int i=1; i<mPhaseBounds.size(); ++i) {
+    if (T <= (mPhaseBounds[i])[0].first.T()) {
+      phaseBound = &mPhaseBounds[i-1];
+      break;
+    }
   }
-
+  
+  
   // Didn't find a phase boundary that was close enough, bite the bullet and 
   // calculate a new one 
-  if (!phaseBound) { 
+  if (!phaseBound) {
+    std::cerr << "Calculating new phase boundary." << std::endl;
     mPhaseBounds.push_back(FindFixedTPhaseBoundary(T)); 
     phaseBound = &mPhaseBounds.back(); 
   } 
+  
   if (phaseBound->size()<1) {
     std::cout << "# There are not two phases for this temperature \n";
     return mpEos->FromNAndT(eosIn); 
@@ -209,7 +261,7 @@ GibbsPhaseConstruct::FindPhaseRange(double T, bool doMun,
   } 
   if ((muStart-muEnd)/(muEnd + 1.e-4) < -0.02
       || (muStart-muEnd)/(muEnd + 1.e-4) > 0.02) 
-      iter_func(-deltaMu*1.e-1, true);
+      iter_func(-deltaMu*3.e-1, true);
   
   return phasePoints; 
 
