@@ -24,7 +24,7 @@ public:
   /// Initialize with an EoS that has a non-convex region
   GibbsPhaseConstruct(const EOSBase& eos);  
   
-  EOSData FromNAndT(const EOSData& eosIn);
+  virtual EOSData FromNAndT(const EOSData& eosIn);
   
   /// Get the critical temperature for this EoS.
   double GetCriticalT() const {return mTCrit;};

@@ -24,6 +24,8 @@
 class EOSSingleNucleus : public GibbsPhaseConstruct {
 public:
   EOSSingleNucleus(const EOSBase& eos) : GibbsPhaseConstruct(eos) {};
+  
+  EOSData FromNAndT(const EOSData& eosIn);
 
 protected:
 };

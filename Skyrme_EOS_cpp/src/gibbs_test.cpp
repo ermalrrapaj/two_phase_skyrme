@@ -8,6 +8,7 @@
 #include "EOSSkyrme.hpp" 
 #include "Constants.hpp"
 #include "GibbsPhaseConstruct.hpp"
+#include "EOSSingleNucleus.hpp"
 
 int main() {
   double HBC = Constants::HBCFmMeV;
