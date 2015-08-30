@@ -10,6 +10,7 @@
 #include <limits>
 #include <exception>
 #include <stdexcept>
+#include <vector> 
 
 #include "EOSData.hpp" 
 
@@ -105,9 +106,9 @@ EOSData EOSData::InputFromTNnMup(const double T, const double nn,
 
 EOSData EOSData::Output(const double T, const double nn, const double np, 
     const double mun, const double mup, const double pp, 
-    const double ss, const double ee ) {
+    const double ss, const double ee) {
   EOSData out;
-  
+   
   out.mT.first = T; 
   out.mT.second = true; 
   

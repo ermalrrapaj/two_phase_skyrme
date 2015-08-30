@@ -11,6 +11,7 @@
 
 #include <utility>
 #include <limits>
+#include <vector>
 ///
 /// Class for storing state data passed to or returned from equations of state.
 /// Performs various error checking to make sure that values being asked for are 
@@ -48,7 +49,11 @@ public:
       const double pp = std::numeric_limits<double>::quiet_NaN(), 
       const double ss = std::numeric_limits<double>::quiet_NaN(), 
       const double ee = std::numeric_limits<double>::quiet_NaN());
+
+  void SetPhases(std::vector<EOSData> phases) { mPhases = phases;} 
   
+  /// Get a vector of the subphases of this point
+  std::vector<EOSData> Phases() const {return mPhases;}  
   double T() const; ///< Return the temperature in [1/fm]
   double Ye() const; ///< Return the electron fraction 
   double Nb() const; ///< Return the baryon density [1/fm^3] 
@@ -61,6 +66,7 @@ public:
   double S() const; ///< Return the entropy per baryon 
 
 protected:
+  std::vector<EOSData> mPhases;
   std::pair<double, bool> mT, mNp, mNn;
   std::pair<double, bool> mP, mMun, mMup, mE, mS;
 

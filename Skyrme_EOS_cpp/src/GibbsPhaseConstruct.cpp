@@ -397,9 +397,12 @@ EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn,
         EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np())); 
   }
 
-  return EOSData::Output(T, eosIn.Np(), eosIn.Nn(), eHi.Mun(), eHi.Mup(), eHi.P(), 
+  EOSData out = EOSData::Output(T, eosIn.Np(), eosIn.Nn(), 
+      eHi.Mun(), eHi.Mup(), eHi.P(), 
       ((1.0 - pars[4])*eLo.S()*eLo.Nb() + pars[4]*eHi.S()*eHi.Nb())/eosIn.Nb(),
       ((1.0 - pars[4])*eLo.E()*eLo.Nb() + pars[4]*eHi.E()*eHi.Nb())/eosIn.Nb());
+  out.SetPhases({eLo, eHi});
+  return out;
 } 
  
 std::pair<EOSData, EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, 
