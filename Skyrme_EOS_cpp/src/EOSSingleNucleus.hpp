@@ -23,12 +23,20 @@
 ///
 class EOSSingleNucleus : public GibbsPhaseConstruct {
 public:
-  EOSSingleNucleus(const EOSBase& eos) : GibbsPhaseConstruct(eos) {};
+  EOSSingleNucleus(const EOSBase& eos) : GibbsPhaseConstruct(eos), mA0(56.0) {};
   
   EOSData FromNAndT(const EOSData& eosIn);
 
 protected:
+  std::vector<EOSData> EquilibriumConditions(const EOSData& eosIn, 
+      const EOSData& eosLo, const EOSData& eosHi); 
+
   std::vector<double> DSurf(double u);
+  
+  double GetNQ(double u, double nn, double T); 
+   
+  double mA0;
+
 };
 
 #endif // EOS_EOSSINGLENUCLEUS_HPP_
