@@ -15,6 +15,9 @@ INCDIR = include
 EXEDIR = exe
 INCLUDE += -I$(INCDIR) 
 
+# BOOST 
+LIBS += -lboost_system -lboost_serialization 
+
 # HDF5 libraries
 HDF5INCS=-I/usr/include
 HDF5LIBS=-L/usr/lib/x86_64-linux-gnu/ -lhdf5 -lhdf5_fortran -lhdf5 -lz -lhdf5_hl -lhdf5hl_fortran
@@ -39,12 +42,15 @@ OBJS_ := ${OBJS_:.cpp=.o}
 OBJS = $(patsubst %,$(OBJDIR)/%,$(OBJS_)) 
 SRCS = $(patsubst %,$(SRCDIR)/%,$(SRCS_)) 
  
-all: create_dirs skyrme gibbs_test
+all: create_dirs skyrme gibbs_test gibbs_archive
 
 skyrme: $(OBJS) $(OBJDIR)/skyrme_exe.o
 	$(CXX) $(INCLUDE) -o $(EXEDIR)/$@ $^ $(LIBS)
 
 gibbs_test: $(OBJS) $(OBJDIR)/gibbs_test.o
+	$(CXX) $(INCLUDE) -o $(EXEDIR)/$@ $^ $(LIBS)
+
+gibbs_archive: $(OBJS) $(OBJDIR)/gibbs_archive.o
 	$(CXX) $(INCLUDE) -o $(EXEDIR)/$@ $^ $(LIBS)
 
 create_dirs:
