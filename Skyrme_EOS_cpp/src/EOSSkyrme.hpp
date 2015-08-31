@@ -32,6 +32,12 @@ public:
     return std::unique_ptr<EOSBase>(new EOSSkyrme(*this));
   }  
    
+  friend class boost::serialization::access; 
+  template<class Archive> 
+  void serialize(Archive & ar, const unsigned int /* File Version */) {
+    ar & mA & mB & mC & mD & mF & mG & mDelta;
+  }
+   
 protected:
 
   EOSData BaseEOSCall(const double T, const double nn, const double np) const;
