@@ -16,12 +16,12 @@
 #include "MultiDimensionalRoot.hpp"
 #include "OneDimensionalRoot.hpp"
 
-GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos) : 
+GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos, bool findPhaseBound) : 
     mTMult(1.25),
     mpEos(eos.MakeUniquePtr()), 
-    mVerbose(true),
+    mVerbose(false),
     mTMin(0.1/Constants::HBCFmMeV) {
-  FindPhaseBoundary();
+  if (findPhaseBound) FindPhaseBoundary();
 }
 
 void GibbsPhaseConstruct::FindPhaseBoundary() {
@@ -30,9 +30,9 @@ void GibbsPhaseConstruct::FindPhaseBoundary() {
   double TFail = 0.0;
   double TMax = 50.0/Constants::HBCFmMeV;
   for (double lT = log10(mTMin); lT < log10(TMax); lT +=  log10(mTMult)) {
-    if (mVerbose) std::cerr << pow(10.0, lT)*Constants::HBCFmMeV << " ";
+    std::cerr << pow(10.0, lT)*Constants::HBCFmMeV << " ";
     auto phaseBound = FindFixedTPhaseBoundary(pow(10.0, lT));
-    if (mVerbose) std::cerr << phaseBound.size() << std::endl;
+    std::cerr << phaseBound.size() << std::endl;
     if (phaseBound.size()>10) {
       mPhaseBounds.push_back(phaseBound);
       mTCrit = 1.01 * pow(10.0, lT);
@@ -48,9 +48,9 @@ void GibbsPhaseConstruct::FindPhaseBoundary() {
   double Tmid = 0.0;
   for (int i=0; i<8; i++) {
     Tmid = 0.5*(Tlo + Thi); 
-    if (mVerbose) std::cerr << Tmid*Constants::HBCFmMeV << " ";
+    std::cerr << Tmid*Constants::HBCFmMeV << " ";
     auto phaseBound = FindFixedTPhaseBoundary(Tmid);
-    if (mVerbose) std::cerr << phaseBound.size() << std::endl;
+    std::cerr << phaseBound.size() << std::endl;
     if (phaseBound.size()>10) { 
       mPhaseBounds.push_back(phaseBound);
       Tlo = Tmid; 
@@ -60,7 +60,7 @@ void GibbsPhaseConstruct::FindPhaseBoundary() {
   }
   mTCrit = Tmid;
    
-  if (mVerbose) std::cerr << "Tcritical : " << mTCrit*Constants::HBCFmMeV 
+  std::cerr << "Tcritical : " << mTCrit*Constants::HBCFmMeV 
       << std::endl;
 
   // Sort the phase boundaries in terms of temperature 
@@ -80,7 +80,7 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
     throw std::logic_error("Trying to call the EoS below the minimum allowed T.");
    
   if (T > mTCrit) {
-    std::cout << "# We are above the critical temperature \n";
+    if (mVerbose) std::cout << "# We are above the critical temperature \n";
     return mpEos->FromNAndT(eosIn); 
   } 
     
@@ -103,7 +103,7 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
   } 
   
   if (phaseBound->size()<1) {
-    std::cout << "# There are not two phases for this temperature \n";
+    if (mVerbose) std::cout << "# There are not two phases for this temperature \n";
     return mpEos->FromNAndT(eosIn); 
   }
    
@@ -135,15 +135,15 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
   }  
 
   if (bracketNn.size() < 1) { 
-    std::cout << "# Next point found no bracketing proton fractions \n";
+    if (mVerbose) std::cout << "# Next point found no bracketing proton fractions \n";
     return mpEos->FromNAndT(eosIn); 
   }
 
   std::sort(bracketNn.begin(), bracketNn.end()); 
   
   if (eosIn.Nn() < bracketNn[0] || eosIn.Nn() > bracketNn.back()) {
-    std::cout << "# Next point outside of neutron brackets " << bracketNn[0]
-        << " " << bracketNn.back() << std::endl;
+    if (mVerbose) std::cout << "# Next point outside of neutron brackets " 
+        << bracketNn[0] << " " << bracketNn.back() << std::endl;
     return mpEos->FromNAndT(eosIn); 
   }
   
@@ -184,7 +184,7 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
       + (1.0 - del) * (*phaseBound)[lo].second.Np(); 
   double uu = del * u[up] + (1.0 - del) * u[lo]; 
   
-  std::cout << "# Next point is mixed phase \n";
+  if (mVerbose) std::cout << "# Next point is mixed phase \n";
   
   return GetState(eosIn, 
       EOSData::InputFromTNnNp(T, nnLo, npLo), 
@@ -365,8 +365,21 @@ EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn,
       EOSData::InputFromTNnNp(T, exp(pars[2]) + exp(pars[0]), 
       exp(pars[3])+exp(pars[1])));
   rootFinder = MultiDimensionalRoot(1.e-10, 200);
-  linear = false; 
-  PScale = std::max(1.e0*fabs(eHi.P()), 1.e-6);
+  linear = false;
+  
+  try { 
+    PScale = std::max(1.e0*fabs(eHi.P()), 1.e-6);
+  } catch(...) {
+    try { 
+      PScale = std::max(1.e0*fabs(eLo.P()), 1.e-6);
+    } catch(...) {
+      if (mVerbose) std::cerr << "Pressure problems encountered, giving up." 
+          << std::endl;
+      return mpEos->FromNAndT(
+          EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np())); 
+    }
+  }
+
   MunScale = fabs(eHi.Mup());
   MupScale = fabs(eHi.Mun());
   try {

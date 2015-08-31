@@ -16,13 +16,21 @@
 #include "EOSBase.hpp"
 #include "EOSData.hpp"
 
+#include <boost/archive/text_iarchive.hpp> 
+#include <boost/archive/text_oarchive.hpp> 
+
+#include <boost/serialization/base_object.hpp> 
+#include <boost/serialization/utility.hpp> 
+#include <boost/serialization/list.hpp> 
+#include <boost/serialization/assume_abstract.hpp> 
+
 ///
 /// Finds the Gibbs phase boundaries for a given EoS.
 ///
 class GibbsPhaseConstruct : public EOSBase {
 public:
   /// Initialize with an EoS that has a non-convex region
-  GibbsPhaseConstruct(const EOSBase& eos);  
+  GibbsPhaseConstruct(const EOSBase& eos, bool findPhaseBound=true);  
   
   virtual EOSData FromNAndT(const EOSData& eosIn);
   
@@ -58,6 +66,12 @@ public:
   std::vector<std::pair<EOSData, EOSData>> FindFixedTPhaseBoundary(double T,
       double NLoG=1.e-20, double NHiG=0.08, double deltaMu=0.03) const;
   
+  friend class boost::serialization::access; 
+  template<class Archive> 
+  void serialize(Archive & ar, const unsigned int /* File Version */) {
+    ar & mTMin & mTMult & mTCrit & mVerbose & mPhaseBounds;
+  }
+    
 protected:
   /// Solve the three Gibbs equilibrium equations and the constraint equations 
   /// for the neutron and proton density and return the mixed phase state
