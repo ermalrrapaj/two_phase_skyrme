@@ -12,6 +12,16 @@
 #include <utility>
 #include <limits>
 #include <vector>
+
+#include <boost/archive/text_iarchive.hpp> 
+#include <boost/archive/text_oarchive.hpp> 
+
+#include <boost/serialization/base_object.hpp> 
+#include <boost/serialization/utility.hpp> 
+#include <boost/serialization/list.hpp> 
+#include <boost/serialization/vector.hpp> 
+#include <boost/serialization/assume_abstract.hpp> 
+
 ///
 /// Class for storing state data passed to or returned from equations of state.
 /// Performs various error checking to make sure that values being asked for are 
@@ -52,6 +62,13 @@ public:
 
   void SetPhases(std::vector<EOSData> phases) { mPhases = phases;} 
   
+  /// 
+  friend class boost::serialization::access; 
+  template<class Archive> 
+  void serialize(Archive & ar, const unsigned int /* File Version */) {
+    ar & mT & mNp & mNn & mP & mMun & mMup & mE & mS & mPhases;
+  }
+   
   /// Get a vector of the subphases of this point
   std::vector<EOSData> Phases() const {return mPhases;}  
   double T() const; ///< Return the temperature in [1/fm]
