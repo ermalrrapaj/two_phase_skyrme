@@ -28,7 +28,7 @@ EOSData EOSSingleNucleus::FromNAndT(const EOSData& eosIn) {
       double h = 1.0; 
       double T = snState[1].T();
       double muh = GetNQ(u, snState[1].Nb(), T); 
-      double P = snState[1].P() + u*(1.0-u)*snState[1].Nb()/mA0*h*(muh + T);
+      double P = snState[0].P() + u*snState[1].Nb()/mA0*h*(T*(1-u) - u*muh);
       double S = u*snState[1].Nb()*snState[1].S() 
           + (1.0-u)*snState[0].Nb()*snState[0].S() 
           + u*(1.0-u)*snState[1].Nb()*h/mA0*(2.5 - muh/T);
@@ -80,16 +80,16 @@ std::vector<EOSData> EOSSingleNucleus::EquilibriumConditions(
          eHi.Mup() - eLo.Mup(),
          ((1.0 - u)*eLo.Np() + u*eHi.Np())/eosIn.Np() - 1.0,
          ((1.0 - u)*eLo.Nn() + u*eHi.Nn())/eosIn.Nn() - 1.0};
-
+    
     // Factor for approaching critical temperature  
     double h = 1.0;
     double hp = 0.0; // Derivative of h wrt T
       
     // Calculate velocity corrections
-    //double muh = GetNQ(u, eHi.Nb(), T); 
-    //f[0] += lamV*h*muh/mA0*u*eHi.Nb();  
-    //f[1] += lamV*h*muh/mA0*(1.0-u); 
-    //f[2] += lamV*h*muh/mA0*(1.0-u); 
+    double muh = GetNQ(u, eHi.Nb(), T); 
+    f[0] += lamV*h*muh/mA0*u*eHi.Nb();  
+    f[1] += lamV*h*muh/mA0*(1.0-u); 
+    f[2] += lamV*h*muh/mA0*(1.0-u); 
 
     // Calculate surface corrections
     
@@ -101,18 +101,18 @@ std::vector<EOSData> EOSSingleNucleus::EquilibriumConditions(
     return f;
   };
   
-  PScale = eosHi.P(); 
+  PScale = std::max(eosHi.P(), 1.e-6); 
   MunScale = fabs(eosHi.Mun()); 
   MupScale = fabs(eosHi.Mup()); 
   MultiDimensionalRoot rootFinder = MultiDimensionalRoot(1.e-10, 200);
   
   std::vector<double> pars = {log(eosLo.Nn()), log(eosLo.Np()),
-      log(eosHi.Nn())-log(eosLo.Nn()), log(eosHi.Np())-log(eosLo.Np()), 
+      log(eosHi.Nn() - eosLo.Nn()), log(eosHi.Np() - eosLo.Np()), 
       (eosIn.Np()-eosLo.Np())/(eosHi.Np() - eosLo.Np())};
        
   // Try to slowly increase the affect of surface terms 
   for (double llam = -5.0; llam <= 0.0; llam += 0.5) { 
-    lamV = 0.0; //pow(10.0, llam); 
+    lamV = pow(10.0, llam); 
     try {
       pars = rootFinder(equil_f, pars, 5);
     } catch (std::exception& e) {

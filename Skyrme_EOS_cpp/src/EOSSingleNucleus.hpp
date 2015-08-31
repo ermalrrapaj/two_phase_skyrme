@@ -23,7 +23,9 @@
 ///
 class EOSSingleNucleus : public GibbsPhaseConstruct {
 public:
-  EOSSingleNucleus(const EOSBase& eos) : GibbsPhaseConstruct(eos), mA0(56.0) {};
+  EOSSingleNucleus(const EOSBase& eos, bool createPhaseBound=true
+  ) : 
+      GibbsPhaseConstruct(eos, createPhaseBound), mA0(56.0) {};
   
   EOSData FromNAndT(const EOSData& eosIn);
 
