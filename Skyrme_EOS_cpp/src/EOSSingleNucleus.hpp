@@ -28,6 +28,7 @@ public:
   EOSData FromNAndT(const EOSData& eosIn);
 
 protected:
+  std::vector<double> DSurf(double u);
 };
 
 #endif // EOS_EOSSINGLENUCLEUS_HPP_
