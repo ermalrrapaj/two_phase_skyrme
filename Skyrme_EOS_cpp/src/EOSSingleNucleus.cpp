@@ -26,19 +26,28 @@ EOSData EOSSingleNucleus::FromNAndT(const EOSData& eosIn) {
   // The Gibbs phase boundary is not the same as the SN phase boundary
   // so try to work from higher and lower density to the phase boundary
   if (snState.size()<2) { 
-    for (double nb = eosIn.Nb()*100.0; nb > eosIn.Nb(); nb /= 1.1) {
-      EOSData tmpIn =  EOSData::InputFromTNbYe(eosIn.T(), nb, eosIn.Ye());
-      auto tmp = GibbsPhaseConstruct::FromNAndT(tmpIn).Phases();
+    for (double nb = eosIn.Nb()*1.0e1; nb > eosIn.Nb()*1.05; nb /= 1.05) {
+      EOSData tmpIn =  EOSData::InputFromTNbYe(eosIn.T(), 
+          std::max(nb, eosIn.Nb()), eosIn.Ye());
+      
+      std::vector<EOSData> tmp;
+      if (snState.size()<2) {  
+        tmp = GibbsPhaseConstruct::FromNAndT(tmpIn).Phases();
+        if (tmp.size()<2) break;
+      } else { 
+        tmp = snState;
+      }
+
+      tmp = EquilibriumConditions(tmpIn, tmp[0], tmp[1]);
       if (tmp.size()<2) break;
       //std::cout << "Searching down from higher density. " << std::to_string(eosIn.Nb()) << " " 
       //    << std::to_string(nb)  << std::endl; 
-      tmp = EquilibriumConditions(tmpIn, tmp[0], tmp[1]);
-      if (tmp.size()<2) break;
-      gibbsState = tmp;
+      snState = tmp;
       llam = 0.0;
+      
     }
-    if (gibbsState.size()>1)
-        snState = EquilibriumConditions(eosIn, gibbsState[0], gibbsState[1], llam);
+    if (snState.size()>1)
+        snState = EquilibriumConditions(eosIn, snState[0], snState[1], llam);
   }  
 
   if (snState.size()<2) {
@@ -57,8 +66,8 @@ EOSData EOSSingleNucleus::FromNAndT(const EOSData& eosIn) {
 
       tmp = EquilibriumConditions(tmpIn, tmp[0], tmp[1]);
       if (tmp.size()<2) break;
-      std::cout << "Searching up from lower density. " << std::to_string(eosIn.Nb()) << " " 
-          << std::to_string(nb)  << std::endl; 
+      //std::cout << "Searching up from lower density. " << std::to_string(eosIn.Nb()) << " " 
+      //    << std::to_string(nb)  << std::endl; 
       snState = tmp;
       llam = 0.0;
     }
@@ -69,13 +78,15 @@ EOSData EOSSingleNucleus::FromNAndT(const EOSData& eosIn) {
   if (snState.size()>1) {
     
     double u = (eosIn.Nn() - snState[0].Nn()) 
-        / (snState[1].Nn() - snState[0].Np());
+        / (snState[1].Nn() - snState[0].Nn());
     double T = snState[1].T();
     double muh = GetNQ(u, snState[1].Nb(), T); 
     
     std::array<double, 2> D = DSurf(u); 
     std::array<double, 2> sig = Sigma(snState[1].Ye()); 
     std::array<double, 3> h = HFunc(T, snState[1].Ye());
+    sig[1] = sig[0]*h[1] + sig[1]*h[0];
+    sig[0] = sig[0]*h[0];
     double beta = 4.5 * pow(8.0*Constants::Pi/15.0, 1.0/3.0)
       * pow(Constants::ElementaryCharge*snState[1].Np()*sig[0], 2.0/3.0);
     
@@ -83,20 +94,33 @@ EOSData EOSSingleNucleus::FromNAndT(const EOSData& eosIn) {
     P -= beta*u*(D[0] - D[1]);
      
     double S = u*snState[1].Nb()*snState[1].S() 
-        + (1.0-u)*snState[0].Nb()*snState[0].S() 
-        + u*(1.0-u)*snState[1].Nb()*h[0]/mA0*(2.5 - muh/T);
-
-    /// \todo Include h factor correction to Entropy 
-     
-    /// \todo Implement calculation of the internal energy 
-
+        + (1.0-u)*snState[0].Nb()*snState[0].S();
+        + u*(1.0-u)*snState[1].Nb()*h[0]/mA0*(5.0/2.0 - muh/T)
+        - (2*beta*u*D[0]/(3*h[0]) + u*(1.0-u)*snState[1].Nb()/mA0*(muh-T))*h[2]; 
+    
+    double F = (1.0-u)*snState[0].Nb()*(snState[0].E() - T*snState[0].S());
+    F += u*snState[1].Nb()*(snState[1].E() - T*snState[1].S());
+    F += beta*u*D[0];
+    F += u*(1.0-u)*snState[1].Nb()/mA0*h[0]*(muh-T);
+    
+    double E = F - T*S;
+    
+    EOSData bulk = mpEos->FromNAndT(eosIn); 
+    double Fbulk = (bulk.E()-T*bulk.S())*eosIn.Nb();
+    if ( Fbulk < F) {
+      std::cout << eosIn.Nb() << " ";
+      std::cout << F << " " << Fbulk << std::endl;
+      return bulk;
+    }
     EOSData out = EOSData::Output(T, eosIn.Nn(), eosIn.Np(), snState[0].Mun(),
-        snState[0].Mup(), P, S/eosIn.Nb(), 0.0);
+        snState[0].Mup(), P, S/eosIn.Nb(), E/eosIn.Nb());
     out.SetPhases(snState);
     return out;
   } else {
-    EOSData out = GibbsPhaseConstruct::FromNAndT(eosIn);
-    if (out.Phases().size()>1) std::cout << "Returning two phase gibbs" << std::endl;
+    //EOSData out = GibbsPhaseConstruct::FromNAndT(eosIn);
+    //if (out.Phases().size()>1) std::cout << "Returning two phase gibbs" << std::endl;
+    EOSData out = mpEos->FromNAndT(eosIn);
+    if (out.Phases().size()>1) std::cout << "Returning bulk Skyrme" << std::endl;
     return out;
   } 
 }
@@ -157,8 +181,8 @@ std::vector<EOSData> EOSSingleNucleus::EquilibriumConditions(
     
     f[0] += lamS*beta*(2.0*D[0]/3.0 - D[1]); 
     f[1] -= lamS*2.0*beta*D[0]*eHi.Ye()*sig[1]/(3.0*eHi.Nb()*sig[0]); 
-    f[2] -= lamS*2.0*beta*D[0]*(1.0-eHi.Ye())*sig[1]/(3.0*eHi.Nb()*sig[0]); 
-    f[2] -= lamS*2.0*beta*D[0]/(3.0*eHi.Np()); 
+    f[2] += lamS*2.0*beta*D[0]*(1.0-eHi.Ye())*sig[1]/(3.0*eHi.Nb()*sig[0]); 
+    f[2] += lamS*2.0*beta*D[0]/(3.0*eHi.Np()); 
        
     // Rescale the equations 
     f[0] = f[0]/PScale; 
@@ -202,22 +226,26 @@ std::vector<EOSData> EOSSingleNucleus::EquilibriumConditions(
 
 std::array<double, 2> EOSSingleNucleus::DSurf(double u) {
   
-  double a  = 1.0 - 1.5*pow(u, 1.0/3.0) + 0.5*u + 1.e-50;
-  double uda = -0.5*(u, 1.0/3.0) + 0.5*u;
-  double b = std::max(1.0 - 1.5*pow(1.0-u, 1.0/3.0) + 0.5*(1.0-u) + 1.e-50,0.0);
-  double mudb = 0.5*pow(1.0-u, 1.0/3.0) - 0.5*(1.0-u);
-  double denom = u*u + (1.0-u)*(1.0-u) + 0.6*u*u*pow(1.0-u, 2.0); 
+  double a  = 1.0 - 1.5*pow(u, 1.0/3.0) + 0.5*u;
+  double adu = -0.5*pow(u,-2.0/3.0) + 0.5; 
+  double b  = 1.0 - 1.5*pow(1.0-u, 1.0/3.0) + 0.5*(1.0-u);
+  double bdu = 0.5*pow(1.0-u,-2.0/3.0) - 0.5; 
+
+  double denom = u*u + (1.0-u)*(1.0-u) + 0.6*u*u*pow(1.0-u, 2); 
   double ddeno = 2.0*u - 2.0*(1.0 - u) + 1.2*u*pow(1.0-u, 2) - 1.2*u*u*(1.0-u);  
   
   // This is actually D/u 
   double D  = (1.0-u)*((1.0-u)*pow(a, 1.0/3.0) + u*pow(b, 1.0/3.0))/denom;
   
+  // This is D' 
   double Dp = (1.0-2.0*u)*((1.0-u)*pow(a, 1.0/3.0) + u*pow(b, 1.0/3.0))/denom; 
-  Dp +=(pow(1.0-u, 2)*pow(a, -2.0/3.0)/3.0*uda 
-      + u*u*pow(b, -2.0/3.0)/3.0*mudb)/denom;
-  Dp += u*(1.0-u)*(-pow(a, 1.0/3.0) + pow(b, 1.0/3.0))/denom;
-  Dp -= u*(1.0-u)*((1.0-u)*pow(a, 1.0/3.0) 
-      + u*pow(b, 1.0/3.0))/(denom*denom)*ddeno;
+  Dp -= u*D/denom*ddeno; 
+   
+  Dp += u*(1.0-u)/denom * (1.0-u)*pow(a, -2.0/3.0)/3.0 * adu; 
+  Dp += u*(1.0-u)/denom * pow(a, 1.0/3.0);
+ 
+  Dp += u*(1.0-u)/denom * u*pow(b, -2.0/3.0)/3.0 * bdu;
+  Dp += u*(1.0-u)/denom * pow(b, 1.0/3.0);
   
   return {D, Dp}; 
 
