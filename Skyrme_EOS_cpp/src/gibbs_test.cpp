@@ -15,19 +15,26 @@ int main() {
   double HBC = Constants::HBCFmMeV;
   
   EOSSkyrme eos;
+  EOSSingleNucleus eosSN(eos, false);
   GibbsPhaseConstruct gibbs(eos, false);
   
+  // Read in pre-calculated EoS data 
   std::ifstream ifs("eos_data.xml");
   boost::archive::text_iarchive ia(ifs); 
   ia >> gibbs;
   ifs.close();
   
-  for (double lye = -2.0; lye <= log10(0.5); lye += 0.1) { 
+  std::ifstream ifs2("eos_data.xml");
+  boost::archive::text_iarchive ib(ifs2); 
+  ib >> eosSN;
+  ifs2.close(); 
+   
+  for (double lye = log10(0.01); lye <= log10(0.5); lye += 5.0) { 
     double ye = pow(10.0, lye); 
     std::ofstream outFile; 
     outFile.open("State" + std::to_string(ye) + ".out"); 
     
-    for (double lT = log10(0.1); lT < log10(30.0); lT += 0.05) {
+    for (double lT = log10(1.0); lT < log10(1.1); lT += 0.05) {
       double T  = pow(10.0, lT)/HBC;
       for (double lnb = -8.0; lnb<0.5; lnb += 0.005) {  
         double nb = pow(10.0, lnb); 
@@ -37,8 +44,13 @@ int main() {
         EOSData stateBulk = 
             eos.FromNAndT(EOSData::InputFromTNbYe(T, nb, ye));
         
+        EOSData stateSN = 
+            eosSN.FromNAndT(EOSData::InputFromTNbYe(T, nb, ye));
+        
         outFile << nb << " " << T << " " << stateGibbs.P() << " " << stateBulk.P(); 
-        outFile << " " << stateGibbs.S() << " " << stateBulk.S() << std::endl;
+        outFile << " " << stateSN.P() ;
+        outFile << " " << stateGibbs.S() << " " << stateBulk.S() ;
+        outFile << " " << stateSN.S() << std::endl;
       }
       outFile << std::endl;
       outFile << T*HBC << " done \n";
