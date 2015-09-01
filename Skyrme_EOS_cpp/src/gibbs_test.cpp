@@ -29,14 +29,14 @@ int main() {
   ib >> eosSN;
   ifs2.close(); 
    
-  for (double lye = log10(0.01); lye <= log10(0.5); lye += 5.0) { 
+  for (double lye = log10(0.3); lye <= log10(0.5); lye += 5.0) { 
     double ye = pow(10.0, lye); 
     std::ofstream outFile; 
     outFile.open("State" + std::to_string(ye) + ".out"); 
     
-    for (double lT = log10(1.0); lT < log10(1.1); lT += 0.05) {
+    for (double lT = log10(3); lT < log10(11); lT += 1) {
       double T  = pow(10.0, lT)/HBC;
-      for (double lnb = -8.0; lnb<0.5; lnb += 0.005) {  
+      for (double lnb = -12.0; lnb<log10(0.15); lnb += 0.005) {  
         double nb = pow(10.0, lnb); 
         EOSData stateGibbs = 
             gibbs.FromNAndT(EOSData::InputFromTNbYe(T, nb, ye));
