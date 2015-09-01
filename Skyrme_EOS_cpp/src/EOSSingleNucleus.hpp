@@ -23,9 +23,11 @@
 ///
 class EOSSingleNucleus : public GibbsPhaseConstruct {
 public:
-  EOSSingleNucleus(const EOSBase& eos, bool createPhaseBound=true
-  ) : 
-      GibbsPhaseConstruct(eos, createPhaseBound), mA0(56.0) {};
+  EOSSingleNucleus(const EOSBase& eos, bool createPhaseBound = true) : 
+      GibbsPhaseConstruct(eos, createPhaseBound), 
+      mA0(56.0),
+      mSigma0(1.15/Constants::HBCFmMeV),
+      mSs0(45.8/Constants::HBCFmMeV) {};
   
   EOSData FromNAndT(const EOSData& eosIn);
 
@@ -33,11 +35,14 @@ protected:
   std::vector<EOSData> EquilibriumConditions(const EOSData& eosIn, 
       const EOSData& eosLo, const EOSData& eosHi); 
 
-  std::vector<double> DSurf(double u);
+  std::array<double, 2> DSurf(double u);
+  std::array<double, 2> Sigma(double xp);
   
   double GetNQ(double u, double nn, double T); 
    
   double mA0;
+  double mSigma0;
+  double mSs0; 
 
 };
 
