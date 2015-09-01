@@ -88,6 +88,9 @@ struct ConstantsStruct {
   
   static constexpr double NeutronMassInFm = 939.565379 / HBCFmMeV;
 
+  /// Elementary charge (unitless when hbar = c = 1)
+  static constexpr double ElementaryCharge = sqrt(1.4299764/HBCFmMeV);
+   
 };
 
 typedef ConstantsStruct Constants;
