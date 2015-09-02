@@ -76,22 +76,29 @@ EOSData EOSSingleNucleus::FromNAndT(const EOSData& eosIn) {
   }  
 
   if (snState.size()>1) {
-    
+    // Calculate the thermodynamic quantities for this mixed phase 
     double u = (eosIn.Nn() - snState[0].Nn()) 
         / (snState[1].Nn() - snState[0].Nn());
     double T = snState[1].T();
-    double muh = GetNQ(u, snState[1].Nb(), T); 
+    double muh = GetMuh(u, snState[1].Nb(), T); 
     
     std::array<double, 2> D = DSurf(u); 
     std::array<double, 2> sig = Sigma(snState[1].Ye()); 
     std::array<double, 3> h = HFunc(T, snState[1].Ye());
-    sig[1] = sig[0]*h[1] + sig[1]*h[0];
     sig[0] = sig[0]*h[0];
     double beta = 4.5 * pow(8.0*Constants::Pi/15.0, 1.0/3.0)
       * pow(Constants::ElementaryCharge*snState[1].Np()*sig[0], 2.0/3.0);
     
-    double P = snState[0].P() + u*snState[1].Nb()/mA0*h[0]*(T*(1-u) - u*muh);
+    // One way of calculating P  
+    double P = snState[0].P(); 
+    P += u*snState[1].Nb()/mA0*h[0]*(T*(1.0-u) - u*muh);
     P -= beta*u*(D[0] - D[1]);
+
+    // Second way of calculating P
+    //double P2 = snState[1].P(); 
+    //P2 += beta*((2.0/3.0 - u)*D[0] - D[1]*(1.0-u));
+    //P2 += u*(1.0-u)*snState[1].Nb()/mA0*h[0]*(muh + T);
+    //P = P2;
      
     double S = u*snState[1].Nb()*snState[1].S() 
         + (1.0-u)*snState[0].Nb()*snState[0].S();
@@ -110,8 +117,9 @@ EOSData EOSSingleNucleus::FromNAndT(const EOSData& eosIn) {
     if ( Fbulk < F) {
       std::cout << eosIn.Nb() << " ";
       std::cout << F << " " << Fbulk << std::endl;
-      return bulk;
+      //return bulk;
     }
+
     EOSData out = EOSData::Output(T, eosIn.Nn(), eosIn.Np(), snState[0].Mun(),
         snState[0].Mup(), P, S/eosIn.Nb(), E/eosIn.Nb());
     out.SetPhases(snState);
@@ -125,7 +133,7 @@ EOSData EOSSingleNucleus::FromNAndT(const EOSData& eosIn) {
   } 
 }
 
-double EOSSingleNucleus::GetNQ(double u, double nn, double T) {
+double EOSSingleNucleus::GetMuh(double u, double nn, double T) {
   double nQ = pow((Constants::NeutronMassInFm*T/(2.0*Constants::Pi)), 1.5);
   return T*log(u*(1.0-u)*nn/(nQ*pow(mA0, 2.5))); 
 }
@@ -166,22 +174,22 @@ std::vector<EOSData> EOSSingleNucleus::EquilibriumConditions(
     auto h = HFunc(T, eHi.Ye());
       
     // Calculate velocity corrections
-    double muh = GetNQ(u, eHi.Nb(), T); 
+    double muh = GetMuh(u, eHi.Nb(), T); 
     f[0] += lamV*h[0]*muh/mA0*u*eHi.Nb();  
     f[1] += lamV*(h[0]*muh - h[1]*eHi.Ye()*(muh-T))/mA0*(1.0-u); 
-    f[2] += lamV*(h[0]*muh - h[1]*(1.0-eHi.Ye())*(muh-T))/mA0*(1.0-u); 
+    f[2] += lamV*(h[0]*muh + h[1]*(1.0-eHi.Ye())*(muh-T))/mA0*(1.0-u); 
 
     // Calculate surface corrections
     std::array<double, 2> D = DSurf(u); 
     std::array<double, 2> sig = Sigma(eHi.Ye());
-    sig[1] = sig[0]*h[1] + sig[1]*h[0];
+    sig[1] = h[1]/h[0] + sig[1]; // sigma'/sigma
     sig[0] = sig[0]*h[0];
     double beta = 4.5 * pow(8.0*Constants::Pi/15.0, 1.0/3.0)
         * pow(Constants::ElementaryCharge*eHi.Np()*sig[0], 2.0/3.0);
     
-    f[0] += lamS*beta*(2.0*D[0]/3.0 - D[1]); 
-    f[1] -= lamS*2.0*beta*D[0]*eHi.Ye()*sig[1]/(3.0*eHi.Nb()*sig[0]); 
-    f[2] += lamS*2.0*beta*D[0]*(1.0-eHi.Ye())*sig[1]/(3.0*eHi.Nb()*sig[0]); 
+    f[0] += lamS*2.0*beta*(D[0]/3.0 - D[1]/2.0); 
+    f[1] -= lamS*2.0*beta*D[0]*sig[1]/(3.0*eHi.Nb())*eHi.Ye(); 
+    f[2] += lamS*2.0*beta*D[0]*sig[1]/(3.0*eHi.Nb())*(1.0-eHi.Ye()); 
     f[2] += lamS*2.0*beta*D[0]/(3.0*eHi.Np()); 
        
     // Rescale the equations 
@@ -242,7 +250,7 @@ std::array<double, 2> EOSSingleNucleus::DSurf(double u) {
   Dp -= u*D/denom*ddeno; 
    
   Dp += u*(1.0-u)/denom * (1.0-u)*pow(a, -2.0/3.0)/3.0 * adu; 
-  Dp += u*(1.0-u)/denom * pow(a, 1.0/3.0);
+  Dp -= u*(1.0-u)/denom * pow(a, 1.0/3.0);
  
   Dp += u*(1.0-u)/denom * u*pow(b, -2.0/3.0)/3.0 * bdu;
   Dp += u*(1.0-u)/denom * pow(b, 1.0/3.0);
@@ -259,15 +267,16 @@ std::array<double, 3> EOSSingleNucleus::HFunc(double T, double xp) {
   if (T>Tc) return {0.0, 0.0};
   double t = 1.0 - T*T/(Tc*Tc);
   return {t*t, 4.0*t*T*T/pow(Tc, 3)*dTc, 4.0*t*T/(Tc*Tc)};
+  //return {1.0, 0.0, 0.0};
 }
 
 std::array<double, 2> EOSSingleNucleus::Sigma(double xp) {
-  /// \todo Include h factor from L&S
   double r0 = pow(3.0/(4.0*Constants::Pi*0.155), 1.0/3.0); 
   double q = 384.0*Constants::Pi*r0*r0*mSigma0/mSs0 - 16.0; 
   double denom = q + pow(xp, -3.0) + pow(1.0 - xp, -3.0);
-  double sig = mSigma0*(16.0 + q) / denom; 
-  double sigp = sig / denom * (-3.0*pow(xp, -4.0) + 3.0*pow(1.0-xp, -4.0));
+  double sig = mSigma0*(16.0 + q) / denom;
+  // sigp is sig'/sig to prevent divide by zeros
+  double sigp = -(-3.0*pow(xp, -4.0) + 3.0*pow(1.0-xp, -4.0)) / denom;
   return {sig, sigp};
 }
 

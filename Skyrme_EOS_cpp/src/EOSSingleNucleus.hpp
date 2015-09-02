@@ -40,7 +40,7 @@ protected:
   std::array<double, 2> Sigma(double xp);
   std::array<double, 3> HFunc(double T, double xp);
   
-  double GetNQ(double u, double nn, double T); 
+  double GetMuh(double u, double nn, double T); 
    
   double mA0;
   double mSigma0;
