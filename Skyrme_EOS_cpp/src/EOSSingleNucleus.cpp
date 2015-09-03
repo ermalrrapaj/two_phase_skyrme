@@ -170,7 +170,6 @@ std::vector<EOSData> EOSSingleNucleus::EquilibriumConditions(
          ((1.0 - u)*eLo.Nn() + u*eHi.Nn())/eosIn.Nn() - 1.0};
     
     // Factor for approaching critical temperature  
-    /// \todo Implement actual critical T factor
     auto h = HFunc(T, eHi.Ye());
       
     // Calculate velocity corrections
