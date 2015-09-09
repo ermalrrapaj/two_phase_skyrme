@@ -57,6 +57,20 @@ public:
     return mData[GetIdx(idxs)];
   } 
   
+  T& operator[](std::size_t idx) {
+    if (idx >= mNTot) 
+      throw std::length_error("Index out of allocated memory region.");
+    return mData[idx];
+  }     
+  
+  T operator[](std::size_t idx) const {
+    if (idx >= mNTot) 
+      throw std::length_error("Index out of allocated memory region.");
+    return mData[idx];
+  }    
+   
+  std::size_t size() const { return mNTot; }
+    
   void WriteToH5(const H5::CommonFG& group, const std::string& dsetName) const {
     H5::DataType h5DType = GetH5DataType<T>(); 
     H5::DataSpace h5DSpace(Nd, mN.data()); 
