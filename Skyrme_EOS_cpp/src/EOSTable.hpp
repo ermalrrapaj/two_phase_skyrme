@@ -26,6 +26,8 @@ public:
   EOSTable(const EOSBase& eos, double TMin, double TMax, double nbMin, 
       double nbMax, double yeMin, double yeMax, 
       std::size_t nT, std::size_t nNb, std::size_t nYe); 
+  
+  void WriteToH5(const H5::CommonFG& group) const;
    
 protected:
   void BuildTable(); 

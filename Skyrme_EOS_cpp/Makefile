@@ -20,7 +20,7 @@ LIBS += -lboost_system -lboost_serialization
 
 # HDF5 libraries
 HDF5INCS=-I/usr/include
-HDF5LIBS=-L/usr/lib/x86_64-linux-gnu/ -lhdf5 -lhdf5_fortran -lhdf5 -lz -lhdf5_hl -lhdf5hl_fortran
+HDF5LIBS=-L/usr/lib/x86_64-linux-gnu/ -lhdf5 -lhdf5_fortran -lhdf5 -lz -lhdf5_hl -lhdf5hl_fortran -lhdf5_hl_cpp -lhdf5_cpp
 INCLUDE += $(HDF5INCS)  
 LIBS += $(HDF5LIBS)
 

@@ -71,11 +71,16 @@ public:
    
   std::size_t size() const { return mNTot; }
     
-  void WriteToH5(const H5::CommonFG& group, const std::string& dsetName) const {
-    H5::DataType h5DType = GetH5DataType<T>(); 
-    H5::DataSpace h5DSpace(Nd, mN.data()); 
-    auto dset = group.createDataSet(dsetName.c_str(), h5DType, h5DSpace);
-    dset.write(mData, h5DType); 
+  std::shared_ptr<H5::DataSet> 
+  WriteToH5(const H5::CommonFG& group, const std::string& dsetName) const {
+    H5::DataType h5DType = GetH5DataType<T>();
+    hsize_t dims[Nd]; 
+    for (int i=0; i<Nd; ++i) dims[i] = mN[i]; 
+    H5::DataSpace h5DSpace(Nd, dims); 
+    std::shared_ptr<H5::DataSet> dset = std::make_shared<H5::DataSet>( 
+        group.createDataSet(dsetName.c_str(), h5DType, h5DSpace));
+    dset->write(mData, h5DType); 
+    return dset;
   }
 
 protected:
