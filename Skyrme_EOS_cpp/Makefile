@@ -32,7 +32,7 @@ UTILS:=
 UTILS:=$(addprefix $(UTILDIR)/,$(UTILS)) 
 
 EOSDIR=./
-EOSSRCS:= funct_fermi1.f90 EOSData.cpp EOSSkyrme.cpp GibbsPhaseConstruct.cpp EOSSingleNucleus.cpp
+EOSSRCS:= funct_fermi1.f90 EOSData.cpp EOSSkyrme.cpp GibbsPhaseConstruct.cpp EOSSingleNucleus.cpp EOSTable.cpp
 EOSSRCS:=$(addprefix $(EOSDIR)/,$(EOSSRCS)) 
 
 SRCS_ := $(EOSSRCS) $(UTILS) 
