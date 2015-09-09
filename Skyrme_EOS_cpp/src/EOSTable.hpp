@@ -30,8 +30,9 @@ public:
 protected:
   void BuildTable(); 
   std::unique_ptr<EOSBase> mpEos;
-  std::vector<double> mT, mNb, mYe; 
+  NDArray<double, 1> mT, mNb, mYe; 
   NDArray<double, 3> mP, mS, mE;
+
 };
 
 #endif // EOS_EOSTABLE_HPP_
