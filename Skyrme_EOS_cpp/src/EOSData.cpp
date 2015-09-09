@@ -40,12 +40,44 @@ EOSData EOSData::InputFromTNnNp(const double T, const double nn,
   return out; 
 }
 
+EOSData EOSData::InputFromSNnNp(const double S, const double nn, 
+    const double np) {
+  EOSData out;
+  
+  out.mS.first = S; 
+  out.mS.second = true; 
+  
+  out.mNn.first = nn; 
+  out.mNn.second = true; 
+
+  out.mNp.first = np; 
+  out.mNp.second = true; 
+
+  return out; 
+}
+
 EOSData EOSData::InputFromTNbYe(const double T, const double nb, 
     const double ye) {
   EOSData out;
   
   out.mT.first = T; 
   out.mT.second = true; 
+ 
+  out.mNn.first = nb * (1.0 - ye); 
+  out.mNn.second = true; 
+
+  out.mNp.first = nb * ye; 
+  out.mNp.second = true; 
+
+  return out; 
+} 
+
+EOSData EOSData::InputFromSNbYe(const double S, const double nb, 
+    const double ye) {
+  EOSData out;
+  
+  out.mS.first = S; 
+  out.mS.second = true; 
  
   out.mNn.first = nb * (1.0 - ye); 
   out.mNn.second = true; 

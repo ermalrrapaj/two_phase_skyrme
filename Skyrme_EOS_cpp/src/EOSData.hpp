@@ -41,6 +41,12 @@ public:
   /// Create EOSData object from temperature, baryon density, and Ye.
   static EOSData InputFromTNbYe(const double T, const double nb, const double ye);
   
+  /// Create EOSData object from entropy and densities.
+  static EOSData InputFromSNnNp(const double S, const double nn, const double np);
+  
+  /// Create EOSData object from entropy, baryon density, and Ye.
+  static EOSData InputFromSNbYe(const double S, const double nb, const double ye);
+  
   /// Create EOSData object from temperature and chemical potentials.
   static EOSData InputFromTMunMup(const double T, const double mun, const double mup);
   

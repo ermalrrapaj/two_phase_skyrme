@@ -11,8 +11,10 @@
 
 #include <memory>
 #include <vector> 
+#include <iostream> 
  
 #include "EOSData.hpp" 
+#include "OneDimensionalRoot.hpp"
 
 /// Abstract base class for equations of state -
 /// Provides a number of virtual functions for finding the state of the material
@@ -33,6 +35,23 @@ public:
   /// has been set using the baryon number density and the electron fraction.
   virtual EOSData FromNAndT(const EOSData& eosIn) =0; 
   
+  virtual EOSData FromNAndS(const EOSData& eosIn) { 
+    OneDimensionalRoot rootFinder(1.e-12, 100); 
+    try {
+      auto func = [this, &eosIn](double T)->double{
+        return FromNAndT(
+            EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np())).S()
+            / eosIn.S() - 1.0;
+      };
+
+      double T = rootFinder(func, this->GetMinimumT(), this->GetMaximumT());
+      return FromNAndT( 
+          EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np()));
+    } catch(...) {
+      return EOSData();
+    } 
+  }
+   
   /// Get the state of the material from the temperature, neutron chemical 
   /// potential, and proton density.  This is guaranteed to be single 
   /// valued.
@@ -45,7 +64,13 @@ public:
   
   /// Return a unique pointer to a copy of the current object. 
   virtual std::unique_ptr<EOSBase> MakeUniquePtr() const =0; 
-
+  
+  /// Get the minimum temperature allowed by the EoS
+  virtual double GetMinimumT() const =0;
+   
+  /// Get the maximum temperature allowed by the EoS
+  virtual double GetMaximumT() const =0;
+   
 protected:
 private: 
 };

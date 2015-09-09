@@ -10,6 +10,7 @@
 #define EOS_EOSSKYRME_HPP_
 
 #include "EOSBase.hpp" 
+#include "Constants.hpp"
 
 ///
 /// Implements a uniform matter, Skyrme type EOS for with arbitrary parameters.
@@ -31,7 +32,10 @@ public:
   std::unique_ptr<EOSBase> MakeUniquePtr() const {
     return std::unique_ptr<EOSBase>(new EOSSkyrme(*this));
   }  
-   
+  
+  double GetMinimumT() const { return 0.001/Constants::HBCFmMeV; }  
+  double GetMaximumT() const { return 200.0/Constants::HBCFmMeV; }
+    
   friend class boost::serialization::access; 
   template<class Archive> 
   void serialize(Archive & ar, const unsigned int /* File Version */) {
