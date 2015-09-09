@@ -34,9 +34,10 @@ int main() {
     std::ofstream outFile; 
     outFile.open("State" + std::to_string(ye) + ".out"); 
     
-    for (double lT = log10(3); lT < log10(11); lT += 1) {
+    for (double lT = log10(0.1); lT < log10(30); lT += 0.25) {
       double T  = pow(10.0, lT)/HBC;
-      for (double lnb = -12.0; lnb<log10(0.15); lnb += 0.005) {  
+      std::cout << "Point : " << ye << " " << T << std::endl;
+      for (double lnb = -6.0; lnb<log10(0.15); lnb += 0.005) {  
         double nb = pow(10.0, lnb); 
         EOSData stateGibbs = 
             gibbs.FromNAndT(EOSData::InputFromTNbYe(T, nb, ye));
@@ -47,10 +48,16 @@ int main() {
         EOSData stateSN = 
             eosSN.FromNAndT(EOSData::InputFromTNbYe(T, nb, ye));
         
+        double u = 1.0; 
+        if (stateSN.Phases().size()>1) {
+          u = (nb - stateSN.Phases()[0].Nb()) 
+              / (stateSN.Phases()[1].Nb() - stateSN.Phases()[0].Nb());
+        }
+        
         outFile << nb << " " << T << " " << stateGibbs.P() << " " << stateBulk.P(); 
         outFile << " " << stateSN.P() ;
         outFile << " " << stateGibbs.S() << " " << stateBulk.S() ;
-        outFile << " " << stateSN.S() << std::endl;
+        outFile << " " << stateSN.S() << " " << u << std::endl;
       }
       outFile << std::endl;
       outFile << T*HBC << " done \n";
