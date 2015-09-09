@@ -21,8 +21,8 @@ LIBS += -lboost_system -lboost_serialization
 # HDF5 libraries
 HDF5INCS=-I/usr/include
 HDF5LIBS=-L/usr/lib/x86_64-linux-gnu/ -lhdf5 -lhdf5_fortran -lhdf5 -lz -lhdf5_hl -lhdf5hl_fortran
-#INCLUDE += $(HDF5INCS)  
-#LIBS += $(HDF5LIBS)
+INCLUDE += $(HDF5INCS)  
+LIBS += $(HDF5LIBS)
 
 LIBS += -lgsl -lgslcblas -lm 
 
@@ -32,7 +32,7 @@ UTILS:=
 UTILS:=$(addprefix $(UTILDIR)/,$(UTILS)) 
 
 EOSDIR=./
-EOSSRCS:= funct_fermi1.f90 EOSData.cpp EOSSkyrme.cpp GibbsPhaseConstruct.cpp EOSSingleNucleus.cpp EOSTable.cpp
+EOSSRCS:= funct_fermi1.f90 EOSData.cpp EOSSkyrme.cpp GibbsPhaseConstruct.cpp EOSSingleNucleus.cpp EOSTable.cpp 
 EOSSRCS:=$(addprefix $(EOSDIR)/,$(EOSSRCS)) 
 
 SRCS_ := $(EOSSRCS) $(UTILS) 
@@ -42,12 +42,15 @@ OBJS_ := ${OBJS_:.cpp=.o}
 OBJS = $(patsubst %,$(OBJDIR)/%,$(OBJS_)) 
 SRCS = $(patsubst %,$(SRCDIR)/%,$(SRCS_)) 
  
-all: create_dirs skyrme gibbs_test gibbs_archive
+all: create_dirs skyrme gibbs_test gibbs_archive table_test
 
 skyrme: $(OBJS) $(OBJDIR)/skyrme_exe.o
 	$(CXX) $(INCLUDE) -o $(EXEDIR)/$@ $^ $(LIBS)
 
 gibbs_test: $(OBJS) $(OBJDIR)/gibbs_test.o
+	$(CXX) $(INCLUDE) -o $(EXEDIR)/$@ $^ $(LIBS)
+
+table_test: $(OBJS) $(OBJDIR)/table_test.o
 	$(CXX) $(INCLUDE) -o $(EXEDIR)/$@ $^ $(LIBS)
 
 gibbs_archive: $(OBJS) $(OBJDIR)/gibbs_archive.o

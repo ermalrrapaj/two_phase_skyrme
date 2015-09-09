@@ -8,7 +8,7 @@
 
 #include "EOSTable.hpp"
 
-//using namespace {
+//namespace {
 //
 //template<class T> 
 //H5::DataType GetH5DataType() {
@@ -31,13 +31,20 @@
 //  }
 //}
 //
+//template<class T> 
+//void WriteData(const H5::CommonFG& group, const std::string& groupName) {
+//  H5::DataType h5DType = GetH5DataType<T>();
+//  H5::DataSpace 
+//  auto group.createDataSet(groupName.c_str(), h5DType,  
+//}
 //}
 
 EOSTable::EOSTable(const EOSBase& eos, double TMin, double TMax, double nbMin, 
-    double nbMax, double yeMin, double yeMax, int nT, int nNb, int nYe) : 
-    mP(ThreeDArray<double>(nT, nNb, nYe)), 
-    mS(ThreeDArray<double>(nT, nNb, nYe)), 
-    mE(ThreeDArray<double>(nT, nNb, nYe)),
+    double nbMax, double yeMin, double yeMax, 
+    std::size_t nT, std::size_t nNb, std::size_t nYe) : 
+    mP(NDArray<double, 3>({nT, nNb, nYe})), 
+    mS(NDArray<double, 3>({nT, nNb, nYe})), 
+    mE(NDArray<double, 3>({nT, nNb, nYe})),
     mpEos(eos.MakeUniquePtr()) {
   
   mT = std::vector<double>(nT);
@@ -61,17 +68,21 @@ EOSTable::EOSTable(const EOSBase& eos, double TMin, double TMax, double nbMin,
   BuildTable();
 }
 
+//void EOSTable::WriteToH5(const H5::HLocation& h5Loc){ 
+//  
+//}
+
 void EOSTable::BuildTable() { 
-  for (int i=0; i<mT.size(); ++i) {
-    for (int k=0; k<mYe.size(); ++k) {
-      for (int j=0; j<mNb.size(); ++j) {
+  for (std::size_t i=0; i<mT.size(); ++i) {
+    for (std::size_t k=0; k<mYe.size(); ++k) {
+      for (std::size_t j=0; j<mNb.size(); ++j) {
         double T = mT[i];
         double nb = mNb[j];
         double ye = mYe[k]; 
         EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNbYe(T, nb, ye));
-        mP(i, j, k) = eosOut.P();
-        mS(i, j, k) = eosOut.S();
-        mE(i, j, k) = eosOut.E();
+        mP({i, j, k}) = eosOut.P();
+        mS({i, j, k}) = eosOut.S();
+        mE({i, j, k}) = eosOut.E();
       }
     }
   }
