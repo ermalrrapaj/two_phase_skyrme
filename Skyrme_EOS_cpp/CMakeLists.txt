@@ -12,6 +12,7 @@ endif()
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 
 project(EOSBuilder CXX C Fortran)
+set(CMAKE_EXPORT_COMPILE_COMMANDS "ON")
 
 # enable warnings
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
