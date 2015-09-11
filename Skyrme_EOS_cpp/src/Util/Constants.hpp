@@ -50,24 +50,24 @@ struct ConstantsStruct {
       * ReducedPlanckConstantInMeVSec * ReducedPlanckConstantInMeVSec
       * SpeedOfLightInCmPerSec * SpeedOfLightInCmPerSec);
 
-  /// 2 pi hbar^2 c^2 N_A^{2/3}
-#if defined(__ICC) || defined(__INTEL_COMPILER)
-  // we cannot use pow with the Intel compiler, it's a bug:
-  // https://software.intel.com/en-us/forums/topic/484936
-  static constexpr double TwoPiHbar2C2NA23 = TwoPiHbar2C2 * 7.13127680E15;
-
-#else
-  static constexpr double TwoPiHbar2C2NA23 = TwoPiHbar2C2
-      * pow(AvogadroConstantInPerGram, 2.0 / 3.0);
-#endif
+//  /// 2 pi hbar^2 c^2 N_A^{2/3}
+//#if defined(__ICC) || defined(__INTEL_COMPILER)
+//  // we cannot use pow with the Intel compiler, it's a bug:
+//  // https://software.intel.com/en-us/forums/topic/484936
+//  static constexpr double TwoPiHbar2C2NA23 = TwoPiHbar2C2 * 7.13127680E15;
+//
+//#else
+//  static constexpr double TwoPiHbar2C2NA23 = TwoPiHbar2C2
+//      * pow(AvogadroConstantInPerGram, 2.0 / 3.0);
+//#endif
 
   /// k_B / (2 pi hbar^2 c^2)
   static constexpr double BoltzmannConstantDivBy2PiHbar2C2InPerMeVPerGKPerCm2 =
       BoltzmannConstantInMeVPerGK / TwoPiHbar2C2;
 
   /// k_B / (2 pi hbar^2 c^2 N_A^{2/3})
-  static constexpr double InverseRateFactor = BoltzmannConstantInMeVPerGK
-      / TwoPiHbar2C2NA23;
+  //static constexpr double InverseRateFactor = BoltzmannConstantInMeVPerGK
+  //    / TwoPiHbar2C2NA23;
 
   /// m_p http://physics.nist.gov/cgi-bin/cuu/Value?mpc2mev
   static constexpr double ProtonMassInMeV = 938.272046;
@@ -87,9 +87,9 @@ struct ConstantsStruct {
   static constexpr double NeutronMassInMeV = 939.565379;
   
   static constexpr double NeutronMassInFm = 939.565379 / HBCFmMeV;
-
+ 
   /// Elementary charge (unitless when hbar = c = 1)
-  static constexpr double ElementaryCharge = sqrt(1.4299764/HBCFmMeV);
+  static constexpr double ElementaryChargeSquared = 1.4299764/HBCFmMeV;
    
 };
 

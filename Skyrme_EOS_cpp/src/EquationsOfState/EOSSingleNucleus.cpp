@@ -86,8 +86,9 @@ EOSData EOSSingleNucleus::FromNAndT(const EOSData& eosIn) {
     std::array<double, 2> sig = Sigma(snState[1].Ye()); 
     std::array<double, 3> h = HFunc(T, snState[1].Ye());
     sig[0] = sig[0]*h[0];
-    double beta = 4.5 * pow(8.0*Constants::Pi/15.0, 1.0/3.0)
-      * pow(Constants::ElementaryCharge*snState[1].Np()*sig[0], 2.0/3.0);
+    double beta = 4.5 * pow(8.0*Constants::Pi/15.0 
+        *Constants::ElementaryChargeSquared , 1.0/3.0)
+        * pow(snState[1].Np()*sig[0], 2.0/3.0);
     
     // One way of calculating P  
     double P = snState[0].P(); 
@@ -101,7 +102,7 @@ EOSData EOSSingleNucleus::FromNAndT(const EOSData& eosIn) {
     //P = P2;
      
     double S = u*snState[1].Nb()*snState[1].S() 
-        + (1.0-u)*snState[0].Nb()*snState[0].S();
+        + (1.0-u)*snState[0].Nb()*snState[0].S()
         + u*(1.0-u)*snState[1].Nb()*h[0]/mA0*(5.0/2.0 - muh/T)
         - (2*beta*u*D[0]/(3*h[0]) + u*(1.0-u)*snState[1].Nb()/mA0*(muh-T))*h[2]; 
     
@@ -183,8 +184,9 @@ std::vector<EOSData> EOSSingleNucleus::EquilibriumConditions(
     std::array<double, 2> sig = Sigma(eHi.Ye());
     sig[1] = h[1]/h[0] + sig[1]; // sigma'/sigma
     sig[0] = sig[0]*h[0];
-    double beta = 4.5 * pow(8.0*Constants::Pi/15.0, 1.0/3.0)
-        * pow(Constants::ElementaryCharge*eHi.Np()*sig[0], 2.0/3.0);
+    double beta = 4.5 * pow(8.0*Constants::Pi/15.0
+        * Constants::ElementaryChargeSquared, 1.0/3.0)
+        * pow(eHi.Np()*sig[0], 2.0/3.0);
     
     f[0] += lamS*2.0*beta*(D[0]/3.0 - D[1]/2.0); 
     f[1] -= lamS*2.0*beta*D[0]*sig[1]/(3.0*eHi.Nb())*eHi.Ye(); 
