@@ -35,7 +35,7 @@ int main() {
   << state4.Mun()*HBC << " " << state4.Mup()*HBC << " " 
   << state4.P()*HBC << " " << std::endl;
   
-  const double tol = 1.e-2; // We seem to only get about 1% agreement
+  double tol = 1.e-2; // We seem to only get about 1% agreement
   if (fabs(state4.E()/state2.E() - 1.0)>tol) return 1;
   if (fabs(state4.S()/state2.S() - 1.0)>tol) return 1;
   if (fabs(state4.P()/state2.P() - 1.0)>tol) return 1;
@@ -47,10 +47,14 @@ int main() {
   EOSData reverse = eos2.FromNnMupAndT(
       EOSData::InputFromTNnMup(forward.T(), forward.Nn(), forward.Mup()));
   std::cout << "Mu test : " << reverse.Np() << " " << forward.Np() << std::endl;
+  tol = 1.e-6;
   if (fabs(reverse.Np()/forward.Np() - 1.0) > tol) return 1;
   
   // Check that we can succesfully find an entropy 
-   
+  forward = eos2.FromNAndT(eosIn); 
+  reverse = eos2.FromNAndS(
+      EOSData::InputFromSNnNp(forward.S(), forward.Nn(), forward.Np()));
+  if (fabs(reverse.T()/forward.T() - 1.0) > tol) return 1;
   return 0;
 }
 
