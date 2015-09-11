@@ -1,6 +1,7 @@
 #include <iostream> 
 #include <math.h> 
 #include <vector>
+#include <stdio.h> 
 
 #include "EquationsOfState/EOSData.hpp" 
 #include "EquationsOfState/EOSSkyrme.hpp" 
@@ -17,10 +18,13 @@ int main() {
   auto eosDat = eos.FromNAndS(EOSData::InputFromSNbYe(1.0, 1.e-3, 0.4)); 
   std::cout << eosDat.S() << " " << eosDat.T() * Constants::HBCFmMeV << std::endl;
   
-  H5::H5File h5File("file.h5", H5F_ACC_TRUNC);
+  H5::H5File h5File("temporary_file.h5", H5F_ACC_TRUNC);
      
   tab.WriteToH5(h5File); 
+  h5File.close(); 
 
+  if (remove("temporary_file.h5") != 0) return 1;
+  std::cout << "Everything worked" << std::endl;
   return 0;
 }
 

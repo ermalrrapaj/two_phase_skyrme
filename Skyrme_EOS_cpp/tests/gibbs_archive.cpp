@@ -16,7 +16,6 @@ int main() {
   double HBC = Constants::HBCFmMeV;
   
   EOSSkyrme eos = EOSSkyrme::FromErmalSkyrme(ErmalSkyrmeParameters::Ska35S2009);
-  //EOSSkyrme eos;
   EOSSingleNucleus gibbs(eos);
   std::ofstream ofs("eos_data.xml"); 
   boost::archive::text_oarchive oa(ofs); 
