@@ -49,7 +49,7 @@ SRCS = $(patsubst %,$(SRCDIR)/%,$(SRCS_))
  
 all: create_dirs skyrme gibbs_test gibbs_archive table_test gibbs_boundary
 
-skyrme: $(OBJS) $(OBJDIR)/skyrme_exe.o
+skyrme: $(OBJS) $(OBJDIR)/skyrme_test.o
 	$(CXX) $(INCLUDE) -o $(EXEDIR)/$@ $^ $(LIBS)
 
 gibbs_test: $(OBJS) $(OBJDIR)/gibbs_test.o
@@ -83,6 +83,10 @@ $(OBJDIR)/$(notdir %.o): $(SRCDIR)/%.c
 	@$(CC) -c $(CFLAGS) $(INCLUDE) -o $@ $< $(LIBS)
 
 $(OBJDIR)/$(notdir %.o): $(SRCDIR)/%.cpp
+	@echo Compiling $< to $(OBJDIR)/$(notdir $@) 
+	@$(CXX) -c $(CPPFLAGS) $(INCLUDE) -o $@ $< $(LIBS)
+
+$(OBJDIR)/$(notdir %.o): tests/%.cpp
 	@echo Compiling $< to $(OBJDIR)/$(notdir $@) 
 	@$(CXX) -c $(CPPFLAGS) $(INCLUDE) -o $@ $< $(LIBS)
 

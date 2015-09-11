@@ -64,7 +64,7 @@ macro(add_EOSBuilder_library library sources)
 endmacro()
 
 add_subdirectory(src)
-# dd_subdirectory(tests)
+add_subdirectory(tests)
 # add_subdirectory(examples)
 
 # make CMake config file
