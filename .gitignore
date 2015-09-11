@@ -24,4 +24,5 @@ exe
 *.toc
 doc
 install
-build 
+build
+
