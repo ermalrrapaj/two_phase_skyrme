@@ -19,7 +19,7 @@
 GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos, bool findPhaseBound) : 
     mTMult(1.25),
     mpEos(eos.MakeUniquePtr()), 
-    mVerbose(false),
+    mVerbose(true),
     mTMin(0.1/Constants::HBCFmMeV) {
   if (findPhaseBound) FindPhaseBoundary();
 }
@@ -74,7 +74,8 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
   double T = eosIn.T(); 
   double nb = eosIn.Nb();
   double np = eosIn.Np();
-
+  //std::cout<<"Tcrit = "<<mTCrit<<std::endl;
+  //std::cout<<"T = "<<T<<std::endl;
   // Check that we are within the temperature bounds. 
   if (T < mTMin) 
     throw std::logic_error("Trying to call the EoS below the minimum allowed T.");
@@ -86,12 +87,17 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
     
   // Check if a close by temperature phase boundary has been calculated 
   std::vector<std::pair<EOSData, EOSData>> *phaseBound = NULL;
-  phaseBound = &mPhaseBounds.back();
-  for (int i=1; i<mPhaseBounds.size(); ++i) {
-    if (T <= (mPhaseBounds[i])[0].first.T()) {
-      phaseBound = &mPhaseBounds[i-1];
-      break;
-    }
+  if (mPhaseBounds.size()>0)
+  {
+	phaseBound = &mPhaseBounds.back();
+	for (int i=1; i<mPhaseBounds.size(); ++i) 
+	{
+		if (T <= (mPhaseBounds[i])[0].first.T())
+		{
+			phaseBound = &mPhaseBounds[i-1];
+			break;
+		}
+	}
   }
   
   // Didn't find a phase boundary that was close enough, bite the bullet and 
@@ -156,7 +162,7 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
     double uC = (nb - p.first.Nb())/(p.second.Nb() - p.first.Nb());
     double npC = (1.0 - uC)*p.first.Np() + uC*p.second.Np(); 
     u.push_back(uC);
-    npArr.push_back((1.0 - uC)*p.first.Np() + uC*p.second.Np()); 
+    npArr.push_back(npC); 
   }
 
   // Find the bracketing points
@@ -225,7 +231,7 @@ GibbsPhaseConstruct::FindPhaseRange(double T, bool doMun,
         continue;
       }
       if (doMun && outDat.first.Np()*1.e-3 < outDat.first.Nn()) 
-        phasePoints.push_back(outDat);
+        phasePoints.push_back(outDat); 
       if (!doMun && outDat.first.Nn()*1.e-3 < outDat.first.Np()) 
         phasePoints.push_back(outDat);
       
@@ -465,7 +471,8 @@ std::pair<EOSData, EOSData> GibbsPhaseConstruct::FindPhasePoint(double T,
   initial = true;
   std::vector<double> logN = rootFinder(root_f, 
       {log(NLoG), log(NHiG-NLoG)}, 2); 
-
+ //std::cout<<"lo, hi = "<< NLoG <<", "<< NHiG <<std::endl;
+ //std::cout<<"lo, hi = "<< exp(logN[0]) <<", "<< exp(logN[0])+exp(logN[1]) <<std::endl;
   // Now get to high precision with non-linear scaled version of equations
   initial = false;
   EOSData eosLo = (mpEos.get()->*eosCall)(eosDat(T, exp(logN[0]), mu)); 

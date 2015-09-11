@@ -50,7 +50,7 @@ public:
   
   /// Create EOSData object from temperature, neutron number density, and proton 
   /// chemical potential.
-  static EOSData InputFromTNnMup(const double T, const double nn, const double mun);
+  static EOSData InputFromTNnMup(const double T, const double nn, const double mup);
   
   /// Create EOSData object with most fields initialized.  Intended for output 
   /// from EOSBase calls.
@@ -60,7 +60,9 @@ public:
       const double ss = std::numeric_limits<double>::quiet_NaN(), 
       const double ee = std::numeric_limits<double>::quiet_NaN());
 
-  void SetPhases(std::vector<EOSData> phases) { mPhases = phases;} 
+  void SetPhases(std::vector<EOSData> phases) { mPhases = phases;}
+  
+  void SetT(double T) {mT=std::pair<double, bool>(T,true);} 
   
   /// 
   friend class boost::serialization::access; 

@@ -72,7 +72,7 @@ public:
     ar & mTMin & mTMult & mTCrit & mVerbose & mPhaseBounds;
   }
     
-protected:
+//protected:
   /// Solve the three Gibbs equilibrium equations and the constraint equations 
   /// for the neutron and proton density and return the mixed phase state
   EOSData GetState(const EOSData& eosIn, const EOSData& lo, const EOSData& hi, 
