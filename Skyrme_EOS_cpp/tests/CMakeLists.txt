@@ -1,4 +1,5 @@
 add_executable(skyrme_test skyrme_test.cpp) 
+add_test(skyrme skyrme_test)
 target_link_libraries(skyrme_test eos ${EOSBUILDER_EXTERNAL_LIBS} )
 
 add_executable(gibbs_archive gibbs_archive.cpp) 
