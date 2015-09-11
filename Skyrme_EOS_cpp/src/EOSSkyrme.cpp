@@ -96,7 +96,7 @@ EOSData EOSSkyrme::FromNAndT(const EOSData& eosIn) {
   return BaseEOSCall(eosIn.T(), eosIn.Nn(), eosIn.Np()); 
 } 
 
-EOSSkyrme EOSSkyrme:: FromErmalSkyrme(std::vector<double>& param) {
+EOSSkyrme EOSSkyrme::FromErmalSkyrme(const std::array<const double, 7>& param) {
 	double a= param[0], b = param[1], t0 = param[2], x0 = param[3];
 	double t3=param[4], x3=param[5], alpha = param[6];
     double A, B, C, D, F, G, delta;
@@ -113,7 +113,7 @@ EOSSkyrme EOSSkyrme:: FromErmalSkyrme(std::vector<double>& param) {
 	return out;
 }
 
-EOSSkyrme EOSSkyrme:: FromSaturation(std::vector<double>& param){
+EOSSkyrme EOSSkyrme::FromSaturation(const std::array<const double, 7>& param){
 	double rho_s = param[0], BE = param[1], MsoM = param[2], KM = param[3];
 	double S = param[4], L = param[5], KS = param[6]; 
   double A, B, C, D, F, G, a, b, c, d, f, g, delta;

@@ -9,14 +9,15 @@
 #include "EOSSkyrme.hpp" 
 #include "Constants.hpp"
 #include "GibbsPhaseConstruct.hpp"
+#include "SkyrmeParameters.hpp"    
 
 int main() {
   double HBC = Constants::HBCFmMeV;
   
   //EOSSkyrme eos;
-	std::vector<double> Ska35S2009{-172.485, 172.087, -1767.71, 0.282732, 
-      12899.2, 0.413266, 0.35};
-  EOSSkyrme eos = EOSSkyrme::FromErmalSkyrme(Ska35S2009);
+	//std::vector<double> Ska35S2009{-172.485, 172.087, -1767.71, 0.282732, 
+  //    12899.2, 0.413266, 0.35};
+  EOSSkyrme eos = EOSSkyrme::FromErmalSkyrme(ErmalSkyrmeParameters::Ska35S2009);
   GibbsPhaseConstruct gibbs(eos, false);
   
   std::ofstream outFile; 
