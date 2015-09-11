@@ -42,12 +42,15 @@ OBJS_ := ${OBJS_:.cpp=.o}
 OBJS = $(patsubst %,$(OBJDIR)/%,$(OBJS_)) 
 SRCS = $(patsubst %,$(SRCDIR)/%,$(SRCS_)) 
  
-all: create_dirs skyrme gibbs_test gibbs_archive table_test
+all: create_dirs skyrme gibbs_test gibbs_archive table_test gibbs_boundary
 
 skyrme: $(OBJS) $(OBJDIR)/skyrme_exe.o
 	$(CXX) $(INCLUDE) -o $(EXEDIR)/$@ $^ $(LIBS)
 
 gibbs_test: $(OBJS) $(OBJDIR)/gibbs_test.o
+	$(CXX) $(INCLUDE) -o $(EXEDIR)/$@ $^ $(LIBS)
+
+gibbs_boundary: $(OBJS) $(OBJDIR)/gibbs_boundary.o
 	$(CXX) $(INCLUDE) -o $(EXEDIR)/$@ $^ $(LIBS)
 
 table_test: $(OBJS) $(OBJDIR)/table_test.o
