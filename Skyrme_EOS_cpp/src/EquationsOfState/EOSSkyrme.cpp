@@ -9,10 +9,10 @@
 #include <vector>
 #include <math.h>
 
-#include "EOSSkyrme.hpp" 
-#include "OneDimensionalRoot.hpp"
-#include "MultiDimensionalRoot.hpp"
-#include "Constants.hpp" 
+#include "EquationsOfState/EOSSkyrme.hpp" 
+#include "Util/OneDimensionalRoot.hpp"
+#include "Util/MultiDimensionalRoot.hpp"
+#include "Util/Constants.hpp" 
 
 static double HBC = Constants::HBCFmMeV; 
 static double MNUC = 938.918/HBC;

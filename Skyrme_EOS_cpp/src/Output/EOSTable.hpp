@@ -14,8 +14,8 @@
 #include <utility> 
 #include <H5Cpp.h> 
 
-#include "EOSBase.hpp"
-#include "NDArray.hpp"
+#include "EquationsOfState/EOSBase.hpp"
+#include "Util/NDArray.hpp"
 
 ///
 /// Create an EOSTable from a specified EOS object

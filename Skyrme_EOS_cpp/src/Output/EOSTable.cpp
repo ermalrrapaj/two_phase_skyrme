@@ -6,7 +6,7 @@
 ///
 ///
 
-#include "EOSTable.hpp"
+#include "Output/EOSTable.hpp"
 
 EOSTable::EOSTable(const EOSBase& eos, double TMin, double TMax, double nbMin, 
     double nbMax, double yeMin, double yeMax, 

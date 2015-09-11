@@ -5,11 +5,11 @@
 #include <utility>
 #include <algorithm> 
 
-#include "EOSData.hpp" 
-#include "EOSSkyrme.hpp" 
-#include "Constants.hpp"
-#include "GibbsPhaseConstruct.hpp"
-#include "SkyrmeParameters.hpp"    
+#include "Util/Constants.hpp"
+#include "EquationsOfState/EOSData.hpp" 
+#include "EquationsOfState/EOSSkyrme.hpp" 
+#include "EquationsOfState/GibbsPhaseConstruct.hpp"
+#include "EquationsOfState/SkyrmeParameters.hpp"    
 
 int main() {
   double HBC = Constants::HBCFmMeV;

@@ -13,8 +13,8 @@
 #include <vector> 
 #include <iostream> 
  
-#include "EOSData.hpp" 
-#include "OneDimensionalRoot.hpp"
+#include "EquationsOfState/EOSData.hpp" 
+#include "Util/OneDimensionalRoot.hpp"
 
 /// Abstract base class for equations of state -
 /// Provides a number of virtual functions for finding the state of the material

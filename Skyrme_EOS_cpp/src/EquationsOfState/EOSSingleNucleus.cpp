@@ -11,10 +11,10 @@
 #include <algorithm> 
 #include <iterator> 
 
-#include "Constants.hpp"
-#include "EOSSingleNucleus.hpp"
-#include "MultiDimensionalRoot.hpp"
-#include "OneDimensionalRoot.hpp" 
+#include "EquationsOfState/EOSSingleNucleus.hpp"
+#include "Util/Constants.hpp"
+#include "Util/MultiDimensionalRoot.hpp"
+#include "Util/OneDimensionalRoot.hpp" 
 
 EOSData EOSSingleNucleus::FromNAndT(const EOSData& eosIn) {
   double llam = -5.0; 

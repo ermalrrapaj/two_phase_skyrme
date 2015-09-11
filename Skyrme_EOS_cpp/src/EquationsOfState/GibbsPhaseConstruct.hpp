@@ -13,9 +13,9 @@
 #include <vector> 
 #include <utility> 
 
-#include "EOSBase.hpp"
-#include "EOSData.hpp"
-#include "Constants.hpp" 
+#include "EquationsOfState/EOSBase.hpp"
+#include "EquationsOfState/EOSData.hpp"
+#include "Util/Constants.hpp" 
 
 #include <boost/archive/text_iarchive.hpp> 
 #include <boost/archive/text_oarchive.hpp> 

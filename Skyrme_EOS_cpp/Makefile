@@ -14,6 +14,7 @@ LIBDIR = lib
 INCDIR = include
 EXEDIR = exe
 INCLUDE += -I$(INCDIR) 
+INCLUDE += -I$(SRCDIR)
 
 # BOOST 
 LIBS += -lboost_system -lboost_serialization 
@@ -27,15 +28,19 @@ LIBS += $(HDF5LIBS)
 LIBS += -lgsl -lgslcblas -lm 
 
 # Source files
-UTILDIR=./
-UTILS:= 
+UTILDIR=Util
+UTILS:= funct_fermi1.f90 
 UTILS:=$(addprefix $(UTILDIR)/,$(UTILS)) 
 
-EOSDIR=./
-EOSSRCS:= funct_fermi1.f90 EOSData.cpp EOSSkyrme.cpp GibbsPhaseConstruct.cpp EOSSingleNucleus.cpp EOSTable.cpp 
+EOSDIR=EquationsOfState
+EOSSRCS:= EOSData.cpp EOSSkyrme.cpp GibbsPhaseConstruct.cpp EOSSingleNucleus.cpp
 EOSSRCS:=$(addprefix $(EOSDIR)/,$(EOSSRCS)) 
 
-SRCS_ := $(EOSSRCS) $(UTILS) 
+OUTDIR=Output
+OUTSRCS:= EOSTable.cpp 
+OUTSRCS:=$(addprefix $(OUTDIR)/,$(OUTSRCS)) 
+
+SRCS_ := $(EOSSRCS) $(UTILS) $(OUTSRCS) 
 OBJS_ := ${SRCS_:.F90=.o}
 OBJS_ := ${OBJS_:.f90=.o}
 OBJS_ := ${OBJS_:.cpp=.o}
@@ -67,6 +72,7 @@ create_dirs:
 	@ if test ! -d $(OBJDIR)/$(NRDIR); then mkdir $(OBJDIR)/$(NRDIR); fi
 	@ if test ! -d $(OBJDIR)/$(EOSDIR); then mkdir $(OBJDIR)/$(EOSDIR); fi
 	@ if test ! -d $(OBJDIR)/$(UTILDIR); then mkdir $(OBJDIR)/$(UTILDIR); fi
+	@ if test ! -d $(OBJDIR)/$(OUTDIR); then mkdir $(OBJDIR)/$(OUTDIR); fi
 
 clean:
 	find $(OBJDIR) -name \*.[o,a] -delete	

@@ -13,9 +13,9 @@
 #include <vector> 
 #include <utility> 
 
-#include "EOSBase.hpp"
-#include "EOSData.hpp"
-#include "GibbsPhaseConstruct.hpp"
+#include "EquationsOfState/EOSBase.hpp"
+#include "EquationsOfState/EOSData.hpp"
+#include "EquationsOfState/GibbsPhaseConstruct.hpp"
 
 ///
 /// Calculate a two-phase EOS within the single nucleus 

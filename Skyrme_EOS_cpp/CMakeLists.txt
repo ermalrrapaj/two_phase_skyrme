@@ -57,6 +57,12 @@ include("CMakeLists_Requirements.txt")
 # add the source directory to the include list
 include_directories(src)
 
+macro(add_EOSBuilder_library library sources)
+  add_library(${library} OBJECT ${sources})
+  set(EOSBUILDER_LIBS "${EOSBUILDER_LIBS};$<TARGET_OBJECTS:${library}>" PARENT_SCOPE)
+  add_dependencies(${library} src)
+endmacro()
+
 add_subdirectory(src)
 # dd_subdirectory(tests)
 # add_subdirectory(examples)

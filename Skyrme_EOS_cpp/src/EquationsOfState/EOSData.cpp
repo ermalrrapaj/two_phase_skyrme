@@ -12,7 +12,7 @@
 #include <stdexcept>
 #include <vector> 
 
-#include "EOSData.hpp" 
+#include "EquationsOfState/EOSData.hpp" 
 
 EOSData::EOSData() : 
     mT(std::pair<double, bool>(0.0, false)), 

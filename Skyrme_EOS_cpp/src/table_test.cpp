@@ -2,10 +2,10 @@
 #include <math.h> 
 #include <vector>
 
-#include "EOSData.hpp" 
-#include "EOSSkyrme.hpp" 
-#include "EOSTable.hpp"
-#include "Constants.hpp"
+#include "EquationsOfState/EOSData.hpp" 
+#include "EquationsOfState/EOSSkyrme.hpp" 
+#include "Output/EOSTable.hpp"
+#include "Util/Constants.hpp"
 
 #include <H5Cpp.h> 
  

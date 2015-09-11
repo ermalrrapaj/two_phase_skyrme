@@ -11,10 +11,10 @@
 #include <algorithm> 
 #include <iterator> 
 
-#include "Constants.hpp"
-#include "GibbsPhaseConstruct.hpp" 
-#include "MultiDimensionalRoot.hpp"
-#include "OneDimensionalRoot.hpp"
+#include "EquationsOfState/GibbsPhaseConstruct.hpp" 
+#include "Util/Constants.hpp"
+#include "Util/MultiDimensionalRoot.hpp"
+#include "Util/OneDimensionalRoot.hpp"
 
 GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos, bool findPhaseBound) : 
     mTMult(1.25),

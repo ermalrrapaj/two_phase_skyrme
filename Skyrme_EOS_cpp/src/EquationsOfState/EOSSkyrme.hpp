@@ -9,8 +9,8 @@
 #ifndef EOS_EOSSKYRME_HPP_
 #define EOS_EOSSKYRME_HPP_
 
-#include "EOSBase.hpp" 
-#include "Constants.hpp"
+#include "EquationsOfState/EOSBase.hpp" 
+#include "Util/Constants.hpp"
 
 ///
 /// Implements a uniform matter, Skyrme type EOS for with arbitrary parameters.
