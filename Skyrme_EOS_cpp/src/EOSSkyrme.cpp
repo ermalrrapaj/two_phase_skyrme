@@ -65,13 +65,13 @@ std::vector<EOSData> EOSSkyrme::FromMuAndT(const EOSData& eosIn) const {
 EOSData EOSSkyrme::FromNpMunAndT(const EOSData& eosIn) const {
   
   auto root_func = [&eosIn, this](double logNn)->double {  
-      EOSData out = BaseEOSCall(eosIn.T(), exp(logNn), eosIn.Np()); 
+      EOSData out = BaseEOSCall(eosIn.T(), exp(logNn), eosIn.Np());
       return (out.Mun() - eosIn.Mun()) / (eosIn.Mun() + 1.e-10);
   }; 
   
   OneDimensionalRoot rootFinder(1.e-12);
   double nn_lo = log(1.e-120);
-  double nn_hi = log(1.e5);
+  double nn_hi = log(0.95/(fabs(mF + mG) + 1.e-5));
   double logNn = rootFinder(root_func, nn_lo, nn_hi);
   
   return BaseEOSCall(eosIn.T(), exp(logNn), eosIn.Np());  
@@ -86,7 +86,7 @@ EOSData EOSSkyrme::FromNnMupAndT(const EOSData& eosIn) const {
   
   OneDimensionalRoot rootFinder(1.e-12);
   double nn_lo = log(1.e-120);
-  double nn_hi = log(1.e5);
+  double nn_hi = log(0.95/(fabs(mF + mG) + 1.e-5));
   double logNp = rootFinder(root_func, nn_lo, nn_hi);
   
   return BaseEOSCall(eosIn.T(), eosIn.Nn(), exp(logNp));  
