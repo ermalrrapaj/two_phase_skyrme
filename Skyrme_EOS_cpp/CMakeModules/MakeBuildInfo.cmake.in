@@ -1,0 +1,57 @@
+set(BUILD_INFO_SRC_DIR "@CMAKE_CURRENT_SOURCE_DIR@")
+set(BUILD_INFO_BIN_DIR "@CMAKE_CURRENT_BINARY_DIR@")
+set(BUILD_INFO_GIT_ROOT "@CMAKE_GIT_ROOT@")
+set(SKYNET_ROOT "@SKYNET_ROOT@")
+
+# get current time and date (which are time and date of the build)
+execute_process(
+  COMMAND date "+%F at %I:%M:%S %p" 
+  OUTPUT_VARIABLE CMAKE_BUILD_DATE_TIME
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# get the Git hash of HEAD
+execute_process(
+  COMMAND git rev-parse --verify HEAD
+  WORKING_DIRECTORY ${BUILD_INFO_GIT_ROOT}
+  OUTPUT_VARIABLE CMAKE_GIT_HASH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# now check whether the Git source directory is clean
+
+# check for local unstaged changes
+execute_process(
+  COMMAND git diff --exit-code
+  WORKING_DIRECTORY ${BUILD_INFO_GIT_ROOT}
+  RESULT_VARIABLE CMAKE_GIT_UNSTAGED
+  OUTPUT_QUIET
+)
+
+# check for uncommitted changes
+execute_process(
+  COMMAND git diff --cached --exit-code
+  WORKING_DIRECTORY ${BUILD_INFO_GIT_ROOT}
+  RESULT_VARIABLE CMAKE_GIT_UNCOMMITTED
+  OUTPUT_QUIET
+)
+
+# check for untracked files
+execute_process(
+  COMMAND git ls-files --other --exclude-standard --directory
+  WORKING_DIRECTORY ${BUILD_INFO_GIT_ROOT}
+  OUTPUT_VARIABLE CMAKE_GIT_UNTRACKED
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+set(CMAKE_GIT_CLEAN "false")
+
+if((${CMAKE_GIT_UNSTAGED} EQUAL 0) AND (${CMAKE_GIT_UNCOMMITTED} EQUAL 0)
+   AND ("${CMAKE_GIT_UNTRACKED}" STREQUAL ""))
+  set(CMAKE_GIT_CLEAN "true")
+endif()
+
+configure_file(
+  ${BUILD_INFO_SRC_DIR}/BuildInfo.cpp.in 
+  ${BUILD_INFO_BIN_DIR}/BuildInfo.cpp @ONLY
+)

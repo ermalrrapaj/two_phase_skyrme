@@ -23,3 +23,5 @@ exe
 *.log
 *.toc
 doc
+install
+build 
