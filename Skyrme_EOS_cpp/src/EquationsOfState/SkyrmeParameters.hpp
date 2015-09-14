@@ -22,6 +22,9 @@ namespace ErmalSkyrmeParameters {
 	static constexpr std::array<const double, 7> SKT11{{25.175, -12.2601, -1815.65, 0.24924, 12984.8, 0.217553, 1.0/3.0}};
 	static constexpr std::array<const double, 7> SKT21{{-28.3961, 16.7196, -1822.27, 0.258133, 13155.8, 0.24668, 1.0/3.0}};
 	static constexpr std::array<const double, 7> SKT31{{4.51143, 0.0220502, -1816.13, 0.256993, 13025.9, 0.247513, 1.0/3.0}};
+	
+	static constexpr std::array< std::array<const double, 7>, 5> ErmalAllSkyrme09 = {Ska35S2009,Ska25S2009,SKT109,SKT209,SKT309}, 
+	                                            ErmalAllSkyrme1 = {Ska35S201,Ska25S201,SKT11,SKT21,SKT31};
 }
 
 namespace SaturationSkyrmeParameters {	
@@ -36,6 +39,9 @@ namespace SaturationSkyrmeParameters {
 	static constexpr std::array<const double, 7> SKT11{{0.158519, -16.065, 0.987809, 237.264, 32.5327, 51.5294, -160.419}};
 	static constexpr std::array<const double, 7> SKT21{{0.158706, -16.0573, 1.0113, 236.173, 32.3098, 50.4438, -160.611}};
 	static constexpr std::array<const double, 7> SKT31{{0.158687, -16.049, 0.995682, 236.752, 31.9537, 48.8985, -163.314}};
+	
+	static constexpr std::array< std::array<const double, 7>, 5> SaturationSkyrme09 = {Ska35S2009,Ska25S2009,SKT109,SKT209,SKT309}, 
+	                                            SaturationSkyrme1 = {Ska35S201,Ska25S201,SKT11,SKT21,SKT31};
 }
 
 #endif // EOS_SKYRMEPARAMETERS_HPP_
