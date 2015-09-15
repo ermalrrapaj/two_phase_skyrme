@@ -133,15 +133,51 @@ v_i + \frac{\partial V_o}{\partial \mathcal{N}_i} = 0, \,\, \,\,
 \end{eqnarray*}
 and results in the system of equations 
 \begin{eqnarray}
+\label{eq:dFdN}
 &&\frac{\partial F}{\partial \mathcal{N}_i} = v_i f_{B,i} + F_{FS,i} 
 + \mu_{K,i} + E_{0,i} - Z_i \mu_{p,o} - N_i \mu_{n,o} + v_i P_o  = 0 \\
+\label{eq:dFdv}
 &&\frac{\partial F}{\partial v_i} = \mathcal{N}_i 
-\left(- P_{B,i} - P_{FS,i} + P_{B,o} \right) = 0 \\ 
+\left(- P_{B,i} - P_{FS,i} + P_{o} \right) = 0 \\ 
 &&\sum Z_i n_i + \left(1-\sum v_i n_i \right) n_{p,o} = n_p = n_e \\
 &&\sum N_i n_i + \left(1-\sum v_i n_i \right) n_{n,o} = n_n,
 \end{eqnarray}
-where we have defined $\mu_{K,i} = T \ln (A_i^{-3/2} n_i/n_Q)$.
+where we have defined $\mu_{K,i} = T \ln (A_i^{-3/2} n_i/n_Q)$, 
+$P_{B,i} = -\partial (v_i f_{B,i}) / \partial v_i$, and 
+$P_{FS,i} = -\partial (F_{S,i}) / \partial v_i$.
+
+
 \subsection{Connection to NSE} 
+These constraint equations bear a strong resemblance to the standard NSE 
+equations.  This can be seen by recasting equation \ref{eq:dFdN} to 
+\begin{equation*}
+n_i = A_i^{3/2} n_Q \exp(Z_i \mu_{p,o} + N_i \mu_{n,o} - \tilde B_i - v_i P_o),
+\end{equation*}
+where 
+\begin{equation*}
+\tilde B_i(v_i, n_{p,o}, n_{n,o}, T) = 
+-v_i f_{B,i} - F_{FS,i} - E_{0,i}.
+\end{equation*}
+We can also see that equation \ref{eq:dFdv} is independent of $\mathcal{N}_i$ 
+when $n_i$ is non-zero.  This allows us to express the nuclear volume as a 
+function of only the properties of the external medium, $v_i = v_i(n_{p,o},
+n_{n,o}, T)$, so that $\tilde B_i = \tilde B_i(n_{p,o}, n_{n,o}, T)$ is just 
+an external density dependent binding energy for species $i$.  For some choices 
+of the properties of the external medium, the pressure equilibrium conditions 
+cannot be met for any volume.  This just implies that $n_i$ must be zero, which 
+also provides a solution to equation \ref{eq:dFdv}.  When solutions are admitted, 
+the expression for the number density of species $i$ can be further massaged to look like standard NSE by expressing the thermal average 
+of the excitation energy above the ground state as 
+\begin{equation*}
+\langle E^* \rangle = T \frac{d \ln G}{d \ln T},
+\end{equation*} 
+where $G(T)$ is the internal partition function of the gas and $E^*$ is the 
+excitation energy above the zero temperature ground state.  To get the 
+internal partition function outside the exponential as would be the case in 
+NSE, we must make the identification $ G_i = \exp(d \ln G/ d\ln T)$.  
+\todo{This probably should reduce to something like a fermi gas model for the 
+level density.  Check if this is in fact the case.}
+
 When the outside densities are low, $P_o$ is negligible and the second
 constraint equation results in \begin{equation*}
 P_{B,i} + P_{FS,i} = 0.
@@ -149,22 +185,13 @@ P_{B,i} + P_{FS,i} = 0.
 As long as the finite size term is not strongly affected by the exterior medium
 (which is expected at low densities), this equation only depends on $v_i$.
 Therefore, it just determines the volume of nucleus $i$ in vacuum, and thereby
-its total energy and entropy.  The first constraint equation then results in
-\begin{equation*}
-n_i = A_i^{3/2} n_Q \exp(Z_i \mu_{p,o} + N_i \mu_{n,o} - v_i P_o - B_i),
-\end{equation*}
-where $B_i = -v_i f_{B,i} - F_{FS,i} - E_{0,i}$.  This is almost the same form
-as we would recover for standard NSE with excluded volume corrections, but at
-first glance there appears to be no contribution from the internal partition
-function.  This is of course not the case, since $B_i$ is temperature dependent
-and contains information about the internal excitation as well as the ground
-state energy.  Combined with the proton and neutron density constraint
-equations, this results in the standard NSE system that is used by Hempel, for
-instance.  
+its total energy and entropy.  Combined with the proton and neutron density 
+constraint equations, this results in the excluded volume NSE equations employed 
+by Hempel, for instance.  Further assuming that $\sum v_i n_i$ and $v_i P_o$ are 
+negligible, which is a very good approximation at low density, results in the
+standard equations for low density NSE.
 
-\todo{Work out what the internal partition function is in more detail}
-
-\subsection{Reduction to Gibbs Phase Equilibrium}
+\subsection{Connection to Gibbs Phase Equilibrium}
 The Gibbs phase construction assumes there are no surface effects and that the
 phase bubbles are stationary.  Employing these two approximations forces us to
 set $E_{FS,i}$ and $\mu_{K,i}$ to zero (or assume they are negligible).  Our
@@ -172,7 +199,8 @@ constraint equations are then \begin{eqnarray*}
 n_i P_{B,i} = n_i P_o \\ 
 v_i f_{B,i} + E_{0,i} =  Z_i \mu_{p,o} + N_i \mu_{n,o} - v_i P_o.
 \end{eqnarray*}
-The relation $P_B = n_p \mu_p + n_n \mu_n - f_B$ can then be employed to recast
+The relation $P_B = n_p \mu_p + n_n \mu_n - f_B$ (which holds for 
+homogeneous matter) can then be employed to recast
 the constraints as \begin{eqnarray*}
 n_i P_{B,i} = n_i P_o \\ 
 Z_i \left(\mu_{p,i} - \mu_{p,o}\right) + N_i \left(\mu_{n,i} - \mu_{n,o}\right) = 0\\
@@ -180,7 +208,11 @@ Z_i \left(\mu_{p,i} - \mu_{p,o}\right) + N_i \left(\mu_{n,i} - \mu_{n,o}\right) 
 These equations are either satisfied by nucleus $i$ when it's density is zero or
 when it satisfies the Gibbs phase equilibrium conditions.  Since there is no
 difference between different nuclei with the same $Y_p$ because there is are no
-finite size effects, this will just look like a two phase construction.   
+finite size effects, this will just look like a two phase construction.    
+
+\subsection{Connection to the Single Nucleus Approximation} 
+\todo{Write down constraint equations with single nuclear species with N and Z 
+allowed to vary.}
 
 \section{Thermodynamic Quantities} 
 The pressure is given by 
@@ -200,9 +232,10 @@ The chemical potentials are
 && \mu_n = \mu_{n,o} + \sum_i \frac{n_i}{u_0} \frac{\partial F_{FS,i}}{\partial n_{n,o}}.
 \end{eqnarray}
 I think the finite size correction should be there, but this bears double
-checking.  The LS model would predict them to be zero, since their $F_{FS}$ is
-independent of the external densities.  In any case, these corrections should
-always be quite small for nuclei.  They can potentially be large for voids.
+checking.  The LS model would predict them to be zero, since their expressions for
+$F_{FS}$ are independent of the external densities.  In any case, these 
+corrections should always be quite small for nuclei.  They can potentially be 
+large for voids.
 
 \section{Model for Finite Size Effects}
 \subsection{Coulomb Corrections} 
@@ -219,7 +252,7 @@ u_i = v_i/v_{WS,i} = \frac{n_e - n_{p,o}}{n_{p,i} - n_{p,o}}.
 The total Coulomb contribution to the free energy for a single nucleus is then
 given by
 \begin{equation}
-F_{C,i} = \frac{3\alpha}{5 r_i} \left(Z_i - v_i n_{p,o}\right)^2 
+F_{C,i}(v_i, n_{p,o}, n_e) = \frac{3\alpha}{5 r_i} \left(Z_i - v_i n_{p,o}\right)^2 
 \mathcal{D}(u_i),
 \end{equation} 
 where $\mathcal{D}(u) = 1 - 3/2 u^{1/3} + u/2$.  This expression is valid wether
@@ -230,7 +263,7 @@ voids.  Derivatives of this are also required
 \pd{u_i}{\ln n_e} \\
 && \pd{F_{WS,i}}{\ln n_{p,o}} = F_{WS,i} \frac{\mathcal{D}'}{\mathcal{D}}
 \pd{u_i}{\ln n_{p,o}} - v_i \frac{F_{WS,i}}{Z_i - v_i n_{p,o}}\\
-&& \pd{F_{WS,i}}{v_i} = \frac{F_{WS,i}}{v_i} 
+-P_{C,i} &=&  \pd{F_{WS,i}}{v_i} = \frac{F_{WS,i}}{v_i} 
 \left[ \frac{\mathcal{D}'}{\mathcal{D}}  \pd{u_i}{\ln v_i} 
 - \frac{2n_{p,o}}{n_{p,i} - n_{p,o}} - \frac{1}{3} \right].
 \end{eqnarray*}
