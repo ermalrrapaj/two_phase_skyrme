@@ -56,7 +56,8 @@ public:
 protected:
   double SurfacePressure(double v) const;
   double SurfaceEnergy(double v) const;
-  double CoulombPressure(double v, double ne) const;
+  double CoulombPressure(double v, double npo, double ne) const;
+  double CoulombEnergy(double v, double npo, double ne) const;
   std::unique_ptr<EOSBase> mpEos;
   double mSs0; 
   double mSigma0; 
