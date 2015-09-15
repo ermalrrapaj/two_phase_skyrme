@@ -21,7 +21,9 @@ class NucleusBase {
 public:
   NucleusBase(int Z, int A) : mZ(Z), mA(A), mN(A-Z) {}
   virtual double GetBindingEnergy(const EOSData& eosIn, double ne) const =0; 
-  //virtual double GetVolume(const EOSData& eosIn) const =0; 
+  virtual double GetBindingEnergy(const EOSData& eosIn, double ne, 
+      double v) const =0; 
+  virtual double GetVolume(const EOSData& eosIn, double ne) const =0; 
   
 protected:
   int mZ, mN, mA;
@@ -38,6 +40,12 @@ public:
   double GetBindingEnergy(const EOSData& /*eosIn*/, double /*ne*/) const { 
     return mBE;
   }
+  
+  double GetBindingEnergy(const EOSData& eosIn, double ne, double /*v*/) const { 
+    return GetBindingEnergy(eosIn, ne);
+  }
+
+  double GetVolume(const EOSData& /*eosIn*/, double /*ne*/) const {return 0.0;}
    
 protected: 
   double mBE;
@@ -51,7 +59,9 @@ public:
       mpEos(eos.MakeUniquePtr()),
       mSigma0(1.15/Constants::HBCFmMeV),
       mSs0(45.8/Constants::HBCFmMeV) {} 
+  double GetVolume(const EOSData& eosIn, double ne) const;
   double GetBindingEnergy(const EOSData& eosIn, double ne) const;
+  double GetBindingEnergy(const EOSData& eosIn, double ne, double v) const;
 
 protected:
   double SurfacePressure(double v) const;
