@@ -116,8 +116,8 @@ EOSData EOSSingleNucleus::FromNAndT(const EOSData& eosIn) {
     EOSData bulk = mpEos->FromNAndT(eosIn); 
     double Fbulk = (bulk.E()-T*bulk.S())*eosIn.Nb();
     if ( Fbulk < F) {
-      std::cout << eosIn.Nb() << " ";
-      std::cout << F << " " << Fbulk << std::endl;
+      std::cout << " Bulk energy is lower than single nucleus prediction ";
+      std::cout << eosIn.Nb() << " "<< F << " " << Fbulk << std::endl;
       //return bulk;
     }
 
