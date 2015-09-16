@@ -24,7 +24,8 @@ public:
   virtual double GetBindingEnergy(const EOSData& eosIn, double ne, 
       double v) const =0; 
   virtual double GetVolume(const EOSData& eosIn, double ne) const =0; 
-  
+  virtual std::unique_ptr<NucleusBase> MakeUniquePtr() const =0;
+   
   double GetN() const {return (double) mN;} 
   double GetZ() const {return (double) mZ;} 
   double GetA() const {return (double) mA;} 
@@ -50,6 +51,10 @@ public:
   }
 
   double GetVolume(const EOSData& /*eosIn*/, double /*ne*/) const {return 0.0;}
+  
+  std::unique_ptr<NucleusBase> MakeUniquePtr() const { 
+    return std::unique_ptr<NucleusBase>(new FreeNucleus(*this));
+  }
    
 protected: 
   double mBE;
@@ -66,6 +71,11 @@ public:
   double GetVolume(const EOSData& eosIn, double ne) const;
   double GetBindingEnergy(const EOSData& eosIn, double ne) const;
   double GetBindingEnergy(const EOSData& eosIn, double ne, double v) const;
+
+  std::unique_ptr<NucleusBase> MakeUniquePtr() const { 
+    return std::unique_ptr<NucleusBase>(new LDNucleus(GetZ(), 
+      GetA(), *mpEos));
+  }
 
 protected:
   double SurfacePressure(double v) const;
