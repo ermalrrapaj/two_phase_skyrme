@@ -15,12 +15,16 @@
 
 class EOSNSE : public EOSBase {
 public:
-  EOSNSE(std::vector<std::shared_ptr<NucleusBase>> nuclei,
+  EOSNSE(std::vector<std::unique_ptr<NucleusBase>> nuclei,
       const EOSBase& eos) : 
-      mNuclei(nuclei), 
       mTMin(0.1/Constants::HBCFmMeV), 
-      mpEos(eos.MakeUniquePtr()) {}
+      mpEos(eos.MakeUniquePtr()) { 
+    for (auto & nuc : nuclei) 
+      mNuclei.push_back(nuc->MakeUniquePtr());
+  }
   
+  EOSNSE(const EOSNSE& other); 
+   
   /// This function is not implemented and will throw an error if called 
   std::vector<EOSData> FromMuAndT(const EOSData& eosIn) const {
     throw std::logic_error("FromMuAndT has not been implemented.");
@@ -45,7 +49,7 @@ public:
   double GetMaximumT() const {return 200.0/Constants::HBCFmMeV;}
 
   std::unique_ptr<EOSBase> MakeUniquePtr() const {
-    return std::unique_ptr<EOSBase>(new EOSNSE(mNuclei, *mpEos));
+    return std::unique_ptr<EOSBase>(new EOSNSE(*this));
   }  
 
 private: 
