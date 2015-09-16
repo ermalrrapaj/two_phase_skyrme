@@ -25,6 +25,10 @@ public:
       double v) const =0; 
   virtual double GetVolume(const EOSData& eosIn, double ne) const =0; 
   
+  double GetN() const {return (double) mN;} 
+  double GetZ() const {return (double) mZ;} 
+  double GetA() const {return (double) mA;} 
+    
 protected:
   int mZ, mN, mA;
 
