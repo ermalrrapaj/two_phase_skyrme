@@ -21,6 +21,7 @@ public:
   EOSSkyrme(double A,  double B,  double C,  double D,  double F,
             double G,  double delta) : mA(A), mB(B), mC(C), mD(D),
             mF(F), mG(G), mDelta(delta) {};
+  static EOSSkyrme FreeGas();
   static EOSSkyrme FromErmalSkyrme(const std::array<const double, 7>& param);
   static EOSSkyrme FromSaturation(const std::array<const double, 7>& param);
   

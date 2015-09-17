@@ -48,7 +48,7 @@ public:
     
     gsl_set_error_handler(NULL);
     
-    if (iter >= mMaxIter) throw std::runtime_error("Root find did not converge.");
+    if (iter >= mMaxIter) throw std::runtime_error("Root find did not converge." + std::to_string(iter));
     
     return 0.5*(x_lo + x_hi);
   }
