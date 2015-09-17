@@ -48,18 +48,25 @@ std::vector<double> EOSNSE::GetExteriorDensities(const EOSData& eosIn) {
     yy[1] += (1.0 - uNuclei)*eosOut.Np(); 
     yy[0] = yy[0]/eosIn.Nn() - 1.0;
     yy[1] = yy[1]/eosIn.Np() - 1.0;
-    //std::cout << yy[0] << " " <<yy[1] << std::endl;
+    std::cout << T*197.3 << " " << yy[0] << " " <<yy[1] << " " << 
+    uNuclei << " " << eosOut.Nb() << std::endl;
     return yy;
   };
 
-  MultiDimensionalRoot rootFinder = MultiDimensionalRoot(1.e-8, 1000);
+  MultiDimensionalRoot rootFinder = MultiDimensionalRoot(1.e-9, 1000);
   std::vector<double> pars = {log(eosIn.Nn()*1.e0), log(eosIn.Np()*1.e0)};
   double Tsafe = pow(eosIn.Nb(), 1.0/3.0)*50.0;
   if (T < Tsafe) {
-    for (T = Tsafe; T >= eosIn.T(); T *= 0.995) {
-      //std::cout << T*197.3 << std::endl;
+    for (T = Tsafe; T >= eosIn.T(); T *= 0.999) {
+      try {
         pars = rootFinder(nse_funcs, pars, 2);
-      //std::cout << std::endl;
+      } catch (MultiDRootException& e) {
+        if (e.GetError()<1.e-1) {
+          pars = e.GetX();
+        } else {
+          throw e;
+        }  
+      }
     }
   }
 

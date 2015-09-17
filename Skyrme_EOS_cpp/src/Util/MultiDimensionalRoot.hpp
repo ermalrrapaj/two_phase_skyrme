@@ -26,6 +26,12 @@ public:
       std::invalid_argument(message) {}
   std::vector<double> GetF() const { return mFfin;}; 
   std::vector<double> GetX() const { return mXfin;}; 
+  double GetError() const {
+    double err = 0.0;
+    for (auto& f : mFfin) err += fabs(f);
+    return err;
+  }
+
   int GetIterations() const { return mIter;}; 
   int GetStatus() const { return mStatus;};
    
