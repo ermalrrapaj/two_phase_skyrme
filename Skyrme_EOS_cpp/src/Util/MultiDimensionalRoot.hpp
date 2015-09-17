@@ -73,6 +73,8 @@ public:
     }
 
     const gsl_multiroot_fsolver_type *T = gsl_multiroot_fsolver_hybrids; 
+    //const gsl_multiroot_fsolver_type *T = gsl_multiroot_fsolver_hybrid; 
+    //const gsl_multiroot_fsolver_type *T = gsl_multiroot_fsolver_dnewton; 
     gsl_multiroot_fsolver *s = gsl_multiroot_fsolver_alloc(T, nFunc);
     int status = gsl_multiroot_fsolver_set(s, &F, x);
      
@@ -93,7 +95,7 @@ public:
         for (int i=0; i<nFunc; i++) {
           ferr.push_back(gsl_vector_get(s->f, i));
           xx.push_back(gsl_vector_get(s->x, i));
-        } 
+        }
         throw MultiDRootException("Multi root find did not converge", iter,
             status, xx, ferr);
     }
