@@ -21,8 +21,8 @@ static double ALPHA = 3.0*HBC/(10.0*MNUC)*pow(3.0/2.0*PI*PI,2.0/3.0);
 static double e_ele = sqrt(1.4299764/HBC);
 
 extern "C" {
-  double ifermi12_(double* scale_density);
-  double zfermi32_(double* eta);
+  double ifermi12_(double* scale_density, double * deriv);
+  double zfermi32_(double* eta, double * deriv);
 }
 
 EOSSkyrme::EOSSkyrme() :
@@ -154,10 +154,12 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
   
   double invetan = 2.0*PI*PI * nn * pow(2.0*MNUC/momsn*T, -1.5); 
   double invetap = 2.0*PI*PI * np * pow(2.0*MNUC/momsp*T, -1.5); 
-  double etan = ifermi12_(&invetan); 
-  double etap = ifermi12_(&invetap); 
-  double taup = pow(2.0*MNUC/momsp*T, 2.5)/(2.0*PI*PI) * zfermi32_(&etap);
-  double taun = pow(2.0*MNUC/momsn*T, 2.5)/(2.0*PI*PI) * zfermi32_(&etan);
+  double detan, detap;
+  double etan = ifermi12_(&invetan, &detan); 
+  double etap = ifermi12_(&invetap, &detap);
+  double dtaun, dtaup; 
+  double taup = pow(2.0*MNUC/momsp*T, 2.5)/(2.0*PI*PI) * zfermi32_(&etap, &dtaun);
+  double taun = pow(2.0*MNUC/momsn*T, 2.5)/(2.0*PI*PI) * zfermi32_(&etan, &dtaup);
   
   double Up = (taup*(mF - mG) + taun*(mF + mG)) / (2.0*MNUC) 
       + 2.0*mA*nt + 4.0*mB*nn + mC*(1.0 + mDelta)*pow(nt, mDelta) 
