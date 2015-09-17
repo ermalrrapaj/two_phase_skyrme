@@ -35,11 +35,11 @@ protected:
 
 }; 
 
-class FreeNucleus : public NucleusBase {
+class StaticNucleus : public NucleusBase {
 public:
-  FreeNucleus(int Z, int A, double BE, const std::vector<double>& TGrid, 
-      const std::vector<double>& PFGrid) : NucleusBase(Z, A), mBE(BE), 
-      mTg(TGrid), mPFg(PFGrid) {}
+  StaticNucleus(int Z, int A, double BE, const std::vector<double>& TGrid, 
+      const std::vector<double>& PFGrid, double v = 0.0) : NucleusBase(Z, A), 
+      mBE(BE), mTg(TGrid), mPFg(PFGrid), mV(v) {}
 
   /// \todo Still need to include partition function in binding energy
   double GetBindingEnergy(const EOSData& /*eosIn*/, double /*ne*/) const { 
@@ -50,14 +50,14 @@ public:
     return GetBindingEnergy(eosIn, ne);
   }
 
-  double GetVolume(const EOSData& /*eosIn*/, double /*ne*/) const {return 0.0;}
+  double GetVolume(const EOSData& /*eosIn*/, double /*ne*/) const {return mV;}
   
   std::unique_ptr<NucleusBase> MakeUniquePtr() const { 
-    return std::unique_ptr<NucleusBase>(new FreeNucleus(*this));
+    return std::unique_ptr<NucleusBase>(new StaticNucleus(*this));
   }
    
 protected: 
-  double mBE;
+  double mBE, mV;
   std::vector<double> mTg, mPFg;
 
 }; 
