@@ -96,6 +96,10 @@ EOSData EOSSkyrme::FromNAndT(const EOSData& eosIn) {
   return BaseEOSCall(eosIn.T(), eosIn.Nn(), eosIn.Np()); 
 } 
 
+EOSSkyrme EOSSkyrme::FreeGas() {
+  return EOSSkyrme(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+}
+
 EOSSkyrme EOSSkyrme::FromErmalSkyrme(const std::array<const double, 7>& param) {
 	double a= param[0], b = param[1], t0 = param[2], x0 = param[3];
 	double t3=param[4], x3=param[5], alpha = param[6];
