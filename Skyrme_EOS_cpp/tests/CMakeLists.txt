@@ -10,6 +10,10 @@ add_executable(table_test table_test.cpp)
 add_test(Table table_test)
 target_link_libraries(table_test output ${EOSBUILDER_EXTERNAL_LIBS} )
 
+add_executable(fermi_test test_fermi_deriv.f90) 
+add_test(Fermi fermi_test)
+target_link_libraries(fermi_test eos ${EOSBUILDER_EXTERNAL_LIBS} )
+
 add_executable(nucleus_test nucleus_test.cpp) 
 #add_test(Nucleus nucleus_test)
 target_link_libraries(nucleus_test eos ${EOSBUILDER_EXTERNAL_LIBS} )
