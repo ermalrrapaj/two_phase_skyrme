@@ -15,11 +15,11 @@
 
 class EOSNSE : public EOSBase {
 public:
-  EOSNSE(std::vector<std::unique_ptr<NucleusBase>> nuclei,
+  EOSNSE(const std::vector<std::unique_ptr<NucleusBase>>& nuclei,
       const EOSBase& eos) : 
       mTMin(0.1/Constants::HBCFmMeV), 
       mpEos(eos.MakeUniquePtr()) { 
-    for (auto & nuc : nuclei) 
+    for (auto& nuc : nuclei) 
       mNuclei.push_back(nuc->MakeUniquePtr());
   }
   
@@ -45,6 +45,8 @@ public:
   
   EOSData FromNAndT(const EOSData& eosIn);
 
+  std::vector<double> GetExteriorDensities(const EOSData& eosIn);
+  
   double GetMinimumT() const {return mTMin;}
   double GetMaximumT() const {return 200.0/Constants::HBCFmMeV;}
 
