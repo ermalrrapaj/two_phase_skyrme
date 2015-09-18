@@ -1,0 +1,478 @@
+\documentclass[preprint,prc,preprintnumbers,superscriptaddress,amsmath,amssymb,floatfix]{revtex4-1}
+\usepackage{graphicx,graphics,setspace,epsfig,color}
+\usepackage[letterpaper,dvips,width=7.5in,height=8.5in,includemp=false]{geometry}
+\usepackage[vcentermath]{}
+\usepackage{epsf}
+\usepackage{url}
+\usepackage{amscd}
+\usepackage{amsmath}
+\usepackage[cm]{fullpage}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{textcomp}
+\usepackage{subcaption}
+\usepackage{slashed}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage[section]{placeins}
+\usepackage{float}
+\usepackage[active]{srcltx}
+\usepackage{color}
+\usepackage{inputenc}
+\usepackage[T4,T1]{fontenc}
+\usepackage{mathtext}
+\usepackage{comment}
+\usepackage{stmaryrd}
+\newcommand{\CZ}{{\cal Z}}
+\newcommand{\CL}{{\cal L}}
+
+\setlength{\textheight}{8.85in}
+\setlength{\topmargin}{.01in}
+% ----------------------------------------------------------------
+\vfuzz2pt % Don't report over-full v-boxes if over-edge is small
+\hfuzz2pt % Don't report over-full h-boxes if over-edge is small
+
+\long\def\symbolfootnote[#1]#2{\begingroup%
+\def\thefootnote{\fnsymbol{footnote}}\footnote[#1]{#2}\endgroup} 
+\newcommand\qslash {\slashed{q}}
+\newcommand\pslash {\slashed{p}}
+\newcommand\dslash {\slashed{\partial}}
+\newcommand\Dslash {\slashed{D}}
+\newcommand{\half}{\frac{1}{2}}
+\newcommand{\be}{\begin{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand\beq{\begin{eqnarray}}
+\newcommand\eeq{\end{eqnarray}} 
+\newcommand\nnnlo {N$^3$LO}
+\newcommand{\E}
+
+
+\def\apjl{ApJL }
+\def\aj{AJ }
+\def\apj{ApJ }
+\def\apjs{ApJ  Supplement}
+\def\pasp{PASP }
+\def\spie{SPIE }
+\def\apjs{ApJS }
+\def\araa{ARAA }
+\def\aap{A\&A }
+\def\nat{Nature }
+\usepackage{hyperref}
+ 
+
+\begin{document}
+
+\title{EOS Constraints}
+
+\author{Ermal Rrapaj}
+\email{ermal@uw.edu}
+\affiliation{Department of Physics, University of Washington, Seattle, WA}
+\affiliation{Institute for Nuclear Theory, University of Washington, Seattle, WA}
+\begin{abstract}
+
+\end{abstract}
+\section{Skyrme interaction - Finite Temperature}
+\subsection{Potential Matrix Element}
+Interaction Matrix:
+\begin{equation}
+ \begin{split}
+  V_{ij}=&t_0(1+x_0 P_{\sigma})\delta(\mathbf{r}_{ij})+\frac{1}{2}t_1(1+x_1P_{\sigma}) \frac{1}{\hbar^2}[\overleftarrow{p^{\dagger}}^2_{ij}\delta(\mathbf{r}_{ij})+\delta(\mathbf{r}_{ij})\overrightarrow{p}^2_{ij}]\\
+  &+t_2(1+x_2P_{\sigma})\frac{1}{\hbar^2}\overleftarrow{\mathbf{p}^{\dagger}}_{ij}\cdot \delta(\mathbf{r}_{ij})\overrightarrow{\mathbf{p}}_{ij}+\frac{1}{6}t_3(1+x_3P_{\sigma})\rho^{\alpha}(\mathbf{r})\delta(\mathbf{r}_{ij})\\
+  &+\frac{i}{\hbar^2}W_0(\mathbf{\sigma}_i+\mathbf{\sigma}_j)\cdot \overleftarrow{\mathbf{p}^{\dagger}}_{ij} \times \delta(\mathbf{r}_{ij})\overrightarrow{\mathbf{p}}_{ij}\\
+  &+\frac{1}{4}t_4(1+x_4 P_{\sigma})\frac{1}{\hbar^2}[ \overleftarrow{p^{\dagger}}^2_{ij}\rho^{\beta}(\mathbf{r})\delta(\mathbf{r}_{ij})+\delta(\mathbf{r}_{ij})\rho^{\beta}(\mathbf{r})\overrightarrow{p}^2_{ij}]\\
+  &+t_5(1+x_5P_{\sigma})\frac{1}{\hbar^2}\overleftarrow{\mathbf{p}}_{ij}\cdot \rho^{\gamma}(\mathbf{r})\delta(\mathbf{r}_{ij})\overrightarrow{\mathbf{p}}_{ij}
+ \end{split}
+\end{equation}
+where, $\mathbf{r}_{ij}=\frac{\mathbf{r}_i-\mathbf{r}_j}{2},\ \mathbf{r}=\frac{\mathbf{r}_i+\mathbf{r}_j}{2},\ P_{\sigma}= \frac{1}{2}(1+\mathbf{\sigma}_1\cdot \mathbf{\sigma}_2),\ \mathbf{p}_{ij}=-i\hbar \frac{\boldmath{\bigtriangledown}_i-\mathbf{\bigtriangledown}_j}{2},\ \rho(\mathbf{r})=\rho_p(\mathbf{r})+\rho_n(\mathbf{r})$
+ and the arrows show the direction on which the momentum operators act.
+ 
+ 
+\subsection{Energy Density}
+Assume time reversal invariance. The Energy of the ground state can be written as integration over an energy density functional, $E_{HFB} = \int d^r  \varepsilon_{HFB} $
+\begin{equation}
+ \begin{split}
+  \varepsilon_{HFB} &= \sum_{t=n,p}\frac{\hbar^2}{2M_q}\tau_q+\frac{1}{2}t_0\Big[(1+\frac{1}{2}x_0)\rho^2-(\frac{1}{2}+x_0)\sum_{q=n,p}\rho^2_q\Big]\\
+  &+\frac{1}{4}t_1\Big[ (1+\frac{1}{2}x_1)(\rho \tau+\frac{3}{4}(\triangledown \rho)^2)-(\frac{1}{2}+x_1)\sum_{q=n,p}(\rho_q \tau_q+\frac{3}{4}(\triangledown \rho_q)^2)\Big]\\
+  &+\frac{1}{4}t_2\Big[ (1+\frac{1}{2}x_2)(\rho \tau+\frac{3}{4}(\triangledown \rho)^2)+(\frac{1}{2}+x_2)\sum_{q=n,p}(\rho_q \tau_q-\frac{1}{4}(\triangledown \rho_q)^2)\Big]\\
+  &+\frac{1}{12}t_3\rho^{\alpha}\Big[(1+\frac{1}{2}x_3)\rho^2-(\frac{1}{2}+x_3)\sum_{q=n,p}\rho_q^2\Big]\\
+  &+\frac{1}{4}t_4\Big[ (1+\frac{1}{2}x_4)(\rho \tau+\frac{3}{4}(\triangledown \rho)^2)-(\frac{1}{2}+x_4)\sum_{q=n,p}(\rho_q \tau_q+\frac{3}{4}(\triangledown \rho_q)^2)\Big]\rho^{\beta}\\
+ &+\frac{\beta}{8}t_4\Big[(1+\frac{1}{2}x_4)\rho(\triangledown \rho)^2-(\frac{1}{2}+x_4)\mathbf{\triangledown}\rho \cdot \sum_{q=n,p}\rho_q\mathbf{\triangledown}\rho_q\Big]\rho^{\beta-1}\\
+ &+\frac{1}{4}t_5\Big[ (1+\frac{1}{2}x_5)(\rho \tau+\frac{3}{4}(\triangledown \rho)^2)+(\frac{1}{2}+x_5)\sum_{q=n,p}(\rho_q \tau_q-\frac{1}{4}(\triangledown \rho_q)^2)\Big]\rho^{\gamma}\\
+ &-\frac{1}{16}(t_1x_1+t_2x_2)J^2+\frac{1}{16}(t_1-t_2)\sum_{q=n,p}J^2_q\\
+ &-\frac{1}{16}(t_4 x_4\rho^{\beta}+t_5x_5\rho^{\gamma})J^2+\frac{1}{16}(t_4\rho^{\beta}-t_5\rho^{\beta})\sum_{q=n,p}J^2_q\\
+ &+\frac{1}{2} W_0 (\mathbf{J}\cdot \mathbf{\triangledown}\rho+\sum_{q=n,p}\mathbf{J}_q\cdot \mathbf{\triangledown}\rho_q)
+ \end{split}
+\end{equation}
+where,
+\begin{equation}
+ \begin{split}
+  \rho &= 2\int \frac{d^3 k}{(2 \pi \hbar)^3} n(k)\\
+  \tau &= 2\int \frac{d^3 k}{(2 \pi \hbar)^3} k^2 n(k)\\
+  \mathbf{J}&= \int \frac{d^3k}{(2\pi \hbar)^3}\mathbf{k} \times \sum_{s,s'}\langle s|\pmb{\bm{\sigma}}|s'\rangle \ n(k)
+ \end{split}
+\end{equation}
+
+The different terms can be grouped together in simpler notation:
+\begin{equation}
+ \begin{split}
+  \varepsilon &= \sum_{t=n,p}\frac{\hbar^2}{2M_q}\tau_q+\frac{1}{4}t_0\Big[(2+x_0)\rho^2-(1+2x_0)\sum_{q=n,p}\rho^2_q\Big]\\
+  &+\frac{1}{8}\Big[ a (\rho \tau+\frac{3}{4}(\triangledown \rho)^2)+2b\sum_{q=n,p}(\rho_q \tau_q+\frac{3}{4}(\triangledown \rho_q)^2)\Big]\\
+  &+\frac{1}{24}t_3\rho^{\alpha}\Big[(2+x_3)\rho^2-(1+2x_3)\sum_{q=n,p}\rho_q^2\Big]\\
+  &+\frac{1}{8}t_4\Big[ (2+x_4)(\rho \tau+\frac{3}{4}(\triangledown \rho)^2)-(1+2x_4)\sum_{q=n,p}(\rho_q \tau_q+\frac{3}{4}(\triangledown \rho_q)^2)\Big]\rho^{\beta}\\
+ &+\frac{\beta}{16}t_4\Big[(2+x_4)\rho(\triangledown \rho)^2-(1+2x_4)\mathbf{\triangledown}\rho \cdot \sum_{q=n,p}\rho_q\mathbf{\triangledown}\rho_q\Big]\rho^{\beta-1}\\
+ &+\frac{1}{8}t_5\Big[ (2+x_5)(\rho \tau+\frac{3}{4}(\triangledown \rho)^2)+(1+2x_5)\sum_{q=n,p}(\rho_q \tau_q-\frac{1}{4}(\triangledown \rho_q)^2)\Big]\rho^{\gamma}\\
+ &-\frac{1}{16}(t_1x_1+t_2x_2)J^2+\frac{1}{16}(t_1-t_2)\sum_{q=n,p}J^2_q\\
+ &-\frac{1}{16}(t_4 x_4\rho^{\beta}+t_5x_5\rho^{\gamma})J^2+\frac{1}{16}(t_4\rho^{\beta}-t_5\rho^{\beta})\sum_{q=n,p}J^2_q\\
+ &+\frac{1}{2} W_0 (\mathbf{J}\cdot \mathbf{\triangledown}\rho+\sum_{q=n,p}\mathbf{J}_q\cdot \mathbf{\triangledown}\rho_q)
+ \end{split}
+\end{equation}
+where, $a = t_1(x_1+2)+t_2(x_2+2), \ b= \frac{1}{2}[t_2(2 x_2+1)-t_1(2x_1+1)]$.
+
+In uniform matter $\triangledown \rho =0$:
+\begin{equation}
+ \begin{split}
+  \varepsilon &= \sum_{t=n,p}\frac{\hbar^2}{2M_q}\tau_q+\frac{1}{4}t_0\Big[(2+x_0)\rho^2-(1+2x_0)\sum_{q=n,p}\rho^2_q\Big]\\
+  &+\frac{1}{8}\Big[ a \rho \tau+2b\sum_{q=n,p}\rho_q \tau_q\Big]\\
+  &+\frac{1}{24}t_3\rho^{\alpha}\Big[(2+x_3)\rho^2-(1+2x_3)\sum_{q=n,p}\rho_q^2\Big]\\
+  &+\frac{1}{8}t_4\Big[ (2+x_4)\rho \tau-(1+2x_4)\sum_{q=n,p}\rho_q \tau_q\Big]\rho^{\beta}\\
+ &+\frac{1}{8}t_5\Big[ (2+x_5)\rho \tau+(1+2x_5)\sum_{q=n,p}\rho_q \tau_q\Big]\rho^{\gamma}\\
+ &-\frac{1}{16}(t_1x_1+t_2x_2)J^2+\frac{1}{16}(t_1-t_2)\sum_{q=n,p}J^2_q\\
+ &-\frac{1}{16}(t_4 x_4\rho^{\beta}+t_5x_5\rho^{\gamma})J^2+\frac{1}{16}(t_4\rho^{\beta}-t_5\rho^{\beta})\sum_{q=n,p}J^2_q\\
+ \end{split}
+\end{equation}
+In unpolarized matter, $\mathbf{J}=0$:
+\begin{equation}
+ \begin{split}
+  \varepsilon &= \sum_{t=n,p}\frac{\hbar^2}{2M_q}\tau_q+\frac{1}{4}t_0\Big[(2+x_0)\rho^2-(1+2x_0)\sum_{q=n,p}\rho^2_q\Big]\\
+  &+\frac{1}{8}\Big[ a \rho \tau+2b\sum_{q=n,p}\rho_q \tau_q\Big]\\
+  &+\frac{1}{24}t_3\rho^{\alpha}\Big[(2+x_3)\rho^2-(1+2x_3)\sum_{q=n,p}\rho_q^2\Big]\\
+  &+\frac{1}{8}t_4\Big[ (2+x_4)\rho \tau-(1+2x_4)\sum_{q=n,p}\rho_q \tau_q\Big]\rho^{\beta}\\
+ &+\frac{1}{8}t_5\Big[ (2+x_5)\rho \tau+(1+2x_5)\sum_{q=n,p}\rho_q \tau_q\Big]\rho^{\gamma}\\
+ \end{split}
+ \label{eq:SkyrmeDFT}
+\end{equation}
+Energy per bayon, $\mathcal{E}\equiv \varepsilon/rho$:
+\begin{equation}
+ \begin{split}
+  \mathcal{E}&= \sum_{t=n,p}\frac{\hbar^2}{2M_q}\frac{\tau_q}{\rho}+\frac{1}{4}t_0\Big[(2+x_0)\rho-(1+2x_0)\sum_{q=n,p}\frac{\rho^2_q}{\rho}\Big]\\
+  &+\frac{1}{8}\Big[ a \tau+2b\sum_{q=n,p}\frac{\rho_q \tau_q}{\rho}\Big]\\
+  &+\frac{1}{24}t_3\rho^{\alpha}\Big[(2+x_3)\rho-(1+2x_3)\sum_{q=n,p}\frac{\rho_q^2}{\rho}\Big]\\
+  &+\frac{1}{8}t_4\Big[ (2+x_4) \tau-(1+2x_4)\sum_{q=n,p}\frac{\rho_q \tau_q}{\rho}\Big]\rho^{\beta}\\
+ &+\frac{1}{8}t_5\Big[ (2+x_5) \tau+(1+2x_5)\sum_{q=n,p}\frac{\rho_q \tau_q}{\rho}\Big]\rho^{\gamma}\\
+ \end{split}
+\end{equation}
+In terms of proton fraction, $y = \frac{\rho_p}{\rho_p+\rho_n}$:
+\begin{equation}
+ \begin{split}
+  \mathcal{E}&= \sum_{t=n,p}\frac{\hbar^2}{2M_q}\frac{\tau_q}{\rho}+\frac{1}{4}t_0\Big[(2+x_0)-(1+2x_0)[y^2+(1-y)^2]\Big]\rho\\
+  &+\frac{1}{8}\Big[ a \tau+2b[y \tau_p + (1-y)\tau_n]\Big]\\
+  &+\frac{1}{24}t_3\rho^{\alpha+1}\Big[(2+x_3)-(1+2x_3)[y^2+(1-y)^2]\Big]\\
+  &+\frac{1}{8}t_4\Big[ (2+x_4) \tau-(1+2x_4)[y \tau_p + (1-y)\tau_n]\Big]\rho^{\beta}\\
+ &+\frac{1}{8}t_5\Big[ (2+x_5) \tau+(1+2x_5)[y \tau_p + (1-y)\tau_n]\Big]\rho^{\gamma}\\
+ \label{eq:SkyrmeEDF}
+ \end{split}
+\end{equation}
+\section{Single particle properties}
+From the energy density the single particle spectrum can be derived. By performing functional variation of the energy density with repsect to the single 
+particle wavefunction, a modified Schrodinger equation can be derived:
+\begin{equation}
+ \begin{split}
+  \delta \varepsilon_i =&  \big[\frac{\delta \varepsilon_i}{\delta \tau_i} +  \frac{\delta \varepsilon_i}{\delta \rho_i}] \delta \phi_i = \epsilon_i \delta \phi_i  
+ \end{split}
+\end{equation}
+Since the Skyrme potential is at mostly quadratic in momenta with nonlinaer density dependence, its effect is 
+exactly included by effective mass and mean field shift(residual interaction), both density dependent:
+\begin{equation}
+ \begin{split}
+ \epsilon_i(k) =& \frac{\hbar^2k^2}{2 M^{*}_i}+U_i\\
+  \frac{\hbar^2}{2 M^{*}_q} \equiv& \frac{\partial \varepsilon}{\partial \tau_q}\\
+  U_i\equiv&\frac{\partial \varepsilon}{\partial \rho_i}\\
+ \end{split}
+\end{equation}
+From eq.~\ref{eq:SkyrmeDFT} the effective baryon masses:
+\begin{equation}
+ \begin{split}
+  M^{*}_p/M =&  \Big\{1 + \frac{M\ \rho}{4 \hbar^2}   \big[a + 2\ y\ b  + t_4 [(2 + x_4) - (1 +2 x_4)\ y ] \rho^\beta +  t_5 [2 + x_5 + (1 + 2 x_5)\ y] \rho^{\gamma}\big]\Big\}^{-1}\\
+   M^{*}_n/M =&   \Big\{1 + \frac{M\ \rho}{4 \hbar^2}   \big[a + 2\ (1-y)\ b  + t_4 [(2 + x_4) - (1 +2 x_4)\ (1-y) ] \rho^\beta +  t_5 [2 + x_5 + (1 + 2 x_5)\ (1-y)] \rho^{\gamma}\big]\Big\}^{-1}
+ \end{split}
+\end{equation}
+and the residual potentials:
+\begin{equation}
+ \begin{split}
+  U_p=&\frac{ 1}{8}(2 b\ \tau_p  +a\ \tau) +\frac{1}{2}t_0 [(2+x_0)-(1+2 x_0)\ y]\rho\\
+  &+ \frac{1}{24}t_3\Big[4 + \alpha - 2 y (1 - (1 - y) \alpha) +  x_3 (1 - 2 y) [2 - (1 - 2 y) \alpha]\Big]\rho^{\alpha+1}\\
+  U_n=&\frac{ 1}{8}(2 b\ \tau_n  +a\ \tau) +\frac{1}{2}t_0 [(1 - x_0) + (1 + 2 x_0) y] \rho \\
+  &+ \frac{1}{24}t_3\Big[2 + \alpha + 2 y (1 + \alpha - y \alpha) - x_3 (1 - 2 y) [2 + (1 - 2 y) \alpha]\Big]\rho^{\alpha+1}
+ \end{split}
+\end{equation}
+
+\section{T=0 DFT}
+At $T=0$, there are simple relation that can be drawn between the 2 integrations in Fourier space since the occuppation number is a step function:
+\begin{equation}
+ \begin{split}
+  \rho_q &= 2\int \frac{d^3k}{(2\pi \hbar)^3} \theta(k_{F,q}-k)=\frac{k_{F,q}^3}{3 \pi^2 \hbar^3}\\
+  \tau_q &=2\int \frac{d^3k}{(2\pi \hbar)^3} (k/\hbar)^2 \theta(k_{F,q}-k)=\frac{k_{F,q}^5}{5 \pi^2 \hbar^5} \rightarrow\\
+  \tau &= \frac{3}{5} (3 \pi^2)^{2/3} \rho_q^{5/3}, H_n(y) = 2^{n-1}[y^n+(1-y)^n], y =\rho_p/\rho\\
+  \tau &= \tau_p+\tau_n =\frac{3}{5}(\frac{3 \pi^2}{2})^{2/3} H_{5/3}(y) \rho^{5/3}
+ \end{split}
+\end{equation}
+So,
+\begin{equation}
+ \begin{split}
+  \mathcal{E}_{0} &=\frac{3\hbar^2}{10M}(\frac{3\pi^2}{2})^{2/3}\rho^{2/3} H_{5/3}(y)+\frac{1}{8}t_0\rho \Big[2(2+x_0)-(1+2x_0)H_2(y)\Big]\\
+  &+\frac{3}{40}(\frac{3 \pi^2}{2})^{2/3}\Big[ a H_{5/3}(y) +b H_{8/5}(y) \Big]\rho^{5/3}\\
+  &+\frac{1}{48}t_3\rho^{\alpha+1}\Big[2(2+x_3)-(1+2x_3)H_2(y)\Big]\\
+  &+\frac{3}{40}(\frac{3 \pi^2}{2})^{2/3}t_4\rho^{\beta+5/3}\Big[ (2+x_4)H_{5/3}(y)-(\frac{1}{2}+x_4)H_{8/3}(y)\Big]\\
+ &+\frac{3}{40}(\frac{3\pi^2}{2})^{2/3}t_5\rho^{\gamma+5/3}\Big[ (2+x_5)H_{5/3}(y)+(\frac{1}{2}+x_5)H_{8/3}(y) \Big]\\
+ \end{split}
+\end{equation}
+with $H_n(y)= 2^{n-1}[y^n+(1-y)^n]$. A common choice is to set $M = 1/2(M_n+M_p)$, or use the individual value for each species.
+In compact notation,
+\begin{equation}
+ \begin{split}
+  \mathcal{E}_{0} &= C(y)\rho^{2/3}+ A(y) \rho + B(y) \rho^{\alpha+1} + D(y) \rho^{5/3} + G(y) \rho^{\beta+5/3} + K(y)\rho^{\gamma+5/3}
+ \end{split}
+\end{equation}
+By comparing the 2 expressions, the following relations can be easily deduced:
+\begin{equation}
+ \begin{split}
+  C(y)=&\frac{3\hbar^2}{10M_y}(\frac{3\pi^2}{2})^{2/3} H_{5/3}(y)\\
+  A(y)=&\frac{1}{8}t_0 \Big[2(2+x_0)-(1+2x_0)H_2(y)\Big]\\
+  B(y)=&\frac{1}{48}t_3\Big[2(2+x_3)-(1+2x_3)H_2(y)\Big]\\
+  D(y)=&\frac{3}{40}(\frac{3 \pi^2}{2})^{2/3}\Big[ a H_{5/3}(y) +b H_{8/5}(y) \Big]\\
+  G(y)=&\frac{3}{40}(\frac{3 \pi^2}{2})^{2/3}t_4\Big[ (2+x_4)H_{5/3}(y)-(\frac{1}{2}+x_4)H_{8/3}(y)\Big]\\
+  K(y)=&\frac{3}{40}(\frac{3\pi^2}{2})^{2/3}t_5\Big[ (2+x_5)H_{5/3}(y)+(\frac{1}{2}+x_5)H_{8/3}(y) \Big]
+ \end{split}
+\end{equation}
+For pure neutron matter and symmetric matter the kinetic coefficient is 
+\begin{equation}
+ \begin{split}
+C_n =& C(0) = \frac{3\hbar^2}{10M_n}(\frac{3\pi^2}{2})^{2/3}H_{5/3}(0) = 118.995\ \text{Mev}\ \text{fm}^{2} \approx 119\ \text{Mev}\ \text{fm}^{2}\\
+C_{sym}=& C(1/2) =  \frac{3\hbar^2}{5(M_n+M_p)}(\frac{3\pi^2}{2})^{2/3}H_{5/3}(1/2) = 75.0139 \ \text{Mev}\ \text{fm}^{2} \approx75\ \text{Mev}\ \text{fm}^{2} 
+ \end{split}
+\end{equation}
+The effective mass is due to the terms dependent on kinetic energy:
+\begin{equation}
+ \begin{split}
+  \tau^{T=0}(\rho,y) \equiv& \frac{3\hbar^2}{10M^{*}}(\frac{3\pi^2}{2})^{2/3}\rho^{2/3} H_{5/3}(y)\\
+  =&\frac{3\hbar^2}{10M}(\frac{3\pi^2}{2})^{2/3}\rho^{2/3} H_{5/3}(y) +\frac{3}{40}(\frac{3 \pi^2}{2})^{2/3}\Big[ a H_{5/3}(y) +b H_{8/5}(y) \Big]\rho^{5/3}\\
+  &+\frac{3}{40}(\frac{3 \pi^2}{2})^{2/3}t_4\rho^{\beta+5/3}\Big[ (2+x_4)H_{5/3}(y)-(\frac{1}{2}+x_4)H_{8/3}(y)\Big]\\
+ &+\frac{3}{40}(\frac{3\pi^2}{2})^{2/3}t_5\rho^{\gamma+5/3}\Big[ (2+x_5)H_{5/3}(y)+(\frac{1}{2}+x_5)H_{8/3}(y) \Big]\\
+ \equiv& C(y)\rho^{2/3} \Big[1 +( D(y) \rho + G(y) \rho^{\beta+1} + K(y)\rho^{\gamma+1})/C(y)\Big]
+ \end{split}
+\end{equation}
+Thus,
+\begin{equation}
+ \begin{split}
+  M^{*}/M= \{&1+\frac{M}{4 H_{5/3}(y) \hbar^2}\Big[ \rho[a H_{5/3}(y) +b H_{8/5}(y)]+\rho^{\beta+1} t_4[ (2+x_4)H_{5/3}(y)-(\frac{1}{2}+x_4)H_{8/3}(y)]\\
+  &+\rho^{\gamma+1} t_5[ (2+x_5)H_{5/3}(y)-(\frac{1}{2}+x_5)H_{8/3}(y)]\Big]\}^{-1}\\
+  =&\frac{C(y)}{C(y)+ D(y) \rho + G(y) \rho^{\beta+1} + K(y)\rho^{\gamma+1}}
+ \end{split}
+\end{equation}
+Also, the thermodynamic pressure:
+\begin{equation}
+ \begin{split}
+  \mathcal{P}^{T=0}(\rho,y) &= \rho^2 \frac{\partial \mathcal{E}^{T=0}}{\partial \rho}\\
+  &=\frac{2}{3}C(y)\rho^{5/3}+A(y)\rho^2+(\alpha+1)B(y)\rho^{\alpha+1}+\frac{5}{3}D(y)\rho^{8/3}+\beta G(y) \rho^{\beta+8/3}+ \gamma K(y) \rho^{\gamma+8/3}
+ \end{split}
+\end{equation}
+\section{Lattimer - Schwesty Notation}
+The standard parametrization:
+\begin{equation}
+ \begin{split}
+  \varepsilon =& \frac{{\hbar}^2 {\tau_n}}{2 {M_n}}+\frac{{\hbar}^2 {\tau_p}}{2 t{M_p}}+\frac{1}{8} [a ({\rho_n}+{\rho_p}) ({\tau_n}+{\tau_p})+2 b ({\rho_n} {\tau_n}+{\rho_p} {\tau_p})]+\frac{1}{4} t_0 [(2 + x_0) (\rho_n + \rho_p)^2 - (1 +  2 x_0) (\rho_n^2 + \rho_p^2)]\\
+  &+\frac{1}{24} t_3 (\rho_n + \rho_p)^\alpha [(2 +  x_3) (\rho_n + \rho_p)^2 - (1 + 2 x_3) (\rho_n^2 + \rho_p^2)]
+ \end{split}
+\end{equation}
+\begin{minipage}[t]{0.5\textwidth}
+  \begin{equation}
+ \begin{split}
+  a=& \frac{4 \hbar^2}{M}(F+G)\\
+  b=&-\frac{4 \hbar^2}{M} G\\
+  t_0=& \frac{8}{3}(A+B)\\
+  x_0=&-\frac{1}{2}\frac{A-2 B}{A+B}\\
+  t_3=&16(C+D)\\
+  x_3=&-\frac{1}{2}\frac{C-D}{C+D}\\
+  \alpha =& \delta -1
+ \end{split}
+\end{equation}
+\end{minipage}
+\begin{minipage}[t]{0.5\textwidth}
+  \begin{equation}
+ \begin{split}
+  a=& \frac{4 \hbar^2}{M}(F+G)\\
+  b=&-\frac{4 \hbar^2}{M} G\\
+  t_0=& \frac{8}{3}(A+B)\\
+  x_0=&-\frac{1}{2}\frac{A-2 B}{A+B}\\
+  t_3=&16(C+D)\\
+  x_3=&-\frac{1}{2}\frac{C-D}{C+D}\\
+  \alpha =& \delta -1
+ \end{split}
+\end{equation}
+\end{minipage}
+
+\begin{equation}
+ \begin{split}
+  \varepsilon =& 4 B \rho_n \rho_p + A (\rho_n + \rho_p)^2 + (\rho_n + \rho_p)^{\delta-1} [4 D \rho_n \rho_p + C (\rho_n + \rho_p)^2]\\
+  &+ \frac{5(\frac{2}{3})^{2/3}}{3\pi^{4/3}}\alpha_S [M(\frac{\tau_n}{M_n}+\frac{\tau_p}{M_p}) +F (\rho_n+\rho_p)(\tau_n+\tau_p)-G(\rho_n-\rho_p)(\tau_n-\tau_p)]
+ \end{split}
+\end{equation}
+
+The standard parametrization for $T = 0,\ (M_n,M_p) \rightarrow M = \frac{1}{2}(M_n+M_p)$:
+\begin{equation}
+ \begin{split}
+  \varepsilon &=\frac{3\hbar^2}{10M}(\frac{3\pi^2}{2})^{2/3}\rho^{5/3} H_{5/3}(y)+\frac{1}{8}t_0\rho^2 \Big[2(2+x_0)-(1+2x_0)H_2(y)\Big]\\
+  &+\frac{3}{40}(\frac{3 \pi^2}{2})^{2/3}\Big[ a H_{5/3}(y) +b H_{8/5}(y) \Big]\rho^{8/3}\\
+  &+\frac{1}{48}t_3\rho^{\alpha+2}\Big[2(2+x_3)-(1+2x_3)H_2(y)\Big]\\
+ \end{split}
+\end{equation}
+By comparing the expression in these notes with the ones from  Lattimer parametrization, the energy density is:
+\begin{equation}
+ \begin{split}
+\varepsilon = \alpha_S \rho^{5/3}H_{5/3}(y)+[A+B(2-H_{2}(y))]\rho^2+ [C+D(2-H_{2}(y))]\rho{\delta}+\alpha_S \rho^{5/3}[(F+G)H_{5/3}-GH_{8/3}(y)]
+ \end{split}
+\end{equation}
+where, $\alpha_S=\frac{3\hbar^2}{10 M}(\frac{3}{2}\pi^2)^{2/3}$
+\subsection{Skyrme parametrization from Saturation Observables}
+Given the following set of physical observables,
+\begin{equation}
+ \begin{split}
+  E_0=&\varepsilon\Big|_{\rho_0,y=1/2}=(A+B) \rho_0^2+(C+D) \rho_0^{\delta+1}+\alpha_S \rho_0^{5/3} (1+F \rho_0)\\
+  P=&\rho^2\frac{d(\varepsilon/\rho)}{d\rho}\Big|_{\rho_0,y=1/2}=\frac{2}{3} \alpha_S \rho_0^{5/3}+(A+B) \rho_0^2+\frac{5}{3} F \alpha_S \rho_0^{8/3}+(C+D) \delta  \rho_0^{1+\delta }=0\\
+  (M^{*}/M)=&\frac{d\varepsilon}{d\tau}\Big|_{\rho_0,y=1/2}=(1+F \rho_0)^{-1}\\
+  K_m=&9\rho^2\frac{d^2(\varepsilon/ \rho)}{d\rho^2}\Big|_{\rho_0,y=1/2}=-2 \alpha_S \rho_0^{2/3} + 10 F \alpha_S \rho_0^{5/3} + 9 (C + D) (\delta-1) \delta \rho_0^\delta\\
+  S =& \frac{1}{8}\frac{d^2(\varepsilon/ \rho)}{dy^2}\Big|_{\rho_0,y=1/2}=\frac{5}{9} \alpha_S \rho_0^{2/3} - B \rho_0 + \frac{5}{9} (F - 3 G) \alpha_S \rho_0^{5/3} - D \rho_0^\delta\\
+  L=& 3\rho \frac{d S}{\rho}\Big|_{\rho_0,y=1/2}=\frac{10}{9} \alpha_S \rho_0^{2/3} - 3 B \rho_0 + \frac{25}{9} (F - 3 G) \alpha_S \rho_0^{5/3} - 3 D \delta \rho_0^\delta\\
+  K_s=&9 \rho^2\frac{d^2S}{d\rho^2}\Big|_{\rho_0,y=1/2}=-\frac{10}{9} \alpha_S \rho_0^{2/3} + \frac{50}{9} (F - 3 G) \alpha_S \rho_0^{5/3} - 9 D (\delta-1) \delta \rho_0^\delta
+ \end{split}
+\end{equation}
+
+the skyrme parameters can be found as follows,
+
+\begin{equation}
+ \begin{split}
+  F=&\frac{(M^{*}/M)^{-1}-1}{\rho_0}\\
+  \delta=&\frac{K_m+2 \rho_0^{2/3}(1-5 F\rho_0)\alpha_S}{3 \rho_0^{2/3}(1-2 F\rho_0)\alpha_S-9 E_0}\\
+  G=&\frac{9 K_S-27 (L-3 S) \delta +5 \rho_0^{2/3} \alpha_S [2-3 \delta +2 F \rho_0 (3 \delta-5)]}{30 \rho_0^{5/3} \alpha_S (3 \delta-5)}\\
+  D=&\frac{5 (3 L-9 S+\rho_0^{2/3} \alpha_S)-3 K_S}{9(5-8 \delta +3 \delta ^2)\rho_0^{\delta }}\\
+  C=&\frac{ \rho_0^{2/3} (1-2 F \rho_0) \alpha_S-3 E_0}{3 (\delta-1)\rho_0^{\delta }}-D\\
+  B=&\frac{ L (6+9 \delta )+5 ( \rho_0^{2/3} \alpha_S (3 \delta -2)-9 S \delta)-3 K_S}{18 \rho_0 (\delta-1)}\\
+  A=&-[\frac{2}{3} \alpha_S \rho ^{-1/3}+ B  +\frac{5}{3}F \alpha_S \rho ^{2/3}+ (C + D) \delta  \rho ^{\delta-1 }]
+ \end{split}
+\end{equation}
+
+
+
+\section{Finite Temperature DFT}
+In order to obtain the relationship between density and chemical potential, the following set of coupled equations need to be solved self-consistenly:
+ \begin{equation}
+  \begin{split}
+  f_k&=\bigg [1+ e^{\big(\frac{k^2}{2M^{*}}+U-\mu \big)/T}\bigg ]^{-1}\\
+  \rho &= \sum_{s,is}\int \frac{d^3k}{(2\pi)^3}f_k\\
+  \tau &= \sum_{s,is}\int \frac{d^3k}{(2\pi)^3}k^2 f_k\\
+  E &\equiv E(\rho,\tau)\\
+  \end{split}
+  \label{eq:sceq1}
+  \end{equation}
+  where, a sum over all discrete quantum numbers is performed (spin and isospin).
+  And from the energy density functional, the mean field parameters can be derived,
+  \begin{equation}
+   \begin{split}
+  M^{*}&=\frac{1}{2}(\frac{\delta E}{\delta \tau})^{-1}\\
+  U &= \frac{\delta E}{\delta \rho}
+   \end{split}
+   \label{eq:sceq2}
+  \end{equation}
+The chemical potential can be found 
+by inverting the expression for the density.
+
+\section{Thermodynamic Potentials}
+Since the effect of phenomenological mean field models can be incorporated into ($M^{*},U$) which are density dependent for Skyrme, and also
+temperature dependent for RMF, the thermodynamic properties of assymetric matter at finite temperature can be expressed by fermi integrals of
+`modified' non-interacting fermi gases.
+The single particle spectrum and dustribution fucntion:
+\begin{equation}
+ \begin{split}
+ \xi_i =& \frac{k^2}{2 M_i^{*}}+U_i\\
+  F_i=& \Big\{ \exp \big[\frac{\xi_i-\mu_i}{T} \big] + 1\Big \}^{-1}= \Big\{ \exp \big[\frac{\frac{k^2}{2 M^{*}_i}-\eta_i}{T} \big] + 1\Big \}^{-1},\ \overline{F}=1 -F\\
+  \end{split}
+  \end{equation}
+  The density and kinetic density:
+  \begin{equation}
+   \begin{split}
+  \rho_i=&\int_0^{\infty} \frac{dk}{\pi^2}k^2 F_i\\
+  \tau_i=&\int_0^{\infty} \frac{dk}{\pi^2}k^4 F_i\\
+   \end{split}
+  \end{equation}
+  The entropy density can be calcualted fro mthe distribution function:
+  \begin{equation}
+   \begin{split}
+  S/V=&-\int_0^{\infty}\frac{dk}{\pi^2}\ k^2 \big [ F_i\ln(F_i) + (1-F_i)\ln (1-F_i)\big]\\
+  =&-\int_0^{\infty}\frac{dk}{\pi^2}\ k^2 F_i \ln(\frac{F_i}{1-F_i})-\int_0^{\infty}\frac{dk}{\pi^2}\ k^2 \ln (1-F_i)\\
+  =&-\int_0^{\infty}\frac{dk}{\pi^2}\ k^2 F_i \ln(\exp \big[\frac{-\xi_i+\mu_i}{T} \big])-[\frac{k^3}{3 \pi^2}\ln (1-F_i)]
+  \Big|_0^{\infty}+\int_0^{\infty}\frac{dk}{\pi^2}\ \frac{k^3}{3} \frac{k}{M_i^{*}}\frac{\exp \big[\frac{\xi_i-\mu_i}{T} \big]}{1-F_i}\\ 
+  =&\big[\frac{1}{2 M_i^{*} T}+\frac{1}{3 M_i^{*}T}\big]\int_0^{\infty}\frac{dk}{\pi^2}\ k^4 F_i+\frac{U_i-\mu_i}{T}\ \int_0^{\infty}\frac{dk}{\pi^2}\ k^2 F_i\\
+  =&\frac{1}{T}[\frac{5\tau_i}{6M_i^{*}}+(U_i-\mu_i)\rho]
+   \end{split}
+  \end{equation}
+From the first law of thermodynamics:
+  \begin{equation}
+  \begin{split}
+  E_i =& TS_i+\mu_i N_i-P_iV\\
+  P_i=&\frac{T S_i + \mu_i N_i - E_i}{V}\\
+    =&\frac{5 \tau_i}{6 M_i^{*}}+U_i \rho_i-\frac{E_i}{V}
+  \end{split}
+  \end{equation}
+\section{Thermodynamic derivatives}
+Let,
+\begin{equation}
+ \begin{split}
+  \alpha_1=&\frac{\hbar^2}{2M}(F-G)\frac{ 1-2 y_p}{ 1-(3-y_p) y_p}, \alpha_2 =\frac{\hbar^2}{2M} \frac{G (2-y_p) (1-2 y_p)-F y_p}{1-(3-y_p) y_p}
+ \end{split}
+\end{equation}
+Then,
+\begin{equation}
+ \begin{split}
+  \frac{\hbar^2}{2 M^{*}_i}=\frac{\hbar^2}{2 M}+\alpha_1 n_i+\alpha_2 n_{-i}
+ \end{split}
+\end{equation}
+where, $i$ denotes the isospin value. From epxression above, the derivative of the effective mass in terms of the density can be found:
+\begin{equation}
+ \begin{split}
+  \partial_{n_i}M^{*}_r=-2\frac{{M_r^{*}}^2}{\hbar^2}\big[\alpha_2+(\alpha_1-\alpha_2)\delta_{ir}\big]
+ \end{split}
+\end{equation}
+The density and kinetic density can be expressed in terms of the general fermi integration:
+\begin{equation}
+ \begin{split}
+  F_n(\eta)=&\int_0^{\infty}\frac{u^n}{e^{u-\eta}+1}du,\ \eta_i=(\mu_i-U_i)/T,\  U_i=\frac{\delta \mathcal{E}}{\delta n_i}\\
+  n_i=&\frac{1}{2\pi^2}(\frac{2M_r^{*}T}{\hbar^2})^{3/2}F_{1/2}(\eta_i)\leftrightarrow   \eta_i= F^{-1}_{1/2}\big[2 \pi^2 n_i(\frac{\hbar^2}{2 M_r^{*}T})^{3/2}\big]=F^{-1}_{1/2}(u_i)\\
+ \end{split}
+\end{equation}
+And,
+\begin{equation}
+ \begin{split}
+  \partial_{n_i}u_r=&2\pi^2(\frac{\hbar^2}{2 M_r^{*}T})^{3/2}\Big[\delta_{ir}+\frac{3 n_r M_r^{*}}{\hbar^2}\big[\alpha_2+(\alpha_1-\alpha_2)\delta_{ir}\big]\Big]\\
+  =&\frac{1}{n_r\ F_{1/2}(\eta_r)}\Big[\delta_{ir}+\frac{3 n_r M_r^{*}}{\hbar^2}\big[\alpha_2+(\alpha_1-\alpha_2)\delta_{ir}\big]\Big]
+ \end{split}
+\end{equation}
+Also, $\partial_{\eta}F^{-1}_n(\eta)=nF_{n-1}(\eta) \leftrightarrow \partial_{u}F^{-1}_n(u)=(1/n)F^{-1}_{n-1}(u)$:
+\begin{equation}
+ \begin{split}
+  \partial_{n_i}\eta_r=&d_{u}F^{-1}_{1/2}(u_r) \times \partial_{n_i}u_r\\
+  =&\frac{\partial{u}F^{-1}_{1/2}(u_r)}{n_r \ F_{1/2}(\eta_r)} \Big[\delta_{ir}+\frac{3 n_r M_r^{*}}{\hbar^2}\big[\alpha_2+(\alpha_1-\alpha_2)\delta_{ir}\big]\Big]\\
+  =&\frac{2F^{-1}_{1/2}(u_r)}{n_r \ F_{1/2}(\eta_r)} \Big[\delta_{ir}+\frac{3 n_r M_r^{*}}{\hbar^2}\big[\alpha_2+(\alpha_1-\alpha_2)\delta_{ir}\big]\Big]\\
+  \equiv \frac{G}{n_r}\Big[\delta_{ir}+\frac{3 n_r M_r^{*}}{\hbar^2}\big[\alpha_2+(\alpha_1-\alpha_2)\delta_{ir}\big]\Big]\\
+ \end{split}
+\end{equation}
+Thus,
+\begin{equation}
+ \begin{split}
+  
+ \end{split}
+\end{equation}
+
+
+
+\end{document}
