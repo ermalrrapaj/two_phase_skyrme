@@ -9,6 +9,7 @@
 %\usepackage[latin1]{inputenc}
 \usepackage{epsfig}
 \usepackage{amsmath}
+\usepackage{mdframed}
 %\usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{listings}
@@ -70,7 +71,7 @@
 % See the ``Article customise'' template for come common customisations
 
 \title{NSE EOS Notes}
-\author{Luke Roberts, Sanjay Reddy}
+\author{Luke Roberts, Ermal Rrapaj, Sanjay Reddy}
 \date{} % delete this line to display the current date
 
 %%% BEGIN DOCUMENT
@@ -286,5 +287,280 @@ voids.  Derivatives of this are also required
 \caption{ Phase boundaries for a variety of temperatures with LS Skyrme.}
 \vspace*{-0.7cm}
 \end{figure}
+
+\section{Uniform Matter Thermodynamics}
+This section deals with the various relationships between the thermodynamic potentials and their derivatives in the framework of uniform matter.
+The set of independent parameters is given by $(V,N,Y_i,T)$.
+In homogeneous matter, $\mathcal{E}=T\mathcal{S} -P+ \mu_i n_i,\ \mathcal{F} =\mathcal{E} - T\mathcal{S} = -P + \mu_i n_i$.
+For constant volume calculations, the indpendent set of parameters becomes 
+$(n,Y_i,T)$ and the first law of thermodynamics can be written
+as follows,
+\begin{equation}
+ \begin{split}
+  d\mathcal{E}&=Td\mathcal{S}+\mu_i d n_i,\ \ d\mathcal{F} = -\mathcal{S}dT+\mu_i d n_i,\ dP = S dT + n_i d\mu_i\\
+ \end{split}
+\end{equation}
+where, $ \mathcal{S}= S/V,\ n_i=N_i/V,\ n = \sum_i n_i, s= S/N = \mathcal{S}/n,\ f= F/N=\mathcal{F}/n$ and when taking partial derivatives, all other 
+independent parameters are kept constant.
+Then, $ \mu_i =\partial_{n_i}\mathcal{F},\  \mathcal{S}=-\partial_{T}\mathcal{F}=\partial_T P, \ \mu_i = \partial \mu_i P$.
+In practice it is more convenient to work with the following set of parameters, $\mu=\mu_n-\mu_p,\ Y = Y_n-Y_p$ where,$1 = Y_n+Y_p$:
+\begin{equation}
+ \begin{split}
+  &d\mathcal{E}=Td\mathcal{S}+\mu d n,\ \ d\mathcal{F} = -\mathcal{S}dT+\mu d n,\ dP = S dT + n d\mu\\
+  &\mu =\partial_{n}\mathcal{E}=\partial_{n}\mathcal{F},\  \mathcal{S}=-\partial_{T}\mathcal{F}=\partial_T P, \ n = \partial \mu P
+ \end{split}
+\end{equation}
+
+The $1^{st}$ order partial derivatives of $f$ with respect to $(n,Y,T)$ can be found:
+\begin{equation}
+ \begin{split}
+  &\partial_{n}f=-\mathcal{F}/n^{2} +\partial_{n}\mathcal{F}/n= (-\mathcal{F} + \mu n )/n^2=P/n^2\\
+  &\partial_{Y} f = \frac{\partial \mathcal{F}}{n \partial Y}=\partial_{n}\mathcal{F}=\mu \\
+  &\partial_Tf= \partial_T \mathcal{F}/n =-s\\
+ \end{split}
+\end{equation}
+So,
+\begin{mdframed}
+\begin{equation}
+ \begin{split}
+  &\partial_{n}f=P/n^2, \  \partial_{Y} f =\mu, \  \partial_Tf=-s\\
+ \end{split}
+\end{equation} 
+\end{mdframed}
+And the 1$^{st}$ law of thermodynamics for the pressure, $dP = S dT + n d\mu$, with $(n,T,Y)$ as independent parameters:
+\begin{equation}
+ \begin{split}
+  \partial_n P =&n \partial_n \mu\\
+  \partial_T P =&S = n s+\partial_T \mu\\
+  \partial_Y P =&n \partial_Y \mu 
+ \end{split}
+\end{equation} 
+The $2^{nd}$ order mixed partial derivatives give thermodynamic relations among $(P,\mu,s)$:
+\begin{equation}
+ \begin{split}
+  \partial_{Tn}f=\partial_{nT}f \rightarrow -\partial_{n}s=&\partial_TP/n^2\\
+  \partial_{TY}f=\partial_{YT}f \rightarrow \partial_T\mu=&-\partial_Ys\\
+  \partial_{Yn}f=\partial_{nY}f \rightarrow \partial_n\mu=&\partial_YP/n^2
+ \end{split}
+\end{equation}
+Combining the 2 set of identities above:
+\begin{equation}
+ \begin{split}
+  -\partial_{n}s=\partial_TP/n^2=(n s+\partial_T \mu)/n^2=&s/n\partial_T \mu/n^2=s/n-\partial_Ys/n^2\leftrightarrow\\
+  s=&\partial_Ys/n-n\partial_ns\\
+ \end{split}
+\end{equation}
+Also,
+\begin{equation}
+ \begin{split}
+ \partial_T P =& n s+\partial_T \mu \leftrightarrow \\
+  \partial_{YT}f=&n^2\partial_{nT}f+n\partial_{T}f
+ \end{split}
+\end{equation}
+The remaining $2^{nd}$ order partial derivatives:
+\begin{equation}
+ \begin{split}
+ \partial_{nn} f =&\partial_n (P/n^2) =\partial_n P/n^2 - 2 P/n^3\\
+  =&\partial_{\{nY\}}f/n - 2 \partial_{n}f/n\\
+  \partial_{YY}f=&\partial_{Y}\mu\\
+  =&\partial_{Y}P/n\\
+  =&n\partial_{nY}f\\
+  \partial_{TT}f=&-\partial_Ts
+ \end{split}
+\end{equation}
+Since all mixed partial derivatives should be equal under permutations of the order of taking the derivatives, for higher order derivatives
+all possible permutations will be denoted by $\{\}$. 
+For instance, all mixed derivatives from $T,n,Y$ will be denoted by $\partial_{\{YTn\}}f$.
+%So,
+%\begin{equation}
+% \begin{split}
+ % &\partial_{nn} f  =\partial_n P/n^2 - 2 P/n^3=\partial_n \mu /n- 2 \partial_{n}f/n = \partial_{Yn} f /n- 2 \partial_{n}f/n\\
+ % &\partial_{nT}f=\partial_T P/n^2 =  s/n+\partial_T \mu/ n^2 = -\partial_{T}f/n+\partial_{YT} f/n^2\\
+ % &\partial_{nY} f=\partial_Y P/n^2 = \partial_Y \mu /n = \partial_{YY} f /n 
+ %\end{split}
+%\end{equation}
+
+Thus, at $2^{dn}$ order, there are only 3 independent partial derivatives and the rest can be calculated from them:
+\begin{mdframed}
+\begin{equation}
+ \begin{split}
+ \partial_{YY}f=&n\partial_{\{nY\}}f=n^2\partial_{nn}f+2n\partial_n f\\
+  \partial_{\{YT\}}f=&n^2\partial_{\{nT\}}f+n\partial_{T}f\\
+ \end{split}
+\end{equation}
+\end{mdframed}
+\begin{mdframed}
+\begin{equation}
+ \begin{split}
+  &\partial_{\{nY\}}f= \partial_n P/n = \partial_n \mu  = \partial_Y P /n^2 = \partial_Y \mu /n \\
+  &\partial_{\{nT\}}f=s/n+\partial_T\mu/n^2=s/n-\partial_Ys/n^2=\partial_T P/n^2=-\partial_n s\\
+  &\partial_{TT} f =-\partial_T s\\
+ \end{split}
+\end{equation}
+\end{mdframed}
+All $3^{rd}$ order derivatives based on $\partial_{TT}f$:
+\begin{equation}
+ \begin{split}
+  \partial_{TTT}f=&-\partial_{TT}s\\
+  \partial_{\{TTn\}}f=&\partial_{\{TTY\}}f/n^2-\partial_{TT}f/n\\
+  =&-\partial_{\{Tn\}}s=\partial_Ts/n+\partial_{TT}\mu/n^2 = \partial_Ts/n-\partial_{YT}s/n^2=\partial_{TT}P/n^2\\ 
+ \end{split}
+\end{equation}
+All remaining $3^{rd}$ order derivatives based on $\partial_{nT}f$:
+\begin{equation}
+ \begin{split}
+  \partial_{\{nnT\}}f=&\partial_n \big[ \partial_{\{YT\}}f/n^2-\partial_{T}f/n\big]\\
+  =&\partial_{\{nTY\}}f/n^2-2\partial_{\{YT\}}f/n^3-\partial_{\{nT\}}f/n+\partial_{T}f/n^2\\
+  =&\partial_{\{nTY\}}f/n^2-3\partial_{\{nT\}}f/n+2\partial_{T}f/n^2\\
+  =&\partial_{\{Tn\}}P/n^2-2\partial_{T}P/n^3=-\partial_{nn}s\\
+  =&\partial_{n}s/n-s/n^2+\partial_{Tn}\mu/n^2-2\partial_{T}\mu/n^3=\partial_{n}s/n-s/n^2-\partial_{\{Yn\}}s/n^2+2\partial_{Y}s/n^3\\
+  =&3\partial_Ys/n^3-2s/n^2-\partial_{\{Yn\}}s/n^2
+ \end{split}
+\end{equation}
+All remaining $3^{rd}$ order derivatives based on $\partial_{nY}f$:
+\begin{equation}
+ \begin{split}
+  \partial_{\{YYn\}}f=&\partial_{YYY}f/n=n\partial_{\{nnY\}}f+\partial_{\{nY\}}f=n^2\partial_{nnn}f+4n\partial_{nn}f+2\partial_{n}f\\
+  \partial_{\{nnY\}}f=&\partial_{nY}P/n=\partial_{YY}P/n^2=\partial_{nY}\mu=\partial_{YY}\mu/n\\
+ \end{split}
+\end{equation}
+Thus, at $3^rd$ order there are 4 independent partial derivatives:
+\begin{mdframed}
+\begin{equation}
+ \begin{split}
+  &\partial_{\{TTn\}}f=\partial_{\{TTY\}}f/n^2-\partial_{TT}f/n\\
+  &\partial_{\{nnT\}}f=\partial_{\{nTY\}}f/n^2-3\partial_{\{nT\}}f/n+2\partial_{T}f/n^2\\
+  &\partial_{\{YYn\}}f=\partial_{YYY}f/n=n\partial_{\{nnY\}}f+\partial_{\{nY\}}f=n^2\partial_{nnn}f+4n\partial_{nn}f+2\partial_{n}f\\
+ \end{split}
+\end{equation} 
+\end{mdframed}
+
+\begin{mdframed}
+\begin{equation}
+ \begin{split}
+  \partial_{TTT}f=&-\partial_{TT}s\\
+  \partial_{\{TTn\}}f=&-\partial_{\{Tn\}}s=\partial_Ts/n+\partial_{TT}\mu/n^2 = \partial_Ts/n-\partial_{YT}s/n^2=\partial_{TT}P/n^2\\ 
+  \partial_{\{nnT\}}f=&\partial_{\{Tn\}}P/n^2-2\partial_{T}P/n^3=-\partial_{nn}s\\
+  =&\partial_{n}s/n-s/n^2+\partial_{Tn}\mu/n^2-2\partial_{T}\mu/n^3=3\partial_Ys/n^3-2s/n^2-\partial_{\{Yn\}}s/n^2\\
+  \partial_{\{nnY\}}f=&\partial_{\{nY\}}P/n=\partial_{YY}P/n^2=\partial_{\{nY\}}\mu=\partial_{YY}\mu/n
+ \end{split}
+\end{equation} 
+\end{mdframed}
+
+All $4^{th}$ order derivatives based on $\partial_{TTT}f$:
+\begin{equation}
+ \begin{split}
+  \partial_{TTTT}f=&-\partial_{TTT}s\\
+  \partial_{\{TTTn\}}f=&\partial_{\{TTTY\}}f/n^2-\partial_{TTT}f/n\\
+   =&-\partial_{\{TTn\}}s=\partial_{\{TT\}}s/n+\partial_{TTT}\mu/n^2=\partial_{\{TT\}}s/n-\partial_{\{YTT\}}s/n^2=\partial_{TTT}P/n^2\\
+ \end{split}
+\end{equation}
+All remaining $4^{th}$ order derivatives based on $\partial_{TTn}f$:
+\begin{equation}
+ \begin{split}
+  \partial_{\{TTnn\}}f=&\partial_{\{TTYn\}}f/n^2-2\partial_{\{TTY\}}f/n^3+\partial_{\{TT\}}f/n^2-\partial_{\{nTT\}}f/n\\
+  =&\partial_{\{TTYn\}}f/n^2-3\partial_{\{TTY\}}f/n^3+2\partial_{TT}f/n^2\\
+  =&-\partial_{\{nnT\}}s=\partial_{\{Tn\}}s/n-\partial_{T}s/n^2+\partial_{\{nTT\}}\mu/n^2-2\partial_{TT}\mu/n^3\\
+  =&\partial_{\{Tn\}}s/n-\partial_{T}s/n^2-\partial_{\{YTn\}}s/n^2+2\partial_{\{YT\}}s/n^3\\
+  =&3\partial_{\{YT\}}s/n^3-2\partial_{T}s/n^2-\partial_{\{YTn\}}s/n^2\\
+  =&\partial_{\{TTn\}}P/n^2-2\partial_{TT}P/n^3\\
+  \partial_{\{TTnY\}}f=&\partial_{\{TTYY\}}f/n^2-\partial_{\{TTY\}}f/n
+ \end{split}
+\end{equation}
+All remaining $4^{th}$ order derivatives based on $\partial_{nnT}f$:
+\begin{equation}
+ \begin{split}
+  \partial_{\{nnnT\}}f=&\partial_{n}\big[\partial_{\{nTY\}}f/n^2-3\partial_{\{nT\}}f/n+2\partial_{T}f/n^2 \big]\\
+  =&\partial_{\{nnTY\}}f/n^2-2\partial_{\{nTY\}}f/n^3-3\partial_{\{nnT\}}f/n+5\partial_{\{nT\}}f/n^2-2\partial_Tf/n^3\\
+  =&\partial_{\{nnYT\}}f/n^2-5\partial_{\{TYn\}}f/n^3+14\partial_{\{nT\}}f/n^2-8\partial_T f/n^3\\
+  =&\partial_{\{nnT\}}P/n^2-4\partial_{\{nT\}}P/n^3+6\partial_{T}P/n^4=-\partial_{nnn}s\\
+  =&\partial_{nn}s/n-2\partial_{n}s/n^2+2s/n^3+\partial_{\{Tnn\}}\mu/n^2-4\partial_{\{Tn\}}\mu/n^3+6\partial_{T}\mu/n^4\\
+  =&5\partial_{\{nY\}}s/n^3-9\partial_{Y}s/n^4-2\partial_ns/n^2+4s/n^3-\partial_{\{nnY\}}s/n^2\\
+  \partial_{\{nnTY\}}f=&\partial_{\{YYnT\}}f/n^2-3\partial_{\{nTY\}}f/n+2\partial_{\{TY\}}f/n^2\\
+ \end{split}
+\end{equation}
+And, from $\partial_{YYn}f$:
+\begin{equation}
+ \begin{split}
+  \partial_{\{YYnT\}}=&f\partial_{\{YYYT\}}f/n=n\partial_{\{nnYT\}}f+\partial_{\{nYT\}}f\ =n^2\partial_{\{nnnT\}}f+4n\partial_{\{nnT\}}f+2\partial_{\{nT\}}f
+ \end{split}
+\end{equation}
+
+
+All remaining $4^{th}$ order derivatives based on $\partial_{YYn}f$:
+\begin{equation}
+ \begin{split}
+  \partial_{\{YYnn\}}f=&\partial_{\{YYYn\}}f/n-\partial_{YYY}f/n^2=n\partial_{\{nnnY\}}f+2\partial_{\{nnY\}}f=n^2\partial_{nnnn}f+6n\partial_{nnn}f+6\partial_{nn}f\\
+  \partial_{\{nnnY\}}f=&\partial_{\{nnY\}}P/n-\partial_{\{nY\}}P/n^2=\partial_{\{YYn\}}P/n^2-2\partial_{YY}P/n^3=\partial_{\{nnY\}}\mu=\partial_{\{YYn\}}\mu/n-\partial_{YY}\mu/n^2
+ \end{split}
+\end{equation}
+
+Thus, at $4^th$ order there are 5 independent partial derivatives:
+\begin{mdframed}
+\begin{equation}
+ \begin{split}
+  \partial_{\{TTTn\}}f=&\partial_{\{TTTY\}}f/n^2-\partial_{\{TTT\}}f/n\\
+  \partial_{\{TTnn\}}f=&\partial_{\{TTYn\}}f/n^2-3\partial_{\{TTY\}}f/n^3+2\partial_{TT}f/n^2\\
+  =&\partial_{\{TTYY\}}f/n^4-4\partial_{\{TTY\}}f/n^3+2\partial_{TT}f/n^2\\
+  \partial_{\{nnYT\}}f=&\partial_{\{YYnT\}}f/n^2-3\partial_{\{nTY\}}f/n+2\partial_{\{TY\}}f/n^2\\
+  =&n^2\partial_{\{nnnT\}}f+5\partial_{\{nTY\}}f/n-14 \partial_{\{nT\}}f+8\partial_Tf/n\\
+  \partial_{\{YYnn\}}f=&\partial_{\{YYYn\}}f/n-\partial_{YYY}f/n^2=n\partial_{\{nnnY\}}f+2\partial_{\{nnY\}}f\\
+  =&n^2\partial_{nnnn}f+6n\partial_{nnn}f+6\partial_{nn}f
+  \end{split}
+\end{equation}
+\end{mdframed}
+\begin{mdframed}
+\begin{equation}
+ \begin{split}
+ \partial_{TTTT}f=&-\partial_{TTT}s\\
+  \partial_{\{TTTn\}}f=&-\partial_{\{TTn\}}s=\partial_{\{TT\}}s/n+\partial_{TTT}\mu/n^2=\partial_{\{TT\}}s/n-\partial_{\{YTT\}}s/n^2=\partial_{TTT}P/n^2\\
+  \partial_{\{TTnn\}}f=&-\partial_{\{nnT\}}s=\partial_{\{Tn\}}s/n-\partial_{T}s/n^2+\partial_{\{nTT\}}\mu/n^2-2\partial_{TT}\mu/n^3\\
+  =&\partial_{\{Tn\}}s/n-\partial_{T}s/n^2-\partial_{\{YTn\}}s/n^2+2\partial_{\{YT\}}s/n^3\\
+  =&3\partial_{\{YT\}}s/n^3-2\partial_{T}s/n^2-\partial_{\{YTn\}}s/n^2\\
+  =&\partial_{\{TTn\}}P/n^2-2\partial_{TT}P/n^3\\
+  \partial_{\{nnnT\}}f=&\partial_{\{nnT\}}P/n^2-4\partial_{\{nT\}}P/n^3+6\partial_{T}P/n^4=-\partial_{nnn}s\\
+  =&\partial_{nn}s/n-2\partial_{n}s/n^2+2s/n^3+\partial_{\{Tnn\}}\mu/n^2-4\partial_{\{Tn\}}\mu/n^3+6\partial_{T}\mu/n^4\\
+  =&5\partial_{\{nY\}}s/n^3-9\partial_{Y}s/n^4-2\partial_ns/n^2+4s/n^3-\partial_{\{nnY\}}s/n^2\\
+  \partial_{\{nnnY\}}f=&\partial_{\{nnY\}}P/n-\partial_{\{nY\}}P/n^2=\partial_{\{YYn\}}P/n^2-2\partial_{YY}P/n^3\\
+  =&\partial_{\{nnY\}}\mu=\partial_{\{YYn\}}\mu/n-\partial_{YY}\mu/n^2
+  \end{split}
+\end{equation}
+\end{mdframed}
+
+$5^{th}$ order partial derivatives based on $\partial_{TTTT}f$:
+\begin{equation}
+ \begin{split}
+  &\partial_{TTTTT}f=-\partial_{TTTT}s\\
+  &\partial_{\{TTTTY\}}f=n^2\partial_{TTTTn}f+n\partial_{TTTT}f\\
+  &\partial_{\{TTTTn\}}f=-\partial_{\{TTTn\}}s=\partial_{\{TTT\}}s/n+\partial_{TTTT}\mu/n^2=\partial_{\{TTT\}}s/n-\partial_{\{TTTY\}}s/n^2=\partial_{TTTT}P/n^2\\
+ \end{split}
+\end{equation}
+$5^{th}$ order partial derivatives based on $\partial_{TTnn}f$:
+\begin{equation}
+ \begin{split}
+  \partial_{TTnnY}f=&\partial_{\{TTYYn\}}f/n^2-3\partial_{\{TTYY\}}f/n^3+2\partial_{\{TTY\}}f/n^2\\
+  =&\partial_{\{TTYYY\}}f/n^4-4\partial_{\{TTYY\}}f/n^3+2\partial_{\{TTY\}}f/n^2\\
+  =&-\partial_{\{nnTY\}}s=\partial_{\{TnY\}}s/n-\partial_{\{TY\}}s/n^2+\partial_{\{nYTT\}}\mu/n^2-2\partial_{\{TTY\}}\mu/n^3\\
+  =&\partial_{\{YTn\}}s/n-\partial_{\{YT\}}s/n^2-\partial_{\{YYTn\}}s/n^2+2\partial_{\{YYT\}}s/n^3\\
+  =&3\partial_{\{YYT\}}s/n^3-2\partial_{\{TY\}}s/n^2-\partial_{\{YYTn\}}s/n^2\\
+  =&\partial_{\{TTnY\}}P/n^2-2\partial_{\{TTY\}}P/n^3\\
+  \partial_{TTTnn}f=&\partial_{\{TTTYn\}}f/n^2-3\partial_{\{TTTY\}}f/n^3+2\partial_{TTT}f/n^2\\
+  =&\partial_{\{TTTYY\}}f/n^4-4\partial_{\{TTTY\}}f/n^3+2\partial_{TTT}f/n^2\\
+  =&-\partial_{\{nnTT\}}s=\partial_{\{TTn\}}s/n-\partial_{TT}s/n^2+\partial_{\{TTTn\}}\mu/n^2-2\partial_{TTT}\mu/n^3\\
+  =&\partial_{\{TTn\}}s/n-\partial_{TT}s/n^2-\partial_{\{TTYn\}}s/n^2+2\partial_{\{TTY\}}s/n^3\\
+  =&3\partial_{\{TTY\}}s/n^3-2\partial_{TT}s/n^2-\partial_{\{TTYn\}}s/n^2\\
+  =&\partial_{\{TTTn\}}P/n^2-2\partial_{TTT}P/n^3\\
+  \partial_{TTnnn}f=&\partial_{n}\big[\partial_{\{TTYn\}}f/n^2-3\partial_{\{TTY\}}f/n^3+2\partial_{TT}f/n^2\big]\\
+  =&\partial_{n} \big[\partial_{\{TTYY\}}f/n^4-4\partial_{\{TTY\}}f/n^3+2\partial_{TT}f/n^2\big]\\
+  =&\partial_{\{TTnnY\}}f/n^2-5\partial_{\{TTYn\}}f/n^3-9\partial_{\{TTY\}}f/n^4+2\partial_{\{TTn\}}f/n^2-4\partial_{TT}f/n^3\\
+  =&\partial_{\{TTnnY\}}f/n^2-5\partial_{\{TTYn\}}f/n^3-7\partial_{\{TTY\}}f/n^4-6\partial_{TT}f/n^3\\
+  =&\partial_{\{TTYYn\}}f/n^4-4\partial_{\{TTYY\}}f/n^5-4\partial_{\{TTYn\}}f/n^3+12\partial_{\{TTY\}}f/n^4+2\partial_{\{TTn\}}f/n^2-4\partial_{TT}f/n^3\\
+  =&\partial_{\{TTYYn\}}f/n^4-4\partial_{\{TTYY\}}f/n^5-4\partial_{\{TTYn\}}f/n^3+14\partial_{\{TTY\}}f/n^4-6\partial_{TT}f/n^3\\
+  =&\partial_{\{TTYYn\}}f/n^4-8\partial_{\{TTYY\}}f/n^5+16\partial_{\{TTY\}}f/n^4-6\partial_{TT}f/n^3\\
+ \end{split}
+\end{equation}
+
+
+
 
 \end{document}
