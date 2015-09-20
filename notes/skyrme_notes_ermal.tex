@@ -10,6 +10,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{mathtools}
+\usepackage{mdframed}
 \usepackage{textcomp}
 \usepackage{subcaption}
 \usepackage{slashed}
@@ -509,8 +510,8 @@ Now, we are ready to find the partial derivatives of the chemical potential,
   \partial_{T}\mu_r=& \eta_r + T \partial_{T}\eta_r +\partial_{T}U_r\\
   =&\eta_r - \frac{3}{2}G_r+\alpha_1 \partial_{T}\tau_r+\alpha_2 \partial_{T}\tau_{-r}\\
   =&\eta_r - \frac{3}{2}G_r+\frac{5}{2T}(\alpha_1\tau_r+\alpha_2\tau_{-r})- \frac{9}{2} (\alpha_1 \frac{M_r^{*}}{\hbar^2}\rho_r G_r+\alpha_2 \frac{M_{-r}^{*}}{\hbar^2}\rho_{-r} G_{-r})\\
-  =&\eta_r - \frac{3}{2}G_r+\sum_i (\frac{5\tau_i}{2T}-\frac{9M_r^{*}}{2 \hbar^2}) \big[\alpha_2+(\alpha_1-\alpha_2)\big]\\
-  =&\eta_r - \frac{3}{2}G_r+\sum_i (\frac{5\tau_i \hbar^2}{4TM_r^{*}}-\frac{9}{4}) \big[F+G(1-2\delta_{ir})\big]
+  =&\eta_r - \frac{3}{2}G_r+\sum_i (\frac{5\tau_i}{2T}-\frac{9M_i^{*}}{2 \hbar^2}\rho_i G_i) \big[\alpha_2+(\alpha_1-\alpha_2)\big]\\
+  =&\eta_r - \frac{3}{2}G_r+\sum_i (\frac{5\tau_i \hbar^2}{4TM_i^{*}}-\frac{9}{4}\rho_iG_i) \big[F+G(1-2\delta_{ir})\big]
  \end{split}
 \end{equation}
 
@@ -547,14 +548,40 @@ The derivatives of the $\mu_r$:
   \partial_{Y}\mu_r=-\text{sgn}(r)\frac{TG_r}{\rho \rho_r}(1-3\rho_r G)+\partial_{Y}U_r&\\
  \end{split}
 \end{equation}
-And, the chemical potential we will use is $\mu = \mu_n-\mu_p$.
+And, the chemical potential we will use is $\mu = \mu_n-\mu_p$:
+\begin{equation}
+ \begin{split}
+  \partial_\rho \mu=&\partial_{\rho_n} \mu+\partial_{\rho_p} \mu\\
+  =&\frac{5 FG\hbar^2}{M}(\tau_n-\tau_p)+\frac{3GT}{M}\Big[G_p M^{*}_p (1+3F\rho_p)-G_n M^{*}_n(1+3F\rho_n)\Big]\\
+  &+3FT(G_n-G_p)+\frac{2T}{(1-Y^2)\rho}[(G_n-G_p)-(G_n+G_p)Y]-8D(\delta-1)Y\rho^{\delta-1}\\
+  \end{split}
+\end{equation}
+
 
 The entropy per baryon is calculated in the previous section and it is $\rho s=\sum_r(\frac{5 \hbar^2\tau_r}{6M_r^{*}T}-\rho_r \eta_r)$:
-%\begin{equation}
-% \begin{split}
-  
-% \end{split}
-%\end{equation}
+\begin{equation}
+ \begin{split}
+ \rho \partial_{T}s=&\sum_r \frac{5 \hbar^2}{6M_r^{*}T}(\partial_T\tau_r-\tau_r/T)-\rho_r\partial_T\eta_r)\\
+ =&\frac{1}{4T}\sum_r(\frac{5\hbar^2\tau_r}{M_r^{*}}-9\rho_r G_r) 
+ \end{split}
+\end{equation}
+
+Thus, we can give analytical expressions for all independent $2^{nd}$ derivatives of the free energy per baryon (see NSE notes). The 
+notation for number density is $n$ in NSE notes and $\rho$ so far here, everything else is the same. Here we switch to match NSE notation.
+
+\begin{mdframed}
+ \begin{equation}
+  \begin{split}
+   \partial_{TT}f=&-\partial_Ts=-\frac{1}{4T\rho}\sum_{r={n,p}}(\frac{5\hbar^2\tau_r}{M_r^{*}}-9\rho_r G_r)\\
+   \partial_{nY}f=&\partial_n\mu=\frac{5 FG\hbar^2}{M}(\tau_n-\tau_p)+\frac{3GT}{M}\Big[G_p M^{*}_p (1+3Fn_p)-G_n M^{*}_n(1+3Fn_n)\Big]\\
+  &+3FT(G_n-G_p)+\frac{2T}{(1-Y^2)n}[(G_n-G_p)-(G_n+G_p)Y]-8D(\delta-1)Yn^{\delta-1}\\
+  \partial_{nT}f=& s/n+\partial_T\mu=\frac{1}{n^2}\sum_r(\frac{5\hbar^2 \tau_r}{6 M_r^{*}T}-n_r\eta_r)+(\eta_n-\eta_p)-\frac{3}{2}(G_n-G_p)\\
+  &-\Big[\frac{5\hbar^2}{2T}[(\frac{\tau_n}{M_n^{*}}-\frac{\tau_p}{M_p^{*}})-\frac{9}{2}(n_n \tau_n-n_p \tau_p)]\Big]
+  \end{split}
+ \end{equation}
+\end{mdframed}
+
+
 
 
 
