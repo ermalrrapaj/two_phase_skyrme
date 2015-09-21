@@ -445,7 +445,7 @@ From epxressions above, the partial derivatives can be found:
 \begin{equation}
  \begin{split}
   \partial_{\rho_i}M^{*}_r=&-2\frac{{M_r^{*}}^2}{\hbar^2}\big[\alpha_2+(\alpha_1-\alpha_2)\delta_{ir}\big]\\
-  =&-\rho_rM_r^{*}\big[F+G(1-2\delta_{ir})\big]\\
+  =&-\frac{{M_r^{*}}^2}{M}\big[F+G(1-2\delta_{ir})\big]\\
   \partial_{T}M^{*}_r =& 0\\
   \partial_{\rho_i}U_r=& \alpha_1 \partial_{\rho_i}\tau_r+\alpha_2 \partial_{\rho_i}\tau_{-r} + 2 A + 4 B \delta_{ir} + C \delta (1+\delta)\rho^{\delta-1}\\
   &+4 D \rho^{\delta-3} \big[(\delta-1)\rho_{-r}(2\rho_{-r}+\delta \rho_r)-\delta_{-ir}\rho [(\delta-2)\rho_{-r}-\delta \rho_r]\big]\\
@@ -530,18 +530,21 @@ where $Y= Y_n-Y_p =\frac{\rho_n-\rho_p}{\rho}$:
 Thus,
 \begin{equation}
  \begin{split}
-  \partial_{\rho}M^{*}_r=&-\frac{2M_r^{*}}{\hbar^2}(\alpha_1+\alpha_2)\\
+  \partial_{\rho}M^{*}_r=&-\frac{2{M_r^{*}}^2}{\hbar^2}(\alpha_1+\alpha_2)=-2\frac{{M^{*}_r}^2}{M}F\\
   \partial_{\rho}U_r=&4 (A+B)+2 C \delta(1+\delta)\rho^{\delta-1}+4D\rho^{\delta-3}\big[\delta \rho_r^2+(3\delta-2)\rho_{-r}^2+2[1+\delta(\delta-1)\rho_r\rho_{-r}]\big]\\
   &+(\alpha_1+\alpha_2)\partial_{\rho}(\tau_r+\tau_{-r})\\
   =&4 (A+B)+2 C \delta(1+\delta)\rho^{\delta-1}+4D\rho^{\delta-3}\big[\delta \rho_r^2+(3\delta-2)\rho_{-r}^2+2[1+\delta(\delta-1)\rho_r\rho_{-r}]\big]\\
   &+\sum_r\big[3TG_r\frac{M_r^{*}}{\hbar^2}+F(\frac{9M_r^{*}}{\hbar^2}T\rho_rG_r-5\tau_r)\big]\\
+  \partial_{\rho}\tau_r=&\frac{3G_rM_r^{*}T}{\hbar^2}(1+3F\rho_r)-5F \tau_r\\
+  \partial_{\rho}\eta_r=&\frac{G_r}{\rho_r}+3F\rho_r\\
   \partial_{Y}M^{*}_r=&-\text{sgn}(r)\frac{2M_r^{*}}{\rho \hbar^2}(\alpha_1-\alpha_2),\ \text{sgn}(n)=-1,\ \text{sgn}(p)=1\\
   \partial_Y U_r=& \text{sgn}(r)\big[4 \frac{B}{\rho}-4D \rho^{\delta-3}[(\delta-2)\rho_p-\delta \rho_n]\big]+\alpha_1\frac{\partial_Y\tau_r}{\rho}+\alpha_2\frac{\partial_Y\tau_{-r}}{\rho}\\
-  =&\text{sgn}(r)\big[4 \frac{B}{\rho}-4D \rho^{\delta-3}[(\delta-2)\rho_p-\delta \rho_n]-\frac{3 G_r M_r T}{\rho \hbar^2}+G(\frac{G_r M_r Y_r T}{ \hbar^2}-5\tau_r)\big],\ Y_r = \frac{1-\text{sgn}(r)Y}{2}
+  =&\text{sgn}(r)\big[4 \frac{B}{\rho}-4D \rho^{\delta-3}[(\delta-2)\rho_p-\delta \rho_n]-\frac{3 G_r M_r T}{\rho \hbar^2}+G(\frac{G_r M_r Y_r T}{ \hbar^2}-5\tau_r)\big],\ Y_r = \frac{1-\text{sgn}(r)Y}{2}\\
+ \partial_{Y}\tau_r=&-\text{sgn}(r)\big[\frac{3G_rTM_r}{\hbar^2}(1-3G\rho_r)-5G\tau_r\big]\\
+ \partial_Y\eta_r=&-\text{sgn}(r)\big[\frac{G_r}{\rho_r}-3G\rho_r\big]\\
  \end{split}
 \end{equation}
-
-The derivatives of the $\mu_r$:
+From the expressions above the derivatives of the $\mu_r$ can be derived:
 \begin{equation}
  \begin{split}
   \partial_{\rho}\mu_r=\frac{TG_r}{\rho_r}(1+ 3\rho_r F)+\partial_{\rho}U_r,\\
@@ -554,7 +557,19 @@ And, the chemical potential we will use is $\mu = \mu_n-\mu_p$:
   \partial_\rho \mu=&\partial_{\rho_n} \mu+\partial_{\rho_p} \mu\\
   =&\frac{5 FG\hbar^2}{M}(\tau_n-\tau_p)+\frac{3GT}{M}\Big[G_p M^{*}_p (1+3F\rho_p)-G_n M^{*}_n(1+3F\rho_n)\Big]\\
   &+3FT(G_n-G_p)+\frac{2T}{(1-Y^2)\rho}[(G_n-G_p)-(G_n+G_p)Y]-8D(\delta-1)Y\rho^{\delta-1}\\
+  \partial_{\rho Y} \mu=&\partial_Y\Big[\frac{5 FG\hbar^2}{M}(\tau_n-\tau_p)+\frac{3GT}{M}\Big[G_p M^{*}_p (1+3F\rho_p)-G_n M^{*}_n(1+3F\rho_n)\Big]\\
+  &+3FT(G_n-G_p)+\frac{2T}{(1-Y^2)\rho}[(G_n-G_p)-(G_n+G_p)Y]-8D(\delta-1)Y\rho^{\delta-1}\Big]\\
+  \partial_T\mu =&\partial_{T} \mu_n-\partial_{T} \mu_p\\
+  =&(\eta_n-\eta_p)-\frac{3}{2}(G_n-G_p)+\frac{9}{2}G(G_n \rho_n -G_p \rho_p)-\frac{5 G \hbar^2}{T} (\frac{\tau_n}{M^{*}_n}-\frac{\tau_p}{M^{*}_p})\\
   \end{split}
+\end{equation}
+
+For higher order thermodynamic derivatives, the following calculation will be needed:
+\begin{equation}
+ \begin{split}
+   \partial_{\eta_r}G_r(\eta_r)=&1+J_r(\eta_r)\\
+   J_r(\eta_r)=&\frac{F_{-3/2}(\eta_r)F_{1/2}(\eta_r)}{F_{-1/2}(\eta_r)}
+ \end{split}
 \end{equation}
 
 
@@ -562,7 +577,22 @@ The entropy per baryon is calculated in the previous section and it is $\rho s=\
 \begin{equation}
  \begin{split}
  \rho \partial_{T}s=&\sum_r \frac{5 \hbar^2}{6M_r^{*}T}(\partial_T\tau_r-\tau_r/T)-\rho_r\partial_T\eta_r)\\
- =&\frac{1}{4T}\sum_r(\frac{5\hbar^2\tau_r}{M_r^{*}}-9\rho_r G_r) 
+ =&\frac{1}{4T}\sum_r(\frac{5\hbar^2\tau_r}{TM_r^{*}}-9\rho_r G_r)\\ 
+ s+\rho \partial_{\rho}s=&\sum_r\Big[\frac{5 \hbar^2}{6M_r^{*}T}(\partial_{\rho}\tau_r-\tau_r \partial_{\rho}M^{*}_r/M_r^{*})-y_r\eta_r-\rho_r\partial_{\rho}\eta_r)\Big]\\
+ =&\sum_r\Big[\frac{3}{2}G_r+3F\rho_r(\frac{5}{2}G_r-\rho_r)+\frac{5\hbar^2\tau_r}{6M_r^{*}T}F(2\frac{M_r^{*}}{M}-5)-y_r\eta_r\Big]\leftrightarrow \\
+ \rho \partial_{\rho}s=&\sum_r\Big[\frac{3}{2}G_r+3F\rho_r(\frac{5}{2}G_r-\rho_r)+\frac{5\hbar^2\tau_r}{6M_r^{*}T}\big[F(2\frac{M_r^{*}}{M}-5)-\frac{1}{\rho}\big]\Big]\leftrightarrow \\
+ \partial_{\rho}s+\rho \partial_{\rho \rho}s=&\sum_r\Big[\frac{3}{2}\partial_{\rho}G_r+3F y_r(\frac{5}{2}G_r-\rho_r)+3F\rho_r(\frac{5}{2}\partial_{\rho}G_r-y_r)\\
+ &+\frac{5\hbar^2\partial_{\rho}\tau_r}{6TM_r^{*}}\big[F(2\frac{M_r^{*}}{M}-5)-\frac{1}{\rho}\big]+\frac{5\hbar^2\tau_r}{6TM_r^{*}}\big[(5F+\frac{1}{\rho})\partial_{\rho}M_r^{*}-\frac{1}{\rho^2}\big]\Big]\leftrightarrow \\
+=&\sum_r\Big[\frac{3}{2}(1+J_r)(\frac{G_r}{\rho_r}+3F\rho_r)(1+5F\rho_r)+3Fy_r(\frac{5}{2}G_r-2\rho_r)\\
+&+(\frac{5}{2}(1+3F\rho_r)-\frac{25 \hbar^2}{6 M_r^{*}T}F\tau_r)\big[F(2\frac{M_r^{*}}{M}-5)-\frac{1}{\rho}\big]-\frac{5 \hbar^2 \tau_r}{6M_r^{*}T}\big[2(5F+\frac{1}{\rho})\frac{{M_r^{*}}^2}{M}F-\frac{1}{\rho^2}\big]\Big]\\
+ \partial_{T}s +\rho \partial_{T\rho}s=&\frac{1}{4T}\sum_r(\frac{5\hbar^2(\partial_{\rho}\tau_r-\tau_r \partial_{\rho}M^{*}_r/M_r^{*})}{TM_r^{*}}-9y_r G_r-9\rho_r \partial_{\rho}G_r)\\
+ =&\frac{3}{4T}\sum_r\Big[(2-y_r-J_r)G_r+3\rho_r F\big[5G_r-3(1+J_r)\rho_r\big]+\frac{5F\hbar^2\tau_r}{TM_r^{*}}(2\frac{M^{*}_r}{M}-5)\Big]\leftrightarrow\\
+ \rho \partial_{T\rho}s=&\frac{3}{4T}\sum_r\Big[(2-4y_r-J_r)G_r+3\rho_r F\big[5G_r-3(1+J_r)\rho_r\big]+\frac{5\hbar^2\tau_r}{TM_r^{*}}\big[F(2\frac{M^{*}_r}{M}-5)-\frac{1}{3\rho}\big]\Big]\\
+-\partial_{TT}s=&\partial_{T}\Big[\frac{1}{4T\rho}\sum_{r={n,p}}(\frac{5\hbar^2\tau_r}{T M_r^{*}}-9\rho_r G_r)\Big]\\
+  =&\frac{1}{4T\rho}\sum_{r={n,p}}\big[\frac{5\hbar^2(\partial_T\tau_r-2\tau_r/T)}{TM_r^{*}}-9\rho_r (\partial_TG_r-G_r/T)\big]\\
+  =&\frac{1}{4T\rho}\sum_{r={n,p}}\big[\frac{25\hbar^2\tau_r}{2M_r^{*}T^2}-9\rho_r (\frac{5}{2}G_r/T+\partial_TG_r-G_r/T)\big]\\
+  =&\frac{1}{4T\rho}\sum_{r={n,p}}\big[\frac{15\hbar^2\tau_r}{2M_r^{*}T}-9\rho_r \big[\frac{5}{2}G_r/T-G_r/T-\frac{3}{2}G_r/T(1+J_r)]\big]\\
+  =&\frac{3}{8T^2\rho}\sum_{r={n,p}}\big[\frac{5\hbar^2\tau_r}{M_r^{*}}-9\rho_rG_r J_r\big]\\
  \end{split}
 \end{equation}
 
@@ -572,7 +602,7 @@ notation for number density is $n$ in NSE notes and $\rho$ so far here, everythi
 \begin{mdframed}
  \begin{equation}
   \begin{split}
-   \partial_{TT}f=&-\partial_Ts=-\frac{1}{4T\rho}\sum_{r={n,p}}(\frac{5\hbar^2\tau_r}{M_r^{*}}-9\rho_r G_r)\\
+   \partial_{TT}f=&-\partial_Ts=-\frac{1}{4Tn}\sum_{r={n,p}}(\frac{5\hbar^2\tau_r}{TM_r^{*}}-9n_r G_r)\\
    \partial_{nY}f=&\partial_n\mu=\frac{5 FG\hbar^2}{M}(\tau_n-\tau_p)+\frac{3GT}{M}\Big[G_p M^{*}_p (1+3Fn_p)-G_n M^{*}_n(1+3Fn_n)\Big]\\
   &+3FT(G_n-G_p)+\frac{2T}{(1-Y^2)n}[(G_n-G_p)-(G_n+G_p)Y]-8D(\delta-1)Yn^{\delta-1}\\
   \partial_{nT}f=& s/n+\partial_T\mu=\frac{1}{n^2}\sum_r(\frac{5\hbar^2 \tau_r}{6 M_r^{*}T}-n_r\eta_r)+(\eta_n-\eta_p)-\frac{3}{2}(G_n-G_p)\\
@@ -581,7 +611,7 @@ notation for number density is $n$ in NSE notes and $\rho$ so far here, everythi
  \end{equation}
 \end{mdframed}
 
-
+For $3^{rd}$ order derivatives, the expressions above in connections with NSE notes can be used to obtain analytical results.
 
 
 
