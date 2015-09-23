@@ -12,6 +12,7 @@
 #include <utility>
 #include <limits>
 #include <vector>
+#include <string> 
 
 #include <boost/archive/text_iarchive.hpp> 
 #include <boost/archive/text_oarchive.hpp> 
@@ -21,6 +22,23 @@
 #include <boost/serialization/list.hpp> 
 #include <boost/serialization/vector.hpp> 
 #include <boost/serialization/assume_abstract.hpp> 
+
+class EOSDatum {
+public:  
+  EOSDatum() : name(" "), val(0.0), set(false) {} 
+  EOSDatum(double val) : name("Un-named"), val(val), set(true) {} 
+  EOSDatum(double val, std::string name) : name(name), val(val), set(true) {} 
+   
+  double Get() const {
+    if (set) return val;
+    else throw std::logic_error(name + " not set."); 
+  }
+
+protected: 
+  std::string name;
+  double val;
+  bool set;
+};
 
 ///
 /// Class for storing state data passed to or returned from equations of state.
