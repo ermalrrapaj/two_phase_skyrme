@@ -13,6 +13,7 @@
 #include <limits>
 #include <vector>
 #include <string> 
+#include <map> 
 
 #include <boost/archive/text_iarchive.hpp> 
 #include <boost/archive/text_oarchive.hpp> 
@@ -118,13 +119,15 @@ public:
   double Mue() const {return mMue.Get();} ///< Return the proton chemical potential [1/fm]
   double E()   const {return mE.Get();} ///< Return the energy per baryon [1/fm] 
   double S()   const {return mS.Get();} ///< Return the entropy per baryon 
-
+  
+  void Set(const std::string name, const double val) { mVars[name]->Set(val);}
+  double Get(const std::string name) {return mVars[name]->Get();}
+   
+protected:
   EOSDatum mT, mNp, mNn;
   EOSDatum mP, mMun, mMup, mMue, mE, mS;
   std::vector<EOSData> mPhases;
-
-protected:
-
+  std::map<std::string, EOSDatum*> mVars;
 };
 #endif // EOS_EOSDATA_HPP_
 

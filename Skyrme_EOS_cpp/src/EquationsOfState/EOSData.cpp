@@ -11,6 +11,7 @@
 #include <exception>
 #include <stdexcept>
 #include <vector> 
+#include <string> 
 
 #include "EquationsOfState/EOSData.hpp" 
 
@@ -20,9 +21,20 @@ EOSData::EOSData() :
     mNn (EOSDatum("Neutron density")), 
     mMun(EOSDatum("Neutron chemical potential")),
     mMup(EOSDatum("Proton chemical potential")), 
+    mMue(EOSDatum("Electron chemical potential")), 
     mP  (EOSDatum("Pressure")), 
     mE  (EOSDatum("Energy per baryon")),
-    mS  (EOSDatum("Entropy per baryon")) {}
+    mS  (EOSDatum("Entropy per baryon")) {
+  mVars["T"] = &mT;
+  mVars["Np"] = &mNp;
+  mVars["Nn"] = &mNn;
+  mVars["Mup"] = &mMup;
+  mVars["Mun"] = &mMun;
+  mVars["Mue"] = &mMue;
+  mVars["P"] = &mP;
+  mVars["E"] = &mE;
+  mVars["S"] = &mS;
+}
   
 EOSData EOSData::InputFromTNnNp(const double T, const double nn, 
     const double np) {
