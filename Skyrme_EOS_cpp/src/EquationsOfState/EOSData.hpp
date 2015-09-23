@@ -26,6 +26,7 @@
 class EOSDatum {
 public:  
   EOSDatum() : name(" "), val(0.0), set(false) {} 
+  EOSDatum(std::string name) : name(name), val(0.0), set(false) {} 
   EOSDatum(double val) : name("Un-named"), val(val), set(true) {} 
   EOSDatum(double val, std::string name) : name(name), val(val), set(true) {} 
    
@@ -34,6 +35,17 @@ public:
     else throw std::logic_error(name + " not set."); 
   }
 
+  void Set(const double& valin) {
+    set = true;
+    val = valin;
+  }
+
+  friend class boost::serialization::access; 
+  template<class Archive> 
+  void serialize(Archive & ar, const unsigned int /* File Version */) {
+    ar & name & val & set;
+  }
+   
 protected: 
   std::string name;
   double val;
@@ -95,21 +107,23 @@ public:
    
   /// Get a vector of the subphases of this point
   std::vector<EOSData> Phases() const {return mPhases;}  
-  double T() const; ///< Return the temperature in [1/fm]
-  double Ye() const; ///< Return the electron fraction 
-  double Nb() const; ///< Return the baryon density [1/fm^3] 
-  double Nn() const; ///< Return the neutron density [1/fm^3] 
-  double Np() const; ///< Return the proton density [1/fm^3] 
-  double P() const;  ///< Return the pressure [1/fm^4] 
-  double Mun() const; ///< Return the neutron chemical potential [1/fm] 
-  double Mup() const; ///< Return the proton chemical potential [1/fm]
-  double E() const; ///< Return the energy per baryon [1/fm] 
-  double S() const; ///< Return the entropy per baryon 
+  double T()   const {return mT.Get();} ///< Return the temperature in [1/fm]
+  double Ye()  const {return mNp.Get()/(mNp.Get() + mNn.Get() + 1.e-50);}; ///< Return the electron fraction 
+  double Nb()  const {return mNp.Get() + mNn.Get();} ///< Return the baryon density [1/fm^3] 
+  double Nn()  const {return mNn.Get();} ///< Return the neutron density [1/fm^3] 
+  double Np()  const {return mNp.Get();} ///< Return the proton density [1/fm^3] 
+  double P()   const {return mP.Get();}  ///< Return the pressure [1/fm^4] 
+  double Mun() const {return mMun.Get();} ///< Return the neutron chemical potential [1/fm] 
+  double Mup() const {return mMup.Get();} ///< Return the proton chemical potential [1/fm]
+  double Mue() const {return mMue.Get();} ///< Return the proton chemical potential [1/fm]
+  double E()   const {return mE.Get();} ///< Return the energy per baryon [1/fm] 
+  double S()   const {return mS.Get();} ///< Return the entropy per baryon 
+
+  EOSDatum mT, mNp, mNn;
+  EOSDatum mP, mMun, mMup, mMue, mE, mS;
+  std::vector<EOSData> mPhases;
 
 protected:
-  std::vector<EOSData> mPhases;
-  std::pair<double, bool> mT, mNp, mNn;
-  std::pair<double, bool> mP, mMun, mMup, mE, mS;
 
 };
 #endif // EOS_EOSDATA_HPP_
