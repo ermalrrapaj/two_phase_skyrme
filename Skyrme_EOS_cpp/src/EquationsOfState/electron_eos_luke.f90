@@ -14,8 +14,8 @@ contains
     real(8) :: muu,muc,mul,fu,fc,fl,dndmu,dfdmu,farr(4)
     real(8),dimension(3,4,4) :: fd,afd 
     integer :: i,j
-    real(8), parameter :: ONEOSQRT2PI2 = 0.0716449 ! 1/(Sqrt(2)*Pi^2)
-    real(8), parameter :: PI2 = 9.8696044
+    real(8), parameter :: ONEOSQRT2PI2 = 0.0716448960313445 ! 1/(Sqrt(2)*Pi^2)
+    real(8), parameter :: PI2 = 9.86960440108936
     
     g = 2.d0 
     theta = T/M 
@@ -28,13 +28,13 @@ contains
       mul = -muu
       muu = 0.d0 
     endif   
-    fl = electron_set_fd(mul,dndmu)/(n/fac)-1.d0 
-    fu = electron_set_fd(muu,dndmu)/(n/fac)-1.d0 
+    fl = electron_set_fd(mul,dndmu)/((n+1.d-100)/fac)-1.d0 
+    fu = electron_set_fd(muu,dndmu)/((n+1.d-100)/fac)-1.d0 
     if (fl*fu>0.d0) print *,'bad interval',mul,muu,fl,fu
 
     do i=1,50
       muc = 0.5d0*(muu+mul) 
-      fc = electron_set_fd(muc,dndmu)/(n/fac)-1.d0
+      fc = electron_set_fd(muc,dndmu)/((n+1.d-100)/fac)-1.d0
       if (fc*fl>0.d0) then
         mul = muc 
         fl  = fc 
@@ -47,12 +47,12 @@ contains
     
     !-- Clean up with NR iteration 
     do i=1,20
-      fc    = electron_set_fd(muc,dndmu)/(n/fac)-1.d0
-      dfdmu = dndmu/(n/fac) 
+      fc    = electron_set_fd(muc,dndmu)/((n+1.d-100)/fac)-1.d0
+      dfdmu = dndmu/((1.d-100+n)/fac) 
       muc   = muc - fc/dfdmu 
-      if (ABS(fc)<1.d-10) exit 
+      if (ABS(fc)<1.d-12) exit 
     enddo   
-    
+     
     !-- Get derivatives wrt eta and T
     fc = electron_set_fd(muc,dndmu)
 
@@ -159,32 +159,55 @@ contains
     mu(:,1) = mu(:,1)*T 
     mu(1,1) = mu(1,1)   + M 
      
+    s(1,1) = e(1,1)/T - p(1,1)/T - mu(1,1)/T*n 
+    s(2,1) = e(2,1)/T - p(2,1)/T - mu(2,1)/T*n - mu(1,1)/T 
+    s(1,2) = -s(1,1)/T + e(1,2)/T - p(1,2)/T - mu(1,2)/T*n
+    s(2,2) = -s(2,1)/T + e(2,2)/T - p(2,2)/T - mu(2,2)/T*n - mu(1,2)/T
+    
     !-- Switch to energy per particle and calculate entropy per particle
-    e(3,1) = e(3,1)/n - 2.d0*e(2,1)/n**2 + 2.d0*e(1,1)/n**3
-    e(3,2) = e(3,2)/n - 2.d0*e(2,2)/n**2 + 2.d0*e(1,2)/n**3
-    e(2,2) = e(2,2)/n - e(1,2)/n**2
-    e(2,1) = e(2,1)/n - e(1,1)/n**2
-    e(1,2) = e(1,2)/n 
-    e(1,1) = e(1,1)/n 
+    !e(3,1) = e(3,1)/n - 2.d0*e(2,1)/n**2 + 2.d0*e(1,1)/n**3
+    !e(3,2) = e(3,2)/n - 2.d0*e(2,2)/n**2 + 2.d0*e(1,2)/n**3
+    !e(2,2) = e(2,2)/n - e(1,2)/n**2
+    !e(2,1) = e(2,1)/n - e(1,1)/n**2
+    !e(1,2) = e(1,2)/n 
+    !e(1,1) = e(1,1)/n 
     
-    s(1,1) = p(1,1)/(n*T) 
-    s(3,1) = p(3,1)/(n*T) - 2.d0*p(2,1)/(n**2*T) + 2.d0*p(1,1)/(n**3*T) 
-    s(3,2) = p(3,2)/(n*T) - 2.d0*p(3,1)/(n*T**2) - 2.d0*p(2,2)/(n**2*T)  &
-                          + p(2,1)/(n**2*T**2) + 2.d0*p(1,2)/(n**3*T) - 2.d0*p(1,1)/(n**3*T**2) 
-    s(2,2) = p(2,2)/(n*T) - p(1,2)/(n**2*T) - p(2,1)/(n*T**2) + p(1,1)/(n**2*T**2)
-    s(2,1) = p(2,1)/(n*T) - p(1,1)/(n**2*T)    
-    s(1,2) = p(1,2)/(n*T) - p(1,1)/(n*T**2)    
     
-    s(1,1) = s(1,1) + (e(1,1) - mu(1,1))/T
-    s(3,1) = s(3,1) + (e(3,1) - mu(3,1))/T 
-    s(3,2) = s(3,2) + (e(3,2) - mu(3,2))/T - (e(3,1) - mu(3,1))/T**2
      
-    s(2,1) = s(2,1) + (e(2,1) - mu(2,1))/T 
-    s(2,2) = s(2,2) + (e(2,2) - mu(2,2))/T - (e(2,1) - mu(2,1))/T**2 
-    s(1,2) = s(1,2) + (e(1,2) - mu(1,2))/T - (e(1,1) - mu(1,1))/T**2 
+    !s(1,1) = p(1,1)/(n*T) 
+    !s(3,1) = p(3,1)/(n*T) - 2.d0*p(2,1)/(n**2*T) + 2.d0*p(1,1)/(n**3*T) 
+    !s(3,2) = p(3,2)/(n*T) - 2.d0*p(3,1)/(n*T**2) - 2.d0*p(2,2)/(n**2*T)  &
+    !                      + p(2,1)/(n**2*T**2) + 2.d0*p(1,2)/(n**3*T) - 2.d0*p(1,1)/(n**3*T**2) 
+    !s(2,2) = p(2,2)/(n*T) - p(1,2)/(n**2*T) - p(2,1)/(n*T**2) + p(1,1)/(n**2*T**2)
+    !s(2,1) = p(2,1)/(n*T) - p(1,1)/(n**2*T)    
+    !s(1,2) = p(1,2)/(n*T) - p(1,1)/(n*T**2)    
+    !
+    !s(1,1) = s(1,1) + (e(1,1) - mu(1,1))/T
+    !s(3,1) = s(3,1) + (e(3,1) - mu(3,1))/T 
+    !s(3,2) = s(3,2) + (e(3,2) - mu(3,2))/T - (e(3,1) - mu(3,1))/T**2
+    ! 
+    !s(2,1) = s(2,1) + (e(2,1) - mu(2,1))/T 
+    !s(2,2) = s(2,2) + (e(2,2) - mu(2,2))/T - (e(2,1) - mu(2,1))/T**2 
+    !s(1,2) = s(1,2) + (e(1,2) - mu(1,2))/T - (e(1,1) - mu(1,1))/T**2 
     
     !write(6,'(20es12.3)')(n**2*e(2,1) + T*p(1,2))/p(1,1)-1.d0,e(1,2)/(T*s(1,2))-1.d0,1.d0+s(2,1)*n**2/p(1,2) 
-  
+    muo = mu(1,1) 
+    so = s(1,1) 
+    po = p(1,1) 
+    eo = e(1,1) 
+    
+    mun = mu(2,1) 
+    sn = s(2,1) 
+    pn = p(2,1) 
+    en = e(2,1) 
+    
+    mut = mu(1,2) 
+    st = s(1,2) 
+    pt = p(1,2) 
+    et = e(1,2) 
+    
+    
+     
   contains
    
     function electron_set_fd(muin,dntdmu) result(nt) 
