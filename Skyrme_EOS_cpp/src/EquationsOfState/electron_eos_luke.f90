@@ -53,7 +53,7 @@ contains
       if (ABS(fc)<1.d-12) exit 
     enddo   
      
-    !-- Get derivatives wrt eta and T
+    !-- Get derivatives wrt eta and T (first index is eta, second is T)
     fc = electron_set_fd(muc,dndmu)
 
     fac     = g*ONEOSQRT2PI2*M**3*SQRT(theta)*theta
@@ -112,7 +112,7 @@ contains
     dmu(3,1) = 0.d0
     dmu(3,2) = 0.d0 
       
-    !-- Combine to get derivatives wrt n and T 
+    !-- Combine to get derivatives wrt n and T  (first index is n, second is T)
     p(1,1) = dp(1,1) 
     p(2,1) = dp(2,1)/dn(2,1) 
     p(1,2) = (dp(1,2) - dp(2,1)*dn(1,2)/dn(2,1))
@@ -158,11 +158,12 @@ contains
     mu(:,2) = mu(:,2)*T + mu(:,1)
     mu(:,1) = mu(:,1)*T 
     mu(1,1) = mu(1,1)   + M 
-     
-    s(1,1) = e(1,1)/T - p(1,1)/T - mu(1,1)/T*n 
-    s(2,1) = e(2,1)/T - p(2,1)/T - mu(2,1)/T*n - mu(1,1)/T 
-    s(1,2) = -s(1,1)/T + e(1,2)/T - p(1,2)/T - mu(1,2)/T*n
-    s(2,2) = -s(2,1)/T + e(2,2)/T - p(2,2)/T - mu(2,2)/T*n - mu(1,2)/T
+    
+    !-- First index derivative wrt to n, second wrt to T  
+    s(1,1) = (e(1,1) + p(1,1) - mu(1,1)*n)/T 
+    s(2,1) = (e(2,1) + p(2,1) - mu(2,1)*n - mu(1,1))/T 
+    s(1,2) = (e(1,2) + p(1,2) - mu(1,2)*n)/T - s(1,1)/T 
+    s(2,2) = (e(2,2) + p(2,2) - mu(2,2)*n - mu(1,2))/T - s(2,1)/T 
     
     !-- Switch to energy per particle and calculate entropy per particle
     !e(3,1) = e(3,1)/n - 2.d0*e(2,1)/n**2 + 2.d0*e(1,1)/n**3
@@ -171,9 +172,9 @@ contains
     !e(2,1) = e(2,1)/n - e(1,1)/n**2
     !e(1,2) = e(1,2)/n 
     !e(1,1) = e(1,1)/n 
-    
-    
-     
+    !
+    !
+    !
     !s(1,1) = p(1,1)/(n*T) 
     !s(3,1) = p(3,1)/(n*T) - 2.d0*p(2,1)/(n**2*T) + 2.d0*p(1,1)/(n**3*T) 
     !s(3,2) = p(3,2)/(n*T) - 2.d0*p(3,1)/(n*T**2) - 2.d0*p(2,2)/(n**2*T)  &
@@ -191,6 +192,7 @@ contains
     !s(1,2) = s(1,2) + (e(1,2) - mu(1,2))/T - (e(1,1) - mu(1,1))/T**2 
     
     !write(6,'(20es12.3)')(n**2*e(2,1) + T*p(1,2))/p(1,1)-1.d0,e(1,2)/(T*s(1,2))-1.d0,1.d0+s(2,1)*n**2/p(1,2) 
+    
     muo = mu(1,1) 
     so = s(1,1) 
     po = p(1,1) 
@@ -206,7 +208,10 @@ contains
     pt = p(1,2) 
     et = e(1,2) 
     
-    
+    print *, (T*so + muo*n - eo - po)/po
+    print *, (T*sn + mun*n + muo - en - pn)/pn
+    print *, (so + T*st + mut*n - et - pt)/pt
+    print *, (sn + mut)/sn
      
   contains
    
@@ -430,30 +435,40 @@ contains
          denom        = factor + 1.d0
          denomi       = 1.0d0/denom
          fd           = xdk * dxst * denomi
-         fdeta        = fd * factor * denomi
-         fdeta2       = (2.0d0 * factor * denomi - 1.0d0)*fdeta
-         fdeta3       = (1.d0 - factor)**2 * denomi**2 * fdeta
-         denom2       = 1.0d0/(4.0d0 * xst)
-         fdtheta      = fd * x * denom2
-         fdtheta2     = -fdtheta * x * denom2
-         fdtheta3     = -3.d0 * fdtheta * x * denom2
-         fdetadtheta  = fdtheta * factor * denomi
-         fdeta2dtheta = fdetadtheta * (2.0d0 * factor * denomi - 1.0d0) 
-         fdetadtheta2 = -fdtheta * x * denom2 * factor * denomi
+         
+         ! Calculate the derivatives unscaled by the total fd function  
+         fdeta        = factor * denomi 
+         fdeta2       = fdeta  * denomi * (factor - 1.0) 
+         fdeta3       = fdeta  * denomi**2 * (factor**3 - 4.0*factor**2 + factor) 
+
         else
+        
          factor       = exp(eta-x)
          fd           = xdk * dxst * factor
-         fdeta        = fd
-         fdeta2       = fd
-         fdeta3       = fd
-         denom2       = 1.0d0/(4.0d0 * xst)
-         fdtheta      = fd * x * denom2
-         fdtheta2     = -fdtheta * x * denom2
-         fdtheta3     = -3.d0 * fdtheta * x * denom2
-         fdetadtheta  = fdtheta
-         fdeta2dtheta = fdtheta
-         fdetadtheta2 = fdtheta2
+         fdeta        = 1.d0
+         fdeta2       = 1.d0
+         fdeta3       = 1.d0
+
         endif
+        
+        denom2       = 1.0d0/(4.0d0 * xst)
+        fdtheta      = x * denom2
+        fdtheta2     = -fdtheta * x * denom2
+        fdtheta3     = -3.d0 * fdtheta2 * x * denom2
+        
+        ! Combine and rescale derivatives (the order is important here)
+        fdtheta  = fd * fdtheta  
+        fdtheta2 = fd * fdtheta2  
+        fdtheta3 = fd * fdtheta3
+          
+        fdetadtheta  = fdeta  * fdtheta
+        fdeta2dtheta = fdeta2 * fdtheta 
+        fdetadtheta2 = fdeta  * fdtheta2
+        
+        fdeta  = fd * fdeta  
+        fdeta2 = fd * fdeta2  
+        fdeta3 = fd * fdeta3
+           
         
         return
       end subroutine fdfunc1_el
@@ -509,30 +524,36 @@ contains
          denom        = factor + 1.d0
          denomi       = 1.0d0/denom
          fd           = 2.0d0 * xdk * dxst * denomi
-         fdeta        = fd * factor * denomi
-         fdeta2       = (2.0d0 * factor * denomi - 1.0d0)*fdeta
-         fdeta3       = (1.d0 - factor)**2 * denomi**2 * fdeta
-         denom2       = 1.0d0/(4.0d0 * xst)
-         fdtheta      = fd * xsq * denom2
-         fdtheta2     = -fdtheta * xsq * denom2
-         fdtheta3     = -3.d0 * fdtheta * xsq * denom2
-         fdetadtheta  = fdtheta * factor * denomi
-         fdeta2dtheta = fdetadtheta * (2.0d0 * factor * denomi - 1.0d0) 
-         fdetadtheta2 = -fdtheta * xsq * denom2 * factor * denomi
+         
+         fdeta        = factor * denomi 
+         fdeta2       = fdeta  * denomi * (factor - 1.0) 
+         fdeta3       = fdeta  * denomi**2 * (factor**3 - 4.0*factor**2 + factor) 
+        
         else
          factor       = exp(eta - xsq)
          fd           = 2.0d0 * xdk * dxst * factor
-         fdeta        = fd
-         fdeta2       = fd
-         fdeta3       = fd
-         denom2       = 1.0d0/(4.0d0 * xst)
-         fdtheta      = fd * xsq * denom2
-         fdtheta2     = -fdtheta * xsq * denom2
-         fdtheta3     = -3.d0 * fdtheta * xsq * denom2
-         fdetadtheta  = fdtheta
-         fdeta2dtheta = fdtheta
-         fdetadtheta2 = fdtheta2
+         fdeta        = 1.d0
+         fdeta2       = 1.d0
+         fdeta3       = 1.d0
         endif
+        
+        denom2       = 1.0d0/(4.0d0 * xst)
+        fdtheta      = xsq * denom2
+        fdtheta2     = -fdtheta * xsq * denom2
+        fdtheta3     = -3.d0 * fdtheta2 * xsq * denom2
+        
+        ! Combine and rescale derivatives (the order is important here)
+        fdtheta  = fd * fdtheta  
+        fdtheta2 = fd * fdtheta2  
+        fdtheta3 = fd * fdtheta3
+          
+        fdetadtheta  = fdeta  * fdtheta
+        fdeta2dtheta = fdeta2 * fdtheta 
+        fdetadtheta2 = fdeta  * fdtheta2
+        
+        fdeta  = fd * fdeta  
+        fdeta2 = fd * fdeta2  
+        fdeta3 = fd * fdeta3
         
         return
       end subroutine fdfunc2_el
