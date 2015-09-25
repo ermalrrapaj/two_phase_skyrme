@@ -1,6 +1,14 @@
+add_executable(eosdata_test eosdata_test.cpp) 
+add_test(EOSData eosdata_test)
+target_link_libraries(eosdata_test eos ${EOSBUILDER_EXTERNAL_LIBS} )
+
 add_executable(skyrme_test skyrme_test.cpp) 
 add_test(Skyrme skyrme_test)
 target_link_libraries(skyrme_test eos ${EOSBUILDER_EXTERNAL_LIBS} )
+
+add_executable(eoselectron_test eoselectron_test.cpp) 
+add_test(EOSElectron eoselectron_test)
+target_link_libraries(eoselectron_test eos ${EOSBUILDER_EXTERNAL_LIBS} )
 
 add_executable(gibbs_test gibbs_test.cpp) 
 add_test(Gibbs gibbs_test)
