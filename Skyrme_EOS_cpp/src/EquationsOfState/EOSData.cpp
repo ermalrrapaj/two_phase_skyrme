@@ -137,22 +137,23 @@ EOSData EOSData::Output(const double T, const double nn, const double np,
   out.mMun.Set(mun); 
   out.mNn.Set(nn); 
   out.mNp.Set(np);
-  if (dpdnn==dpdnn) out.mdPdNn.Set(dpdnn);
-  if (dpdnp==dpdnp) out.mdPdNp.Set(dpdnp);
-  if (dpdt==dpdt) out.mdPdT.Set(dpdt);
-  if (dmundnn==dmundnn) out.mdMundNn.Set(dmundnn);
-  if (dmundnp==dmundnp) out.mdMundNp.Set(dmundnp);
-  if (dmundt==dmundt) out.mdMundT.Set(dmundt);
-  if (dmupdnn==dmupdnn) out.mdMupdNn.Set(dmupdnn);
-  if (dmupdnp==dmupdnp) out.mdMupdNp.Set(dmupdnp);
-  if (dmupdt==dmupdt) out.mdMupdT.Set(dmupdt); 
-  if (dsdnn==dsdnn) out.mdSdNn.Set(dsdnn);
-  if (dsdnp==dsdnp) out.mdSdNp.Set(dsdnp);
-  if (dsdt==dsdt) out.mdSdT.Set(dsdt);
+
+  if (!(dpdnn!=dpdnn)) out.mdPdNn.Set(dpdnn);
+  if (!(dpdnp!=dpdnp)) out.mdPdNp.Set(dpdnp);
+  if (!(dpdt!=dpdt)) out.mdPdT.Set(dpdt);
+  if (!(dmundnn!=dmundnn)) out.mdMundNn.Set(dmundnn);
+  if (!(dmundnp!=dmundnp)) out.mdMundNp.Set(dmundnp);
+  if (!(dmundt!=dmundt)) out.mdMundT.Set(dmundt);
+  if (!(dmupdnn!=dmupdnn)) out.mdMupdNn.Set(dmupdnn);
+  if (!(dmupdnp!=dmupdnp)) out.mdMupdNp.Set(dmupdnp);
+  if (!(dmupdt!=dmupdt)) out.mdMupdT.Set(dmupdt); 
+  if (!(dsdnn!=dsdnn)) out.mdSdNn.Set(dsdnn);
+  if (!(dsdnp!=dsdnp)) out.mdSdNp.Set(dsdnp);
+  if (!(dsdt!=dsdt)) out.mdSdT.Set(dsdt);
   
-  if (pp==pp) out.mP.Set(pp);
-  if (ss==ss) out.mS.Set(ss);
-  if (ee==ee) out.mE.Set(ee);
+  if (!(pp!=pp)) out.mP.Set(pp);
+  if (!(ss!=ss)) out.mS.Set(ss);
+  if (!(ee!=ee)) out.mE.Set(ee);
   
   return out; 
 }
