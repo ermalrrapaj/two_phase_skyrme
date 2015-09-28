@@ -170,8 +170,8 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
   double taup = pow(2.0*MNUC/momsp*T, 2.5)/(2.0*PI*PI) * zfermi32_(&etap, &dtaun);
   double taun = pow(2.0*MNUC/momsn*T, 2.5)/(2.0*PI*PI) * zfermi32_(&etan, &dtaup);
   
-  double Gn = 2.0*zfermi12(&etan)/ifermim12_(&etan);
-  double Gp = 2.0*zfermi12(&etap)/ifermim12_(&etap);
+  double Gn = 2.0*zfermi12_(&etan)/ifermim12_(&etan);
+  double Gp = 2.0*zfermi12_(&etap)/ifermim12_(&etap);
   
   double detandnn = Gn/nn + 1.5*Gn*(mF-mG);
   double detandnp= 1.5*Gn*(mF+mG);
@@ -246,8 +246,8 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
   double dsdT = (5.0/(6.0*MNUC*T)*( (dtaundT-taun/T)*momsn +(dtaupdT-taup/T)*momsp )
                -nn*detandT-np*detapdT)/nt;
    
-  return EOSData::Output(T, nn, np, mun, mup, pp, dpdnn, dpdnp, dpdt,
-    dmundnn, dmundnp, dmundt, dmupdnn, dmupdnp, dmupdt, dsdnn, dsdnp, dsdt, ss/nt, ee/nt);  
+  return EOSData::Output(T, nn, np, mun, mup, pp, ss/nt, ee/nt, dpdnn, dpdnp, dpdT,
+    dmundnn, dmundnp, dmundT, dmupdnn, dmupdnp, dmupdT, dsdnn, dsdnp, dsdT);  
 }
 
 

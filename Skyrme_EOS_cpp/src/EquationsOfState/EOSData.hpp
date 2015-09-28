@@ -24,6 +24,8 @@
 #include <boost/serialization/vector.hpp> 
 #include <boost/serialization/assume_abstract.hpp> 
 
+#define STDNAN std::numeric_limits<double>::quiet_NaN()
+
 class EOSDatum {
 public:  
   EOSDatum() : name(" "), val(0.0), set(false) {} 
@@ -93,13 +95,13 @@ public:
   /// from EOSBase calls.
   static EOSData Output(const double T, const double nn, const double np, 
       const double mun, const double mup,  
-      const double dpdnn, const double dpdnp, const double dpdt,
-	  const double dmundnn, const double dmundnp, const double dmundt,
-	  const double dmupdnn, const double dmupdnp, const double dmupdt,
-	  const double dsdnn, const double dsnp, const double dsdt, 
       const double pp = std::numeric_limits<double>::quiet_NaN(), 
       const double ss = std::numeric_limits<double>::quiet_NaN(), 
-      const double ee = std::numeric_limits<double>::quiet_NaN());
+      const double ee = std::numeric_limits<double>::quiet_NaN(),
+      const double dpdnn=STDNAN, const double dpdnp=STDNAN, const double dpdt=STDNAN,
+      const double dmundnn=STDNAN, const double dmundnp=STDNAN, const double dmundt=STDNAN,
+      const double dmupdnn=STDNAN, const double dmupdnp=STDNAN, const double dmupdt=STDNAN,
+      const double dsdnn=STDNAN, const double dsnp=STDNAN, const double dsdt=STDNAN);
 
   void SetPhases(std::vector<EOSData> phases) { mPhases = phases;} 
   
@@ -148,8 +150,8 @@ protected:
   EOSDatum mT, mNp, mNn;
   EOSDatum mP, mMun, mMup, mMue, mE, mS;
   EOSDatum mdPdNn, mdPdNp, mdPdT;
-  EOSDatum mdMundn, mdMundNp, mdmundT;
-  EOSDatum mdMupdn, mdMupdNp, mdMupdT;
+  EOSDatum mdMundNn, mdMundNp, mdMundT;
+  EOSDatum mdMupdNn, mdMupdNp, mdMupdT;
   EOSDatum mdSdNn, mdSdNp, mdSdT;
   std::vector<EOSData> mPhases;
   std::map<std::string, EOSDatum*> mVars;

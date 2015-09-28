@@ -125,11 +125,11 @@ EOSData EOSData::InputFromTNnMup(const double T, const double nn,
 
 EOSData EOSData::Output(const double T, const double nn, const double np, 
     const double mun, const double mup, 
+    const double pp, const double ss, const double ee,
     const double dpdnn, const double dpdnp, const double dpdt,
     const double dmundnn, const double dmundnp, const double dmundt,
-    const double dmupdnn, const double dmupdnp, const double dmupdt
-    const double dsdnn, const double dsdnp, const double dsdt  
-    const double pp, const double ss, const double ee) {
+    const double dmupdnn, const double dmupdnp, const double dmupdt,
+    const double dsdnn, const double dsdnp, const double dsdt) {
   EOSData out;
    
   out.mT.Set(T); 
@@ -137,18 +137,18 @@ EOSData EOSData::Output(const double T, const double nn, const double np,
   out.mMun.Set(mun); 
   out.mNn.Set(nn); 
   out.mNp.Set(np);
-  out.mdPdNn.Set(dpdnn);
-  out.mdPdNp.Set(dpdnp);
-  out.mdPdT.Set(dpdt);
-  out.mdMundNn.Set(dmundnn);
-  out.mdMundNp.Set(dmundnp);
-  out.mdMundT.Set(dmundt);
-  out.mdMupdNn.Set(dmupdnn);
-  out.mdMupdNp.Set(dmupdnp);
-  out.mdMupdT.Set(dmupdt); 
-  out.mdSdNn.Set(dsdnn);
-  out.mdSdNp.Set(dsdnp);
-  out.mdSdT.Set(dsdt);
+  if (dpdnn==dpdnn) out.mdPdNn.Set(dpdnn);
+  if (dpdnp==dpdnp) out.mdPdNp.Set(dpdnp);
+  if (dpdt==dpdt) out.mdPdT.Set(dpdt);
+  if (dmundnn==dmundnn) out.mdMundNn.Set(dmundnn);
+  if (dmundnp==dmundnp) out.mdMundNp.Set(dmundnp);
+  if (dmundt==dmundt) out.mdMundT.Set(dmundt);
+  if (dmupdnn==dmupdnn) out.mdMupdNn.Set(dmupdnn);
+  if (dmupdnp==dmupdnp) out.mdMupdNp.Set(dmupdnp);
+  if (dmupdt==dmupdt) out.mdMupdT.Set(dmupdt); 
+  if (dsdnn==dsdnn) out.mdSdNn.Set(dsdnn);
+  if (dsdnp==dsdnp) out.mdSdNp.Set(dsdnp);
+  if (dsdt==dsdt) out.mdSdT.Set(dsdt);
   
   if (pp==pp) out.mP.Set(pp);
   if (ss==ss) out.mS.Set(ss);
