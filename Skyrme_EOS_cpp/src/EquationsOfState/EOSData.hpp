@@ -96,6 +96,7 @@ public:
       const double dpdnn, const double dpdnp, const double dpdt,
 	  const double dmundnn, const double dmundnp, const double dmundt,
 	  const double dmupdnn, const double dmupdnp, const double dmupdt,
+	  const double dsdnn, const double dsnp, const double dsdt, 
       const double pp = std::numeric_limits<double>::quiet_NaN(), 
       const double ss = std::numeric_limits<double>::quiet_NaN(), 
       const double ee = std::numeric_limits<double>::quiet_NaN());
@@ -108,8 +109,9 @@ public:
   void serialize(Archive & ar, const unsigned int /* File Version */) {
     ar & mT & mNp & mNn & mP & mMun & mMup & mE & mS
     & mdPdNn & mdPdNp & mdPdT
-    & mdMundNn & & mdMundNp & & mdMundT
-    & mdMupdNn & & mdMupdNp & & mdMupdT
+    & mdMundNn & mdMundNp & mdMundT
+    & mdMupdNn & mdMupdNp & mdMupdT
+    & mdSdNn & mdSdNp & mdSdT
     & mPhases;
   }
    
@@ -135,6 +137,9 @@ public:
   double dMupdNn()   const {return mdMupdNn.Get();} ///< Return the derivative of Mup with repsect to Nn [fm^2]
   double dMupdNp()   const {return mdMupdNp.Get();} ///< Return the derivative of Mup with repsect to Np [fm^2]
   double dMupdT()   const {return mdMupdT.Get();} ///< Return the derivative of Mup with repsect to T [1]
+  double dSdNn () const {return mdSdNn.Get();} /// ///< Return the derivative of S with repsect to Nn [1]
+  double dSdNp () const {return mdSdNp.Get();} /// ///< Return the derivative of S with repsect to Np [1]
+  double dSdT () const {return mdSdT.Get();} /// ///< Return the derivative of S with repsect to T [1/fm^2]
   
   void Set(const std::string name, const double val) { mVars[name]->Set(val);}
   double Get(const std::string name) {return mVars[name]->Get();}
@@ -145,6 +150,7 @@ protected:
   EOSDatum mdPdNn, mdPdNp, mdPdT;
   EOSDatum mdMundn, mdMundNp, mdmundT;
   EOSDatum mdMupdn, mdMupdNp, mdMupdT;
+  EOSDatum mdSdNn, mdSdNp, mdSdT;
   std::vector<EOSData> mPhases;
   std::map<std::string, EOSDatum*> mVars;
 };

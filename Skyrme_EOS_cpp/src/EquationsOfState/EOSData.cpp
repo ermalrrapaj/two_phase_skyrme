@@ -33,7 +33,10 @@ EOSData::EOSData() :
     mdMundT (EOSDatum("Derivative of Neutron chemical potential with respect to Temperature")),
     mdMupdNn (EOSDatum("Derivative of Protron chemical potential with respect to Neutron Density")),
     mdMupdNp (EOSDatum("Derivative of Protron chemical potential with respect to Protron Density")),
-    mdMupdT (EOSDatum("Derivative of Protron chemical potential with respect to Temperature")), {
+    mdMupdT (EOSDatum("Derivative of Protron chemical potential with respect to Temperature")),
+    mdSdNn (EOSDatum("Derivative of Entropy per baryon with respect to Neutron Density")),
+    mdSdNp (EOSDatum("Derivative of Entropy per baryon with respect to Protron Density")),
+    mdSdT (EOSDatum("Derivative of Entropy per baryon with respect to Temperature")) {
   mVars["T"] = &mT;
   mVars["Np"] = &mNp;
   mVars["Nn"] = &mNn;
@@ -52,6 +55,9 @@ EOSData::EOSData() :
   mVars["dMupdNn"] = &mdMupdNn;
   mVars["dMupdNp"] = &mdMupdNp;
   mVars["dMupdT"] = &mdMupdT;
+  mVars["dSdNn"] = &mdSdNn;
+  mVars["dSdNp"] = &mdSdNp;
+  mVars["dSdT"] = &mdSdT;
 }
   
 EOSData EOSData::InputFromTNnNp(const double T, const double nn, 
@@ -121,7 +127,8 @@ EOSData EOSData::Output(const double T, const double nn, const double np,
     const double mun, const double mup, 
     const double dpdnn, const double dpdnp, const double dpdt,
     const double dmundnn, const double dmundnp, const double dmundt,
-    const double dmupdnn, const double dmupdnp, const double dmupdt,    
+    const double dmupdnn, const double dmupdnp, const double dmupdt
+    const double dsdnn, const double dsdnp, const double dsdt  
     const double pp, const double ss, const double ee) {
   EOSData out;
    
@@ -139,6 +146,9 @@ EOSData EOSData::Output(const double T, const double nn, const double np,
   out.mdMupdNn.Set(dmupdnn);
   out.mdMupdNp.Set(dmupdnp);
   out.mdMupdT.Set(dmupdt); 
+  out.mdSdNn.Set(dsdnn);
+  out.mdSdNp.Set(dsdnp);
+  out.mdSdT.Set(dsdt);
   
   if (pp==pp) out.mP.Set(pp);
   if (ss==ss) out.mS.Set(ss);

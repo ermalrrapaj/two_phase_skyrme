@@ -236,9 +236,18 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
   double dpdnn = nn*dmundnn + np*dmupdnn;
   double dpdnp = nn*dmundnp + np*dmupdnp;
   double dpdT = ss + nn*dmundT + np*dmupdT;
+  
+  double dsdnn = (5.0/(6.0*MNUC*T)*( (dtaundnn-taun*dmndnn/MNUC) * momsn
+				+(dtaupdnn-taup*dmpdnn/MNUC) * momsp )
+                - (nn*detandnn + etan)- np*detapdnn -ss/nt)/nn;
+  double dsdnp =( 5.0/(6.0*MNUC*T)*( (dtaundnp-taun*dmndnp/MNUC) * momsn
+				+(dtaupdnp-taup*dmpdnp/MNUC) * momsp )
+                - (np*detapdnp + etap)- nn*detandnp -ss/nt)/np;
+  double dsdT = (5.0/(6.0*MNUC*T)*( (dtaundT-taun/T)*momsn +(dtaupdT-taup/T)*momsp )
+               -nn*detandT-np*detapdT)/nt;
    
   return EOSData::Output(T, nn, np, mun, mup, pp, dpdnn, dpdnp, dpdt,
-    dmundnn, dmundnp, dmundt, dmupdnn, dmupdnp, dmupdt, ss/nt, ee/nt);  
+    dmundnn, dmundnp, dmundt, dmupdnn, dmupdnp, dmupdt, dsdnn, dsdnp, dsdt, ss/nt, ee/nt);  
 }
 
 
