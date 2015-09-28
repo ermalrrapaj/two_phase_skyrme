@@ -214,7 +214,34 @@ contains
     print *, (sn + mut)/sn
      
   contains
-   
+
+    function electron_set_fd_mu(muin, dntdmu) result(nt) 
+      real(8) :: nt 
+      real(8), intent(in)  :: muin 
+      real(8), intent(out) :: dntdmu
+      real(8) :: etat,aetat
+    
+      etat  = ( muin - M)/T
+      aetat = (-muin - M)/T
+      denom = 1.d0
+      theta = T/M 
+      call dfermi(0.5d0,denom,etat, theta, fd(1,1,1), fd(1,2,1), fd(1,1,2), fd(1,3,1), fd(1,1,3), &
+                                           fd(1,4,1), fd(1,1,4), fd(1,2,2), fd(1,3,2), fd(1,2,3))  
+      call dfermi(1.5d0,denom,etat, theta, fd(2,1,1), fd(2,2,1), fd(2,1,2), fd(2,3,1), fd(2,1,3), & 
+                                           fd(2,4,1), fd(2,1,4), fd(2,2,2), fd(2,3,2), fd(2,2,3))  
+      call dfermi(2.5d0,denom,etat, theta, fd(3,1,1), fd(3,2,1), fd(3,1,2), fd(3,3,1), fd(3,1,3), & 
+                                           fd(3,4,1), fd(3,1,4), fd(3,2,2), fd(3,3,2), fd(3,2,3))  
+      
+      !-- Transform to being in terms of \eta and \theta instead of \tilde \eta and \theta
+      fd(:,1,3) = fd(:,1,3) - 2.d0/theta**2*fd(:,2,2) + 2.d0/theta**3*fd(:,2,1) + fd(:,3,1)/theta**4 
+      fd(:,2,3) = fd(:,2,3) - 2.d0/theta**2*fd(:,3,2) + 2.d0/theta**3*fd(:,3,1) + fd(:,4,1)/theta**4 
+      
+      fd(:,1,2) = fd(:,1,2) - fd(:,2,1)/theta**2
+      fd(:,2,2) = fd(:,2,2) - fd(:,3,1)/theta**2 
+      fd(:,3,2) = fd(:,3,2) - fd(:,4,1)/theta**2
+
+    end function electron_set_fd_mu 
+     
     function electron_set_fd(muin,dntdmu) result(nt) 
       real(8) :: nt 
       real(8), intent(in)  :: muin 
@@ -259,9 +286,69 @@ contains
       return 
           
     end function electron_set_fd 
-  
-  end subroutine electron_eos 
    
+  end subroutine electron_eos 
+
+  !subroutine fermion_eos(g, M, T, mu, dn, dp, de, ds) 
+  !  real(8) :: g, M, T, mu 
+  !  real(8), dimension(3,3) :: dn, dp, de, ds
+  !  
+  !  real(8), dimension(3,4,4) :: fd 
+  !  real(8), dimension(3,3,3) :: ff  
+  !  real(8), parameter :: ONEOSQRT2PI2 = 0.0716448960313445 ! 1/(Sqrt(2)*Pi^2)
+  !  real(8), parameter :: PI2 = 9.86960440108936
+  !  real(8) :: fac, theta, denom, eta, detadt
+
+  !  denom = 1.d0
+  !  theta = T/M 
+  !  eta = (mu - M)/T
+  !  detadt = -eta/T
+  !  detadt2 = 2.d0*eta/T**2
+  !  
+  !  call dfermi(0.5d0,denom, eta, theta, fd(1,1,1), fd(1,2,1), fd(1,1,2), fd(1,3,1), fd(1,1,3), &
+  !                                        fd(1,4,1), fd(1,1,4), fd(1,2,2), fd(1,3,2), fd(1,2,3))  
+  !  call dfermi(1.5d0,denom, eta, theta, fd(2,1,1), fd(2,2,1), fd(2,1,2), fd(2,3,1), fd(2,1,3), & 
+  !                                        fd(2,4,1), fd(2,1,4), fd(2,2,2), fd(2,3,2), fd(2,2,3))  
+  !  call dfermi(2.5d0,denom, eta, theta, fd(3,1,1), fd(3,2,1), fd(3,1,2), fd(3,3,1), fd(3,1,3), & 
+  !                                        fd(3,4,1), fd(3,1,4), fd(3,2,2), fd(3,3,2), fd(3,2,3))  
+  !  ff(:,1,1) = fd(:,1,1) 
+  !  
+  !  ff(:,2,1) = fd(:,2,1)/T 
+  !  ff(:,3,1) = fd(:,3,1)/T**2
+  !  
+  !  ff(:,1,2) = fd(:,1,2)/M + fd(:,2,1)*detadt 
+  !  ff(:,1,3) = fd(:,1,3)/M**2 + fd(:,2,2)*detadt/M + fd(:,3,1)*detadt**2 + fd(:,2,1)*detadt2  
+  !  
+  !  ff(:,2,2) = fd(:,2,2)/(T*M) - fd(:,2,1)/T**2 + fd(:,3,1)*detadt 
+  !  ff(:,3,2) = (fd(:,3,2)/M - fd(:,3,1)/T - fd(:,4,1)*detadt)/T**2
+  !  
+  !  ff(:,3,3) = (fd(:,3,3)/(T*M*M) - fd(:,3,2)/(T*T*M)  
+  !              -fd(:,3,2)/(T*T*M) + fd(:,3,1)/T**3
+  !              -fd(:,4,2)/(T*M 
+  !   
+  !  !-- Get derivatives wrt eta and T (first index is eta, second is T)
+  !  fac = g*ONEOSQRT2PI2*M**3*theta**1.5d0 
+  !  dn(1,1) = fac*fd(1,1,1) + theta*fd(2,1,1)
+  !  dn(2,1) = (fac*fd(1,2,1) + theta*fd(2,2,1))/T
+  !  dn(3,1) = (fac*fd(1,3,1) + theta*fd(2,3,1))/T
+  !  
+  !  dn(1,2) = fd(1,1,2) + theta*fd(2,1,2) + fd(2,1,1)/M & 
+  !         + (fd(1,2,1) + theta*fd(2,2,1))*detadt 
+  !  dn(2,2) = fd(1,2,2) + theta*fd(2,2,2) + fd(2,2,1)/M & 
+  !         + (fd(1,3,1) + theta*fd(2,3,1))*detadt &
+  !         - (fd(1,2,1) + theta*fd(2,2,1))/T**2
+  !  dn(3,2) = fd(1,3,2) + theta*fd(2,3,2) + fd(2,3,1)/M & 
+  !         + (fd(1,4,1) + theta*fd(2,4,1))*detadt &
+  !         - 2.0*(fd(1,3,1) + theta*fd(2,3,1))/T**2 
+
+  !   
+  !  dn(:,2:3) = dn(:,2:3) + fd(2,1:3,1:2) 
+  !  dn = dn*fac
+  !  dn   
+  !   
+  !end subroutine fermion_eos  
+  
+  
   !--- All code below is from Frank Timmes (Cococubed) slightly modified 
   
   ! routine dfermi gets the fermi-dirac functions and their derivaties
@@ -439,7 +526,7 @@ contains
          ! Calculate the derivatives unscaled by the total fd function  
          fdeta        = factor * denomi 
          fdeta2       = fdeta  * denomi * (factor - 1.0) 
-         fdeta3       = fdeta  * denomi**2 * (factor**3 - 4.0*factor**2 + factor) 
+         fdeta3       = fdeta  * denomi**2 * (factor**2 - 4.d0*factor + 1.d0) 
 
         else
         
@@ -527,7 +614,7 @@ contains
          
          fdeta        = factor * denomi 
          fdeta2       = fdeta  * denomi * (factor - 1.0) 
-         fdeta3       = fdeta  * denomi**2 * (factor**3 - 4.0*factor**2 + factor) 
+         fdeta3       = fdeta  * denomi**2 * (factor**2 - 4.d0*factor + 1.d0) 
         
         else
          factor       = exp(eta - xsq)
