@@ -149,7 +149,7 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
     const double np) const {
   
   const double nt = nn + np; 
-  const double xp = np/(nt+1.e-40);
+  const double xp = np/(nt+1.e-120);
   
   double momsp = 1.0 + mF*(nn + np) + mG*(nn - np);
   double momsn = 1.0 + mF*(nn + np) - mG*(nn - np);
