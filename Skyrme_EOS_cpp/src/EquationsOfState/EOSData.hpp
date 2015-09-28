@@ -93,6 +93,9 @@ public:
   /// from EOSBase calls.
   static EOSData Output(const double T, const double nn, const double np, 
       const double mun, const double mup,  
+      const double dpdnn, const double dpdnp, const double dpdt,
+	  const double dmundnn, const double dmundnp, const double dmundt,
+	  const double dmupdnn, const double dmupdnp, const double dmupdt,
       const double pp = std::numeric_limits<double>::quiet_NaN(), 
       const double ss = std::numeric_limits<double>::quiet_NaN(), 
       const double ee = std::numeric_limits<double>::quiet_NaN());
@@ -103,7 +106,11 @@ public:
   friend class boost::serialization::access; 
   template<class Archive> 
   void serialize(Archive & ar, const unsigned int /* File Version */) {
-    ar & mT & mNp & mNn & mP & mMun & mMup & mE & mS & mPhases;
+    ar & mT & mNp & mNn & mP & mMun & mMup & mE & mS
+    & mdPdNn & mdPdNp & mdPdT
+    & mdMundNn & & mdMundNp & & mdMundT
+    & mdMupdNn & & mdMupdNp & & mdMupdT
+    & mPhases;
   }
    
   /// Get a vector of the subphases of this point
@@ -119,6 +126,15 @@ public:
   double Mue() const {return mMue.Get();} ///< Return the proton chemical potential [1/fm]
   double E()   const {return mE.Get();} ///< Return the energy per baryon [1/fm] 
   double S()   const {return mS.Get();} ///< Return the entropy per baryon 
+  double dPdNn()   const {return mdPdNn.Get();} ///< Return the derivative of P with repsect to Nn [1/fm]
+  double dPdNp()   const {return mdPdNp.Get();} ///< Return the derivative of P with repsect to Np [1/fm]
+  double dPdT()   const {return mdPdT.Get();} ///< Return the derivative of P with repsect to T [1/fm^3]
+  double dMundNn()   const {return mdMundNn.Get();} ///< Return the derivative of Mun with repsect to Nn [fm^2]
+  double dMundNp()   const {return mdMundNp.Get();} ///< Return the derivative of Mun with repsect to Np [fm^2]
+  double dMundT()   const {return mdMundT.Get();} ///< Return the derivative of Mun with repsect to T [1]
+  double dMupdNn()   const {return mdMupdNn.Get();} ///< Return the derivative of Mup with repsect to Nn [fm^2]
+  double dMupdNp()   const {return mdMupdNp.Get();} ///< Return the derivative of Mup with repsect to Np [fm^2]
+  double dMupdT()   const {return mdMupdT.Get();} ///< Return the derivative of Mup with repsect to T [1]
   
   void Set(const std::string name, const double val) { mVars[name]->Set(val);}
   double Get(const std::string name) {return mVars[name]->Get();}
@@ -126,6 +142,9 @@ public:
 protected:
   EOSDatum mT, mNp, mNn;
   EOSDatum mP, mMun, mMup, mMue, mE, mS;
+  EOSDatum mdPdNn, mdPdNp, mdPdT;
+  EOSDatum mdMundn, mdMundNp, mdmundT;
+  EOSDatum mdMupdn, mdMupdNp, mdMupdT;
   std::vector<EOSData> mPhases;
   std::map<std::string, EOSDatum*> mVars;
 };
