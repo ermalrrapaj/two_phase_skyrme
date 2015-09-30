@@ -7,13 +7,8 @@
 #include "EquationsOfState/EOSElectron.hpp" 
 
 extern"C" {
-  void __electron_eos_mod_MOD_dfermi(double *dk, double *denom, double *eta, 
-      double *theta, double *fd, double *fdeta, double *fdtheta,
-      double *fdeta2, double *fdtheta2, double *fdeta3, double *fdtheta3,
-      double *fdetadtheta, double *fdeta2dtheta, double *fdetadtheta2);
-
-  void __FD_MOD_fermion_eos(double *g, double *M, double *T, double *mu,
-      double *n, double *p, double *e, double *s);
+  void __fermi_dirac_MOD_dfermi(double *dk, double *denom, double *deta, 
+      double *dtheta, double fd[4][5]); 
 }
 
 
@@ -34,18 +29,26 @@ int FermiDiracEtaTest(double eta, double theta) {
       double deta = eta * (1.0 + delta * (double)(i-2));
       double dtheta = theta * (1.0 + delta * (double)(j-2));
       double ft;
-      __electron_eos_mod_MOD_dfermi(&dk, &denom, &deta, &dtheta, &ft, 
-      &fdeta, &fdtheta, &fdeta2, &fdtheta2, &fdeta3, &fdtheta3, &fdetadtheta,
-      &fdeta2dtheta, &fdetadtheta2);
-      fd[i][j] = ft;
+      double farr[4][5];
+      __fermi_dirac_MOD_dfermi(&dk, &denom, &deta, &dtheta, farr); 
+      fd[i][j] = farr[0][0];
     }
   } 
 
   double ft; 
-  __electron_eos_mod_MOD_dfermi(&dk, &denom, &eta, &theta, &ft, 
-  &fdeta, &fdtheta, &fdeta2, &fdtheta2, &fdeta3, &fdtheta3, &fdetadtheta,
-  &fdeta2dtheta, &fdetadtheta2);
-  
+  double farr[4][5];
+  __fermi_dirac_MOD_dfermi(&dk, &denom, &eta, &theta, farr); 
+  ft = farr[0][0]; 
+  fdeta = farr[0][1]; 
+  fdeta2 = farr[0][2]; 
+  fdeta3 = farr[0][3]; 
+  fdtheta = farr[1][0];   
+  fdtheta2 = farr[2][0];   
+  fdtheta3 = farr[3][0];   
+  fdetadtheta = farr[1][1]; 
+  fdeta2dtheta = farr[1][2]; 
+  fdetadtheta2 = farr[2][1]; 
+   
   int ierr = 0; 
   {
     double h = delta * eta; 
