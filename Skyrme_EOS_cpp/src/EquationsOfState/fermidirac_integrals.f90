@@ -1,8 +1,235 @@
-module FD 
+module fermi_dirac
+  implicit none 
+  real(8), parameter, private :: ONEOSQRT2PI2 = 0.0716448960313445 ! 1/(Sqrt(2)*Pi^2)
+  real(8), parameter, private :: PI2 = 9.86960440108936
+contains
 
-contains 
+  subroutine two_fermion_eos(g, M, T, n, mun, pn, en, sn) 
+    real(8) :: g, M, T, n 
+    real(8) :: mu, p, e, s 
+    
+    real(8) :: muu, muc, mul, fl, fc, fu, dndmu, dfdmu  
+    real(8), dimension(3,3) :: na, pa, ea, sa
+    real(8), dimension(3,3) :: np, pp, ep, sp
+    real(8), dimension(2,2) :: mun, nn, pn, en, sn 
+    integer :: i 
+     
+    !-- First find the chemical potential using bisection and NR 
+    muu = ((3.d0*PI2*ABS(n))**(1.d0/3.d0) + M)*1.d2
+    mul = 0.d0 
+    
+    if (n<0.d0) then 
+      mul = -muu 
+      muu = 0.d0 
+    endif   
+    fl = fermion_number(g, M, T, mul, dndmu) - n 
+    fl = fl - fermion_number(g, M, T,-mul, dndmu) 
+    fu = fermion_number(g, M, T, muu, dndmu) - n
+    fu = fu - fermion_number(g, M, T,-mul, dndmu) 
+    if (fu*fl>0.d0) print *,'bad', muu, mul 
+    do i=1,100
+      muc = 0.5d0*(muu+mul) 
+      fc = fermion_number(g, M, T, muc, dndmu) - n 
+      fc = fc - fermion_number(g, M, T,-muc, dndmu)
+      if (fc*fl>0.d0) then
+        mul = muc 
+        fl = fc 
+      else 
+        muu = muc 
+        fu = fc 
+      endif 
+      if (ABS(fu-fl)/(ABS(n) + 1.d-20)<1.d2) exit   
+    enddo  
+    
+    do i=1,25 
+      fc = fermion_number(g, M, T, muc, dndmu) 
+      fc = fc - n 
+      dfdmu = dndmu 
+      fc = fc - fermion_number(g, M, T,-muc, dndmu) 
+      dfdmu = dfdmu + dndmu 
+      muc = muc - fc/(dfdmu + 1.d-100) 
+      if (ABS(fc)/(ABS(n)+1.d-20)<1.d-13) exit 
+    enddo 
+    mu = muc 
 
+    call fermion_eos_mu(g, M, T,  muc, np, pp, ep, sp) 
+    call fermion_eos_mu(g, M, T, -muc, na, pa, ea, sa) 
+    np(1,:) = np(1,:) - na(1,:)
+    np(2,:) = np(2,:) + na(2,:)
+    np(3,:) = np(3,:) - na(3,:)
+    
+    pp(1,:) = pp(1,:) + pa(1,:)
+    pp(2,:) = pp(2,:) - pa(2,:)
+    pp(3,:) = pp(3,:) + pa(3,:)
+    
+    ep(1,:) = ep(1,:) + ea(1,:)
+    ep(2,:) = ep(2,:) - ea(2,:)
+    ep(3,:) = ep(3,:) + ea(3,:)
+    
+    sp(1,:) = sp(1,:) + sa(1,:)
+    sp(2,:) = sp(2,:) - sa(2,:)
+    sp(3,:) = sp(3,:) + sa(3,:)
+    
+    call get_derivs(np, np, nn)  
+    call get_derivs(pp, np, pn)  
+    call get_derivs(ep, np, en)  
+    call get_derivs(sp, np, sn)  
+    
+    mun(1,1) = mu 
+    mun(2,1) = 1.d0/np(2,1) 
+    mun(1,2) = -np(1,2)/np(2,1) 
+    mun(2,2) = (np(3,1)*np(1,2)/np(2,1) - np(2,2))/np(2,1)**2 
+    
+    n = nn(1,1) 
+    p = pn(1,1)  
+    e = en(1,1)  
+    s = sn(1,1)  
+    !print *, mun(1,2), -sn(2,1), mun(1,2)/sn(2,1) + 1.d0    
+  end subroutine two_fermion_eos
+  
+  subroutine get_derivs(F, dn, Fn) 
+    real(8), intent(in), dimension(3,3) :: F, dn 
+    real(8), intent(out), dimension(2,2) :: Fn 
+    real(8), dimension(2,2) :: mu 
+    real(8) :: dndmu 
+    mu = 0.d0
+    dndmu = dn(2,1) + 1.d-100 
+    mu(2,1) = 1.d0/dndmu 
+    mu(1,2) = -dn(1,2)/dndmu
+    mu(2,2) = (dn(3,1)*dn(1,2)/dndmu - dn(2,2))/dndmu**2 
+    
+    Fn(1,1) = F(1,1) 
+    Fn(2,1) = F(2,1)*mu(2,1) 
+    Fn(1,2) = F(1,2) + mu(1,2)*F(2,1) 
+    Fn(2,2) = F(2,1)*mu(2,2) + mu(2,1)*(F(2,2) + mu(1,2)*F(3,1))     
+    
+  end subroutine get_derivs 
  
+  function fermion_number(g, M, T, mu, dndmu) result(n)
+    real(8), intent(in) :: g, M, T, mu
+    real(8) :: n, dndmu 
+    real(8), dimension(3,5,4) :: fd 
+    real(8) :: fac, theta, denom, eta
+
+    denom = 1.d0
+    theta = T/M 
+    eta = (mu - M)/T
+    
+    call dfermi(0.5d0, denom, eta, theta, fd(1,:,:)) 
+    call dfermi(1.5d0, denom, eta, theta, fd(2,:,:)) 
+    fac     = g*ONEOSQRT2PI2*M**3*SQRT(theta)*theta
+    n = fac*(fd(1,1,1) + (T*fd(2,1,1))/M)
+    dndmu = fac*(fd(1,2,1)/T + 1.d0/M*fd(2,2,1))   
+     
+  end function fermion_number 
+
+  subroutine fermion_eos_mu(g, M, T, mu, dn, dp, de, ds) 
+    real(8) :: g, M, T, mu
+    real(8) :: n, p, e, s 
+    real(8), dimension(3,3) :: dn, dp, de, ds
+    
+    real(8), dimension(3,5,4) :: fd 
+    real(8), dimension(3,3,3) :: ff  
+    real(8) :: fac, theta, denom, eta
+
+    denom = 1.d0
+    theta = T/M 
+    eta = (mu - M)/T
+    
+    call dfermi(0.5d0, denom, eta, theta, fd(1,:,:)) 
+    call dfermi(1.5d0, denom, eta, theta, fd(2,:,:)) 
+    call dfermi(2.5d0, denom, eta, theta, fd(3,:,:)) 
+    
+    !-- Transform from  eta, theta derivatives to mu, T derivatives
+    ! 
+    ! Calculated in mathematica using:
+    !
+    ! clean[expr_] := HoldForm[expr] /. (h : Except[HoldForm | Equal |
+    !      Power | Times | Plus | Log | Subscript])[args___] :> h
+    !
+    ! FortVar[str_] := 
+    !   StringReplace[ToString[FullSimplify[HoldForm[str]] // clean // 
+    !   FortranForm], {"Derivative(" ~~ x : DigitCharacter ~~ "," ~~ 
+    !   y : DigitCharacter ~~ ")(F" ~~ z : DigitCharacter ~~ ")" :> 
+    !   "ff(" ~~ z ~~ "," ~~ ToString[ToExpression[x] + 1] ~~ "," ~~ 
+    !   ToString[ToExpression[y] + 1] ~~ ")", 
+    !   "Derivative(" ~~ x : DigitCharacter ~~ "," ~~ y : DigitCharacter ~~
+    !   ")(F)" :> "fd(:," ~~ ToString[ToExpression[x] + 1] ~~ "," ~~ 
+    !   ToString[ToExpression[y] + 1] ~~ ")"}]
+    ! 
+    ! D[F[(mu - M)/T, T/M], {mu, 2}, {T, 2}] /. {mu -> eta*T + M} // FortVar
+
+    ff(:,1,1) = fd(:,1,1) 
+    ff(:,2,1) = fd(:,2,1)/T 
+    ff(:,3,1) = fd(:,3,1)/T**2
+    ff(:,1,2) = fd(:,1,2)/M - fd(:,2,1)*eta/T 
+    ff(:,1,3) = (T**2*fd(:,1,3) + eta*M*(2*M*fd(:,2,1) - 2*T*fd(:,2,2) + &
+                eta*M*fd(:,3,1)))/(M**2*T**2)
+    ff(:,2,2) = (T*fd(:,2,2) - M*(fd(:,2,1) + eta*fd(:,3,1)))/(M*T**2)
+    ff(:,3,2) = (-2*M*fd(:,3,1) + T*fd(:,3,2) - eta*M*fd(:,4,1))/(M*T**3)    
+    ff(:,2,3) = (2*M**2*fd(:,2,1) - 2*M*T*fd(:,2,2) + T**2*fd(:,2,3) + &
+                4*eta*M**2*fd(:,3,1) - 2*eta*M*T*fd(:,3,2) + &
+                eta**2*M**2*fd(:,4,1))/(M**2*T**3)  
+    ff(:,3,3) = (6*M**2*fd(:,3,1) - 4*M*T*fd(:,3,2) + T**2*fd(:,3,3) + &
+                6*eta*M**2*fd(:,4,1) - 2*eta*M*T*fd(:,4,2) + &
+                eta**2*M**2*fd(:,5,1))/(M**2*T**4) 
+        
+               
+    !-- Now get the actual density and derivatives (once again generated in mathematica)
+    ! 
+    !  StringReplace[fac/T^(3/2) D[T^(3/2)*(F1[mu, T] + T/M*F2[mu, T]),  
+    !    {mu, 1}, {T, 1}]// FortVar,{",2," -> ",:,"}]
+    ! 
+    fac     = g*ONEOSQRT2PI2*M**3*SQRT(theta)*theta
+    dn(:,1) = fac*(ff(1,:,1) + (T*ff(2,:,1))/M)
+    dn(:,2) = (fac*((3*Sqrt(T)*(ff(1,:,1) + (T*ff(2,:,1))/M))/2. + &
+              T**1.5*(ff(2,:,1)/M + ff(1,:,2) + (T*ff(2,:,2))/M)))/T**1.5
+    dn(:,3) = (fac*((3*(ff(1,:,1) + (T*ff(2,:,1))/M))/(4.*Sqrt(T)) + &
+              3*Sqrt(T)*(ff(2,:,1)/M + ff(1,:,2) + (T*ff(2,:,2))/M) + &
+              T**1.5*((2*ff(2,:,2))/M + ff(1,:,3) + (T*ff(2,:,3))/M)))/T**1.5     
+    ! 
+    !  StringReplace[fac/T^(3/2) D[T^(5/2)*(F2[mu, T] + T/(2*M)*F3[mu, T]),  
+    !    {mu, 1}, {T, 1}]// FortVar,{",2," -> ",:,"}]
+    ! 
+    fac     = 2.d0/3.d0*g*ONEOSQRT2PI2*M**4*SQRT(theta)*theta**2 
+    dp(:,1) = fac*(ff(2,:,1) + (T*ff(3,:,1))/(2.*M)) 
+    dp(:,2) = (fac*((5*T**1.5*(ff(2,:,1) + (T*ff(3,:,1))/(2.*M)))/2. + &
+              T**2.5*(ff(3,:,1)/(2.*M) + ff(2,:,2) + (T*ff(3,:,2))/(2.*M))))/T**2.5   
+    dp(:,3) = (fac*((15*Sqrt(T)*(ff(2,:,1) + (T*ff(3,:,1))/(2.*M)))/4. + &
+              5*T**1.5*(ff(3,:,1)/(2.*M) + ff(2,:,2) + (T*ff(3,:,2))/(2.*M)) + &
+              T**2.5*(ff(2,:,3) + (2*ff(3,:,2) + T*ff(3,:,3))/(2.*M))))/T**2.5 
+    ! 
+    !  StringReplace[fac/T^(3/2) D[T^(3/2)*(F1[mu, T] + 2*T/M*F2[mu, T] + (T/M)^2*F3[mu, T]),  
+    !    {mu, 1}, {T, 1}]// FortVar,{",2," -> ",:,"}]
+    ! 
+    fac     = g*ONEOSQRT2PI2*M**4*SQRT(theta)*theta 
+    de(:,1) = fac*(ff(1,:,1) + (2*T*ff(2,:,1))/M + (T**2*ff(3,:,1))/M**2)
+    de(:,2) = (fac*((3*Sqrt(T)*(ff(1,:,1) + (2*T*ff(2,:,1))/M + &
+              (T**2*ff(3,:,1))/M**2))/2. + T**1.5*((2*ff(2,:,1))/M + &
+              (2*T*ff(3,:,1))/M**2 + ff(1,:,2) + (2*T*ff(2,:,2))/M + &
+              (T**2*ff(3,:,2))/M**2)))/T**1.5
+    de(:,3) = (fac*((3*(ff(1,:,1) + (2*T*ff(2,:,1))/M + &
+              (T**2*ff(3,:,1))/M**2))/(4.*Sqrt(T)) + 3*Sqrt(T)*((2*ff(2,:,1))/M + &
+              (2*T*ff(3,:,1))/M**2 + ff(1,:,2) + (2*T*ff(2,:,2))/M + &
+              (T**2*ff(3,:,2))/M**2) + T**1.5*((2*ff(3,:,1))/M**2 + &
+              (4*T*ff(3,:,2))/M**2 + ff(1,:,3) + (2*(2*ff(2,:,2) + T*ff(2,:,3)))/M &
+              + (T**2*ff(3,:,3))/M**2)))/T**1.5
+    
+    ds = de + dp - mu*dn 
+    ds(2,:) = ds(2,1) - dn(1,:) 
+    ds(3,:) = ds(3,1) - dn(2,:) 
+    
+    ds(:,3) = ds(:,3)/T - 2.d0*ds(:,2)/T**2 + 2.d0*ds(:,1)/T**3 
+    ds(:,2) = ds(:,2)/T - ds(:,1)/T**2 
+    ds(:,1) = ds(:,1)/T 
+     
+    p = dp(1,1) 
+    n = dn(1,1) 
+    e = de(1,1) 
+    s = e/T + p/T - mu/T*n     
+     
+  end subroutine fermion_eos_mu
+  
   !--- All code below is from Frank Timmes (Cococubed) slightly modified 
   
   ! routine dfermi gets the fermi-dirac functions and their derivaties
@@ -17,7 +244,7 @@ contains
   ! routine el_dqlag040 does 40 point gauss-laguerre integration 18 fig accuracy
   ! routine el_dqlag080 does 80 point gauss-laguerre integration 32 fig accuracy
   
-        subroutine dfermiNew(dk,denom,eta,theta,fd)
+        subroutine dfermi(dk,denom,eta,theta,fd)
         include 'implno_luke.dek'
   
   ! this routine computes the fermi-dirac integrals f(dk,eta,theta) of
@@ -36,14 +263,14 @@ contains
   
   ! declare
         external         fdfunc1,fdfunc2
-        double precision fd(4,4) 
+        double precision fd(5,4) 
         double precision dk,denom,eta,theta,fdeta,fdtheta, &
                          fdeta2,fdtheta2,fdetadtheta,fdeta2dtheta,fdetadtheta2, &
                          d,sg,a1,b1,c1,a2,b2,c2,d2,e2,a3,b3,c3,d3,e3, &
                          eta1,xi,xi2,x1,x2,x3,s1,s2,s3,s12,par(4), &
                          res(4),drde(4),drdt(4),drde2(4),drdt2(4),drdet(4), &
                          drde2t(4),drdet2(4),drde3(4),drdt3(4),fdeta3,fdtheta3
-        double precision, dimension(4,4) :: res1, res2, res3, res4
+        double precision, dimension(5,4) :: res1, res2, res3, res4
   
   !   parameters defining the location of the breakpoints for the
   !   subintervals of integration:
@@ -108,7 +335,7 @@ contains
         fd = res1 + res2 + res3 + res4 
         
         return
-      end subroutine dfermiNew
+      end subroutine dfermi
   
   
         subroutine fdfunc1_el(x,par,n,fout) 
@@ -133,10 +360,10 @@ contains
   
   ! declare the pass
         integer          n
-        double precision fout(4,4) 
+        double precision fout(5,4) 
         double precision x,par(n),fd, &
                          fdeta,fdeta2,fdtheta,fdtheta2,fdetadtheta, &
-                         fdeta2dtheta,fdetadtheta2,fdeta3,fdtheta3
+                         fdeta2dtheta,fdetadtheta2,fdeta3,fdtheta3,fdeta4
   
   ! local variables
         double precision dk,eta,theta, &
@@ -162,6 +389,7 @@ contains
          fdeta        = factor * denomi 
          fdeta2       = fdeta  * denomi * (factor - 1.0) 
          fdeta3       = fdeta  * denomi**2 * (factor**2 - 4.d0*factor + 1.d0) 
+         fdeta4       = fdeta  * denomi**3 * (factor**3 - 11.d0*factor**2 + 11.d0*factor - 1.d0) 
 
         else
         
@@ -170,6 +398,7 @@ contains
          fdeta        = 1.d0
          fdeta2       = 1.d0
          fdeta3       = 1.d0
+         fdeta4       = 1.d0
 
         endif
         
@@ -183,21 +412,25 @@ contains
         fout(2,1) = fdeta 
         fout(3,1) = fdeta2 
         fout(4,1) = fdeta3 
+        fout(5,1) = fdeta4
 
         fout(1,2) = fdtheta * 1.d0 
         fout(2,2) = fdtheta * fdeta 
         fout(3,2) = fdtheta * fdeta2 
         fout(4,2) = fdtheta * fdeta3
+        fout(5,2) = fdtheta * fdeta4
          
         fout(1,3) = fdtheta2 * 1.d0 
         fout(2,3) = fdtheta2 * fdeta 
         fout(3,3) = fdtheta2 * fdeta2 
         fout(4,3) = fdtheta2 * fdeta3
+        fout(5,3) = fdtheta2 * fdeta4
          
         fout(1,4) = fdtheta3 * 1.d0 
         fout(2,4) = fdtheta3 * fdeta 
         fout(3,4) = fdtheta3 * fdeta2 
         fout(4,4) = fdtheta3 * fdeta3
+        fout(5,4) = fdtheta3 * fdeta4
         
         fout = fd * fout  
         
@@ -230,10 +463,10 @@ contains
   
   ! declare the pass
         integer          n
-        double precision fout(4,4) 
+        double precision fout(5,4) 
         double precision x,par(n),fd, &
                          fdeta,fdeta2,fdtheta,fdtheta2,fdetadtheta, &
-                         fdeta2dtheta,fdetadtheta2,fdeta3,fdtheta3
+                         fdeta2dtheta,fdetadtheta2,fdeta3,fdtheta3,fdeta4
   
   ! local variables
         double precision dk,eta,theta, &
@@ -258,6 +491,7 @@ contains
          fdeta        = factor * denomi 
          fdeta2       = fdeta  * denomi * (factor - 1.0) 
          fdeta3       = fdeta  * denomi**2 * (factor**2 - 4.d0*factor + 1.d0) 
+         fdeta4       = fdeta  * denomi**3 * (factor**3 - 11.d0*factor**2 + 11.d0*factor - 1.d0) 
         
         else
          factor       = exp(eta - xsq)
@@ -265,6 +499,7 @@ contains
          fdeta        = 1.d0
          fdeta2       = 1.d0
          fdeta3       = 1.d0
+         fdeta4       = 1.d0
         endif
         
         denom2       = 1.0d0/(4.0d0 * xst)
@@ -277,21 +512,25 @@ contains
         fout(2,1) = fdeta 
         fout(3,1) = fdeta2 
         fout(4,1) = fdeta3 
+        fout(5,1) = fdeta4
 
         fout(1,2) = fdtheta * 1.d0 
         fout(2,2) = fdtheta * fdeta 
         fout(3,2) = fdtheta * fdeta2 
         fout(4,2) = fdtheta * fdeta3
+        fout(5,2) = fdtheta * fdeta4
          
         fout(1,3) = fdtheta2 * 1.d0 
         fout(2,3) = fdtheta2 * fdeta 
         fout(3,3) = fdtheta2 * fdeta2 
         fout(4,3) = fdtheta2 * fdeta3
+        fout(5,3) = fdtheta2 * fdeta4
          
         fout(1,4) = fdtheta3 * 1.d0 
         fout(2,4) = fdtheta3 * fdeta 
         fout(3,4) = fdtheta3 * fdeta2 
         fout(4,4) = fdtheta3 * fdeta3
+        fout(5,4) = fdtheta3 * fdeta4
         
         fout = fd * fout  
         
@@ -321,9 +560,9 @@ contains
   ! declare
         external         f
         integer          j,n
-        double precision a,b,result(4,4), &
+        double precision a,b,result(5,4), &
                          par(n), absc1,absc2,center,hlfrun 
-        double precision, dimension(4,4) :: fval1, fval2 
+        double precision, dimension(5,4) :: fval1, fval2 
          
   ! the abscissae and weights are given for the interval (-1,1).
   ! xg     - abscissae of the 20-point gauss-legendre rule
@@ -545,7 +784,7 @@ contains
   ! declare
         external         f
         integer          j,n
-        double precision result(4,4), fval(4,4) 
+        double precision result(5,4), fval(5,4) 
         double precision a,b,drdeta,drdtheta, &
                          drdeta2,drdtheta2,drdeta3,drdtheta3,drdetadtheta,drdeta2dtheta,drdetadtheta2,par(n), &
                          absc,deta,dtheta, &
@@ -894,20 +1133,3 @@ contains
         
 end module
 
-program test
-  use FD
-  use electron_eos_mod
-   
-  real(8) , dimension(4,4) :: ffd
-  real(8) :: fd2,fdeta,fdtheta
-  real(8) :: fdeta2,fdtheta2,fdeta3,fdtheta3,fdetadtheta,fdeta2dtheta,fdetadtheta2
-  
-  real(8) :: k = 2.d0 
-  real(8) :: denom = 1.d0 
-  real(8) :: eta = 10.d0 
-  real(8) :: theta = 1.2d0
-  call dfermiNew(k, denom, eta, theta, ffd)  
-  call dfermi   (k, denom, eta, theta, fd2,fdeta,fdtheta, &
-                          fdeta2,fdtheta2,fdeta3,fdtheta3,fdetadtheta,fdeta2dtheta,fdetadtheta2)
-  print *, ffd(1,1), fd2, fd2 - ffd(1,1)
-end program 
