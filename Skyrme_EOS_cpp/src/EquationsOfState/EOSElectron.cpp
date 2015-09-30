@@ -10,22 +10,37 @@
 #include "EquationsOfState/EOSElectron.hpp"
 
 extern"C" {
+  void __fermi_dirac_MOD_two_fermion_eos(double *g, double *M, double *T, 
+      double *n, double mu[][2], double p[][2], double e[][2], double s[][2]);
+  
   void __electron_eos_mod_MOD_electron_eos(double *M, double *n, double *T, 
       double *mu, double *p, double *e, double *s,
       double *dmut, double *dpt, double *det, double *dst,
       double *dmun, double *dpn, double *den, double *dsn);
+  
 }
 
 EOSData EOSElectron::FromNAndT(const EOSData& eosIn) {
-  double mu, p, e, s;
+  double g, mu, p, e, s, n;
   double dmun, dpn, den, dsn;
   double dmut, dpt, det, dst;
   double me = Constants::ElectronMassInFm;
   double np = eosIn.Np();
   double T = eosIn.T();
-  __electron_eos_mod_MOD_electron_eos(&me, &np, &T, &mu, &p, &e, &s, 
-      &dmut, &dpt, &det, &dst, &dmun, &dpn, &den, &dsn);
-
+  //__electron_eos_mod_MOD_electron_eos(&me, &np, &T, &mu, &p, &e, &s, 
+  //    &dmut, &dpt, &det, &dst, &dmun, &dpn, &den, &dsn);
+  // Note that the indices will be flipped  
+  double muarr[2][2]; 
+  double parr[2][2]; 
+  double earr[2][2]; 
+  double sarr[2][2]; 
+  g = 2.0;
+  __fermi_dirac_MOD_two_fermion_eos(&g, &me, &T, &np, muarr, parr, earr, sarr);
+  mu = muarr[0][0]; 
+  p = parr[0][0]; 
+  e = earr[0][0]; 
+  s = sarr[0][0]; 
+   
   EOSData eosOut;
   eosOut.Set("T", eosIn.T()); 
   eosOut.Set("Np", eosIn.Np()); 
@@ -34,6 +49,10 @@ EOSData EOSElectron::FromNAndT(const EOSData& eosIn) {
   eosOut.Set("P", p); 
   eosOut.Set("E", e/eosIn.Nb()); 
   eosOut.Set("S", s/eosIn.Nb());
+  eosOut.Set("dPdNp", parr[0][1]);  
+  eosOut.Set("dPdT", parr[1][0]);  
+  eosOut.Set("dPdNn", 0.0);  
+
   return eosOut; 
 
 }

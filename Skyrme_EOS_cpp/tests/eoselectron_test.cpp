@@ -11,7 +11,11 @@ extern"C" {
       double *theta, double *fd, double *fdeta, double *fdtheta,
       double *fdeta2, double *fdtheta2, double *fdeta3, double *fdtheta3,
       double *fdetadtheta, double *fdeta2dtheta, double *fdetadtheta2);
+
+  void __FD_MOD_fermion_eos(double *g, double *M, double *T, double *mu,
+      double *n, double *p, double *e, double *s);
 }
+
 
 int FermiDiracEtaTest(double eta, double theta) {
 
@@ -93,7 +97,6 @@ int CheckLimits() {
   
 
   const double HBC = Constants::HBCFmMeV;
-  
   EOSElectron eose; 
   
   // Check that we agree with the high temperature, zero electron fraction limit 
@@ -105,6 +108,9 @@ int CheckLimits() {
   std::cout << "rel, nondeg : " << state.P() << " " << Prad << " "<< err << std::endl; 
   if (fabs(err)>1.e-6) return 1;
   if (fabs(state.Mue()/eosIn.T())>1.e-10) return 1;
+  err = 4.0*Prad/eosIn.T()/state.dPdT() - 1.0;
+  std::cout << "rel, nondeg : " << state.dPdT() << " " << 4.0*Prad/eosIn.T() << " "<< err << std::endl; 
+  if (fabs(err)>1.e-6) return 1;
 
   // Check that we agree in the degenerate, relativistic limit
   eosIn = EOSData::InputFromTNnNp(1.e-10/HBC, 1.e-2, 1.e1);
@@ -112,12 +118,17 @@ int CheckLimits() {
   
   double mudeg = pow(3.0 * Constants::Pi * Constants::Pi * state.Np(), 1.0/3.0);
   double Pdeg = 1.0/(12.0 * Constants::Pi * Constants::Pi) * pow(mudeg, 4.0);
-  
+  double dmuDeg = 1.0/3.0*mudeg/state.Np(); 
+  double dPdeg = 4.0*Pdeg/mudeg*dmuDeg; 
+   
   err =  state.Mue()/mudeg - 1.0; 
   std::cout << "rel, deg : " << state.Mue() << " " << mudeg << " " << err << std::endl;
   if (fabs(err)>1.e-6) return 1;
   err = state.P()/Pdeg - 1.0;
   std::cout << "rel, deg : " << state.P() << " " << Pdeg << " " << err << std::endl;
+  if (fabs(err)>1.e-6) return 1;
+  err = state.dPdNp()/dPdeg - 1.0;
+  std::cout << "rel, deg : " << state.dPdNp() << " " << dPdeg << " " << err << std::endl;
   if (fabs(err)>1.e-6) return 1;
   
   // Check that we agree in the non-degenerate, non-relativistic limit
@@ -135,17 +146,25 @@ int CheckLimits() {
   err = state.P()/pST - 1.0;
   std::cout << "Nonrel, nondeg : "<< state.P() << " " << pST << " " << err << std::endl;
   if (fabs(err)>1.e-5) return 1;
+  err = state.dPdNp()/state.T() - 1.0;
+  std::cout << "Nonrel, nondeg : "<< state.dPdNp() << " " << state.T() << " " << err << std::endl;
+  if (fabs(err)>1.e-5) return 1;
+  err = state.dPdT()/state.Np() - 1.0;
+  std::cout << "Nonrel, nondeg : "<< state.dPdT() << " " << state.Np() << " " << err << std::endl;
+  if (fabs(err)>1.e-5) return 1;
   
-  /// \todo Add non-relativistic, degenerate limit test 
+  /// non-relativistic, degenerate limit test 
   eosIn = EOSData::InputFromTNnNp(1.e-10/HBC, 1.e-2, 1.e-16);
 	state = eose.FromNAndT(eosIn); 
   
   mudeg = Constants::ElectronMassInFm 
       + pow(3.0*Constants::Pi*Constants::Pi*state.Np(), 2.0/3.0) / 
       (2.0*Constants::ElectronMassInFm);
+  dmuDeg = 2.0/3.0*mudeg/state.Np(); 
   Pdeg = pow(3.0 * Constants::Pi*Constants::Pi, 2.0/3.0)
       / (5.0*Constants::ElectronMassInFm) 
       * pow(state.Np(), 5.0/3.0);
+  dPdeg = 5.0/3.0/state.Np()*Pdeg;
   
   err =  state.Mue()/mudeg - 1.0; 
   std::cout << "Nonrel, deg : " << state.Mue() << " " << mudeg << " " << err << std::endl;
@@ -153,17 +172,55 @@ int CheckLimits() {
   err = state.P()/Pdeg - 1.0;
   std::cout << "Nonrel, deg : "<< state.P() << " " << Pdeg << " " << err << std::endl;
   if (fabs(err)>1.e-4) return 1;
+  err = state.dPdNp()/dPdeg - 1.0;
+  std::cout << "Nonrel, deg : "<< state.dPdNp() << " " << dPdeg << " " << err << std::endl;
+  if (fabs(err)>1.e-4) return 1;
   
-  /// \todo Add partial derivative comparison test
-
   return 0;
+}
+
+int CheckNumericDerivs() {
+  
+  const double HBC = Constants::HBCFmMeV;
+  EOSElectron eose; 
+   
+  for (double lT = -2.0; lT < 4.0; lT += 0.1) {
+  for (double ln = -3.0; ln < 2.0; ln += 0.1) {
+    double T = pow(10.0,lT)/HBC;
+    double ne = pow(10.0,ln);
+    
+    EOSData eosIn = EOSData::InputFromTNnNp(T, 0.0, ne); 
+	  EOSData state = eose.FromNAndT(eosIn);
+    eosIn = EOSData::InputFromTNnNp(T*(1.0-1.e-5), 0.0, ne); 
+	  EOSData stateMinus = eose.FromNAndT(eosIn);
+    eosIn = EOSData::InputFromTNnNp(T*(1.0+1.e-5), 0.0, ne); 
+	  EOSData statePlus = eose.FromNAndT(eosIn);
+    double NdPdT = (statePlus.P() - stateMinus.P())/(statePlus.T() - stateMinus.T()); 
+    double err = fabs((state.dPdT() - NdPdT)/(state.P()/state.T()));
+    std::cout << pow(10.0,lT) << " " << state.P() << " " << state.Mue() << " " << state.dPdT() << " " 
+        << NdPdT << " " << err << std::endl;
+    if (err>1.e-8) return 1; 
+    
+    eosIn = EOSData::InputFromTNnNp(T, 0.0, ne*(1.0-1.e-5)); 
+	  stateMinus = eose.FromNAndT(eosIn);
+    eosIn = EOSData::InputFromTNnNp(T, 0.0, ne*(1.0+1.e-5)); 
+	  statePlus = eose.FromNAndT(eosIn);
+    double NdPdN = (statePlus.P() - stateMinus.P())/(statePlus.Np() - stateMinus.Np()); 
+    err = fabs((state.dPdNp() - NdPdN)/(state.P()/ne));
+    std::cout << pow(10.0,lT) << " " << state.P() << " " << state.Mue() << " " << state.dPdNp() << " " 
+        << NdPdN << " " << err << std::endl;
+    if (err >1.e-8) return 1; 
+  }
+  }
+   
+  return 0; 
 }
 
 int main() {
 
   int ierr = FermiDiracEtaTest(10.0, 1.2);
   ierr += CheckLimits(); 
-  
+  ierr += CheckNumericDerivs(); 
   return ierr; 
 
 }
