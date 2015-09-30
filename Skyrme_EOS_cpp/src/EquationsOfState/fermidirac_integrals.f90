@@ -1,17 +1,21 @@
 module fermi_dirac
+
   implicit none 
   real(8), parameter, private :: ONEOSQRT2PI2 = 0.0716448960313445 ! 1/(Sqrt(2)*Pi^2)
   real(8), parameter, private :: PI2 = 9.86960440108936
+
 contains
 
   subroutine two_fermion_eos(g, M, T, n, mun, pn, en, sn) 
+  ! Calculate the equation of state for a fermion gas of particles and 
+  ! anti-particles.  First index is derivative wrt n and second is derivative
+  ! wrt T  
     real(8) :: g, M, T, n 
-    real(8) :: mu, p, e, s 
     
-    real(8) :: muu, muc, mul, fl, fc, fu, dndmu, dfdmu  
     real(8), dimension(3,3) :: na, pa, ea, sa
     real(8), dimension(3,3) :: np, pp, ep, sp
     real(8), dimension(2,2) :: mun, nn, pn, en, sn 
+    real(8) :: muu, muc, mul, fl, fc, fu, dndmu, dfdmu  
     integer :: i 
      
     !-- First find the chemical potential using bisection and NR 
@@ -50,7 +54,6 @@ contains
       muc = muc - fc/(dfdmu + 1.d-100) 
       if (ABS(fc)/(ABS(n)+1.d-20)<1.d-13) exit 
     enddo 
-    mu = muc 
 
     call fermion_eos_mu(g, M, T,  muc, np, pp, ep, sp) 
     call fermion_eos_mu(g, M, T, -muc, na, pa, ea, sa) 
@@ -75,19 +78,15 @@ contains
     call get_derivs(ep, np, en)  
     call get_derivs(sp, np, sn)  
     
-    mun(1,1) = mu 
+    mun(1,1) = muc
     mun(2,1) = 1.d0/np(2,1) 
     mun(1,2) = -np(1,2)/np(2,1) 
     mun(2,2) = (np(3,1)*np(1,2)/np(2,1) - np(2,2))/np(2,1)**2 
     
-    n = nn(1,1) 
-    p = pn(1,1)  
-    e = en(1,1)  
-    s = sn(1,1)  
-    !print *, mun(1,2), -sn(2,1), mun(1,2)/sn(2,1) + 1.d0    
   end subroutine two_fermion_eos
   
   subroutine get_derivs(F, dn, Fn) 
+    ! Transform from (mu,T) derivatives to (n,T) derivatives
     real(8), intent(in), dimension(3,3) :: F, dn 
     real(8), intent(out), dimension(2,2) :: Fn 
     real(8), dimension(2,2) :: mu 
@@ -106,6 +105,7 @@ contains
   end subroutine get_derivs 
  
   function fermion_number(g, M, T, mu, dndmu) result(n)
+    ! Calculate only the number of particles given the chemical potential mu
     real(8), intent(in) :: g, M, T, mu
     real(8) :: n, dndmu 
     real(8), dimension(3,5,4) :: fd 
@@ -125,7 +125,6 @@ contains
 
   subroutine fermion_eos_mu(g, M, T, mu, dn, dp, de, ds) 
     real(8) :: g, M, T, mu
-    real(8) :: n, p, e, s 
     real(8), dimension(3,3) :: dn, dp, de, ds
     
     real(8), dimension(3,5,4) :: fd 
@@ -214,7 +213,9 @@ contains
               (T**2*ff(3,:,2))/M**2) + T**1.5*((2*ff(3,:,1))/M**2 + &
               (4*T*ff(3,:,2))/M**2 + ff(1,:,3) + (2*(2*ff(2,:,2) + T*ff(2,:,3)))/M &
               + (T**2*ff(3,:,3))/M**2)))/T**1.5
-    
+
+    ! Calculate the entropy and its derivatives from fundamental 
+    ! thermodynamic relation for a uniform gas 
     ds = de + dp - mu*dn 
     ds(2,:) = ds(2,1) - dn(1,:) 
     ds(3,:) = ds(3,1) - dn(2,:) 
@@ -222,11 +223,6 @@ contains
     ds(:,3) = ds(:,3)/T - 2.d0*ds(:,2)/T**2 + 2.d0*ds(:,1)/T**3 
     ds(:,2) = ds(:,2)/T - ds(:,1)/T**2 
     ds(:,1) = ds(:,1)/T 
-     
-    p = dp(1,1) 
-    n = dn(1,1) 
-    e = de(1,1) 
-    s = e/T + p/T - mu/T*n     
      
   end subroutine fermion_eos_mu
   
