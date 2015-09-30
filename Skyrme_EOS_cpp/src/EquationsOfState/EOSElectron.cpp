@@ -37,14 +37,27 @@ EOSData EOSElectron::FromNAndT(const EOSData& eosIn) {
   eosOut.Set("T", eosIn.T()); 
   eosOut.Set("Np", eosIn.Np()); 
   eosOut.Set("Nn", eosIn.Nn()); 
-  eosOut.Set("Mue", mu); 
   eosOut.Set("P", p); 
   eosOut.Set("E", e/eosIn.Nb()); 
   eosOut.Set("S", s/eosIn.Nb());
-  eosOut.Set("dPdNp", parr[0][1]);  
-  eosOut.Set("dPdT", parr[1][0]);  
-  eosOut.Set("dPdNn", 0.0);  
+  eosOut.SetDNp("P", parr[0][1]);  
+  eosOut.SetDT( "P", parr[1][0]);  
+  eosOut.SetDNn("P", 0.0);  
 
+  eosOut.SetDNp("S", sarr[0][1]);  
+  eosOut.SetDT( "S", sarr[1][0]);  
+  eosOut.SetDNn("S", 0.0);  
+  
+  eosOut.SetDNp("E", earr[0][1]);  
+  eosOut.SetDT( "E", earr[1][0]);  
+  eosOut.SetDNn("E", 0.0);  
+  
+  eosOut.Set("Mue", muarr[0][0]); 
+  eosOut.SetDNp("Mue", muarr[0][1]);  
+  eosOut.SetDT( "Mue", muarr[1][0]);  
+  eosOut.SetDNn("Mue", 0.0);  
+  
+  
   return eosOut; 
 
 }
