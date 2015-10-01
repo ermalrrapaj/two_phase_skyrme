@@ -5,6 +5,7 @@
 #include "Util/Constants.hpp"
 #include "EquationsOfState/EOSData.hpp" 
 #include "EquationsOfState/EOSElectron.hpp" 
+#include "EquationsOfState/EOSTestSuite.hpp"
 
 extern"C" {
   void __fermi_dirac_MOD_dfermi(double *dk, double *denom, double *deta, 
@@ -182,48 +183,26 @@ int CheckLimits() {
   return 0;
 }
 
-int CheckNumericDerivs() {
-  
-  const double HBC = Constants::HBCFmMeV;
-  EOSElectron eose; 
-   
-  for (double lT = -2.0; lT < 4.0; lT += 0.1) {
-  for (double ln = -3.0; ln < 2.0; ln += 0.1) {
-    double T = pow(10.0,lT)/HBC;
-    double ne = pow(10.0,ln);
-    
-    EOSData eosIn = EOSData::InputFromTNnNp(T, 0.0, ne); 
-	  EOSData state = eose.FromNAndT(eosIn);
-    eosIn = EOSData::InputFromTNnNp(T*(1.0-1.e-5), 0.0, ne); 
-	  EOSData stateMinus = eose.FromNAndT(eosIn);
-    eosIn = EOSData::InputFromTNnNp(T*(1.0+1.e-5), 0.0, ne); 
-	  EOSData statePlus = eose.FromNAndT(eosIn);
-    double NdPdT = (statePlus.P() - stateMinus.P())/(statePlus.T() - stateMinus.T()); 
-    double err = fabs((state.dPdT() - NdPdT)/(state.P()/state.T()));
-    std::cout << pow(10.0,lT) << " " << state.P() << " " << state.Mue() << " " << state.dPdT() << " " 
-        << NdPdT << " " << err << std::endl;
-    if (err>1.e-8) return 1; 
-    
-    eosIn = EOSData::InputFromTNnNp(T, 0.0, ne*(1.0-1.e-5)); 
-	  stateMinus = eose.FromNAndT(eosIn);
-    eosIn = EOSData::InputFromTNnNp(T, 0.0, ne*(1.0+1.e-5)); 
-	  statePlus = eose.FromNAndT(eosIn);
-    double NdPdN = (statePlus.P() - stateMinus.P())/(statePlus.Np() - stateMinus.Np()); 
-    err = fabs((state.dPdNp() - NdPdN)/(state.P()/ne));
-    std::cout << pow(10.0,lT) << " " << state.P() << " " << state.Mue() << " " << state.dPdNp() << " " 
-        << NdPdN << " " << err << std::endl;
-    if (err >1.e-8) return 1; 
-  }
-  }
-   
-  return 0; 
-}
-
 int main() {
-
+  // Do tests that are specific to the electron Eos
   int ierr = FermiDiracEtaTest(10.0, 1.2);
   ierr += CheckLimits(); 
-  ierr += CheckNumericDerivs(); 
+  ierr = 0; 
+  // Do general EOS tests over temperature density grid 
+  const double HBC = Constants::HBCFmMeV;
+  EOSElectron eos; 
+  EOSTestSuite test(eos, 1.e-5, true);
+  for (double lT = -2.0; lT < 4.0; lT += 0.5) {
+    for (double ln = -3.0; ln < 2.0; ln += 0.5) {
+      double T = pow(10.0,lT)/HBC;
+      double ne = pow(10.0,ln);
+      
+      ierr += test.CheckAnalyticDerivatives(T, 0.1, ne);   
+      ierr += test.CheckThermodynamicConsistency(T, 0.1, ne);   
+      if (ierr>0) return ierr;  
+    }
+  }  
+  
   return ierr; 
 
 }
