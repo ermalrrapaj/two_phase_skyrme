@@ -20,8 +20,8 @@ public:
   EOSTestSuite(const EOSBase& eos, double tol = 1.e-7, bool verbose = false) : 
       mpEos(eos.MakeUniquePtr()), mVerbose(verbose), mTol(tol) {} 
   
-  int CheckThermodynamicConsistency(double nn, double np, double T) const; 
-  int CheckAnalyticDerivatives(double nn, double np, double T) const; 
+  int CheckThermodynamicConsistency(double T, double nn, double np) const; 
+  int CheckAnalyticDerivatives(double T, double nn, double np) const; 
   int CompressionTest(double Ye, double S) const;
 
 protected: 
