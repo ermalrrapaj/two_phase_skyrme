@@ -175,6 +175,9 @@ public:
   double dSdNn () const {return mS.GetDNn();} /// ///< Return the derivative of S with repsect to Nn [1]
   double dSdNp () const {return mS.GetDNp();} /// ///< Return the derivative of S with repsect to Np [1]
   double dSdT () const {return mS.GetDT();} /// ///< Return the derivative of S with repsect to T [1/fm^2]
+  double dEdNn () const {return mE.GetDNn();} /// ///< Return the derivative of S with repsect to Nn [1]
+  double dEdNp () const {return mE.GetDNp();} /// ///< Return the derivative of S with repsect to Np [1]
+  double dEdT () const {return mE.GetDT();} /// ///< Return the derivative of S with repsect to T [1/fm^2]
   
   void Set(const std::string name, const double val) { mVars[name]->Set(val);}
   double Get(const std::string name) {return mVars[name]->Get();}
