@@ -37,20 +37,24 @@ EOSData EOSElectron::FromNAndT(const EOSData& eosIn) {
   eosOut.Set("T", eosIn.T()); 
   eosOut.Set("Np", eosIn.Np()); 
   eosOut.Set("Nn", eosIn.Nn()); 
+  
   eosOut.Set("P", p); 
-  eosOut.Set("E", e/eosIn.Nb()); 
-  eosOut.Set("S", s/eosIn.Nb());
+
   eosOut.SetDNp("P", parr[0][1]);  
   eosOut.SetDT( "P", parr[1][0]);  
   eosOut.SetDNn("P", 0.0);  
-
-  eosOut.SetDNp("S", sarr[0][1]);  
-  eosOut.SetDT( "S", sarr[1][0]);  
-  eosOut.SetDNn("S", 0.0);  
   
-  eosOut.SetDNp("E", earr[0][1]);  
-  eosOut.SetDT( "E", earr[1][0]);  
-  eosOut.SetDNn("E", 0.0);  
+  double nb = eosIn.Nb();
+  eosOut.Set("S", sarr[0][0]/nb);
+  eosOut.SetDNp("S", sarr[0][1]/nb - sarr[0][0]/(nb*nb));  
+  eosOut.SetDT( "S", sarr[1][0]/nb);  
+  eosOut.SetDNn("S", -sarr[0][0]/(nb*nb));  
+  
+  eosOut.Set("E", e/nb); 
+  eosOut.SetDNp("E", earr[0][1]/nb - earr[0][0]/(nb*nb));  
+  eosOut.SetDT( "E", earr[1][0]/nb);  
+  eosOut.SetDNn("E", -earr[0][0]/(nb*nb));  
+
   
   eosOut.Set("Mue", muarr[0][0]); 
   eosOut.SetDNp("Mue", muarr[0][1]);  
