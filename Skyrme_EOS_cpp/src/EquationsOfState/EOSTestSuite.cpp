@@ -6,7 +6,8 @@
 ///
 ///
 
-#include "EOSTestSuite.hpp" 
+#include "EquationsOfState/EOSTestSuite.hpp" 
+#include "Util/OneDimensionalRoot.hpp"
 #include "EquationsOfState/EOSData.hpp" 
 #include "EquationsOfState/EOSBase.hpp" 
 
@@ -127,6 +128,34 @@ int EOSTestSuite::CheckAnalyticDerivatives(double T, double nn, double np) const
 }
 
 int EOSTestSuite::CompressionTest(double Ye, double S) const {
+  
+  double nold, nnew, Told; 
+   
+  auto root_f = [this, &Ye, &nold, &nnew, &Told](double xx) -> double {
+    EOSData eosc = mpEos->FromNAndT(EOSData::InputFromTNbYe(Told, nold, Ye));  
+    EOSData eosn = mpEos->FromNAndT(EOSData::InputFromTNbYe(xx, nnew, Ye));  
+    return (eosn.E() - eosc.E() 
+        - 0.5*(eosn.P()/pow(eosn.Nb(), 2) + eosc.P()/pow(eosc.Nb(),2)) 
+        * (eosn.Nb() - eosc.Nb()))/eosc.E();
+  }; 
+  
+  double delta = 0.005; 
+  nold = 1.e-4; 
+  Told = mpEos->FromNAndS(EOSData::InputFromSNbYe(S, nold, Ye)).T();  
+  
+  OneDimensionalRoot rootFinder(1.e-10, 100);  
+  for (double ln = log10(nold) + delta; ln < -0.5; ln += delta) {
+    nnew = pow(10.0, ln); 
+    Told = rootFinder(root_f,0.99*Told, 1.01*Told);
+    if(mVerbose) {
+      EOSData eosc = mpEos->FromNAndT(EOSData::InputFromTNbYe(Told, nnew, Ye));  
+      std::cout << nnew << " " << Told << " " << eosc.S() << std::endl; 
+    }
+    nold = nnew; 
+  }
+  EOSData eosc = mpEos->FromNAndT(EOSData::InputFromTNbYe(Told, nnew, Ye));  
+
+  if (fabs(eosc.S() - S) < 5.e-3) return 0;
   return 1; 
 }
 

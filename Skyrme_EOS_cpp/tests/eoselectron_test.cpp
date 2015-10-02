@@ -184,14 +184,24 @@ int CheckLimits() {
 }
 
 int main() {
+  
   // Do tests that are specific to the electron Eos
   int ierr = FermiDiracEtaTest(10.0, 1.2);
   ierr += CheckLimits(); 
   ierr = 0; 
+ 
   // Do general EOS tests over temperature density grid 
   const double HBC = Constants::HBCFmMeV;
   EOSElectron eos; 
   EOSTestSuite test(eos, 1.e-5, true);
+  
+  ierr += test.CompressionTest(1.0, 0.1);
+  if (ierr>0) return ierr;  
+  ierr += test.CompressionTest(1.0, 1.0);
+  if (ierr>0) return ierr;  
+  ierr += test.CompressionTest(1.0, 10.0);
+  if (ierr>0) return ierr;  
+  
   for (double lT = -2.0; lT < 4.0; lT += 0.5) {
     for (double ln = -3.0; ln < 2.0; ln += 0.5) {
       double T = pow(10.0,lT)/HBC;
