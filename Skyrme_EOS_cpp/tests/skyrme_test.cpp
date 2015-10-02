@@ -7,6 +7,7 @@
 #include "EquationsOfState/EOSSkyrme.hpp" 
 #include "EquationsOfState/GibbsPhaseConstruct.hpp"
 #include "EquationsOfState/SkyrmeParameters.hpp"
+#include "EquationsOfState/EOSTestSuite.hpp" 
 
 int main() {
   const double HBC = Constants::HBCFmMeV;
@@ -55,6 +56,12 @@ int main() {
   reverse = eos2.FromNAndS(
       EOSData::InputFromSNnNp(forward.S(), forward.Nn(), forward.Np()));
   if (fabs(reverse.T()/forward.T() - 1.0) > tol) return 1;
+  
+  // Check for consistency of the EoS
+  EOSTestSuite test(eos2,1.e-3, true);  
+  std::cout << test.CheckAnalyticDerivatives(2.0/HBC, 0.08, 0.08) << std::endl;
+  
+  
   return 0;
 }
 
