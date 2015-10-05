@@ -435,7 +435,8 @@ Let,
 Then,
 \begin{equation}
  \begin{split}
-  \frac{\hbar^2}{2 M^{*}_i}=&\frac{\hbar^2}{2 M}+\alpha_1 \rho_i+\alpha_2 \rho_{-i}\\
+  \frac{\hbar^2}{2 M^{*}_i}=&\frac{\hbar^2}{2 M}+\alpha_1 \rho_i+\alpha_2 \rho_{-i}\rightarrow\\
+  M^{*}_i=&M \big[1+F \rho- \text{sgn}(i) G (\rho_n-\rho_p)\big]^{-1}\\
   U_i=&\alpha_1 \tau_i+\alpha_2 \tau_{-i}+2A \rho + 4 B \rho_{-i}+ C(1+\delta)\rho^{\delta}+4 D \rho_{-i}(\rho_{-i}+\delta \rho_i)\rho^{\delta-2}\\
   \rho=&\rho_n+\rho_p
  \end{split}
@@ -444,11 +445,11 @@ where, $i$ denotes the isospin value. The set of independent parameters which is
 From epxressions above, the partial derivatives can be found:
 \begin{equation}
  \begin{split}
-  \partial_{\rho_i}M^{*}_r=&-2\frac{{M_r^{*}}^2}{\hbar^2}\big[\alpha_2+(\alpha_1-\alpha_2)\delta_{ir}\big]\\
-  =&-\frac{{M_r^{*}}^2}{M}\big[F+G(1-2\delta_{ir})\big]\\
+  \partial_{\rho_i}M^{*}_r=&-\frac{{M_r^{*}}^2}{M}\big[F+G(1-2\delta_{ir})\big]\\
+  =&-M \big[F+G(1-2\delta_{ir})\big]\big[1+F \rho- \text{sgn}(i) G (\rho_n-\rho_p)\big]^{-2}\\
   \partial_{T}M^{*}_r =& 0\\
-  \partial_{\rho_i}U_r=& \alpha_1 \partial_{\rho_i}\tau_r+\alpha_2 \partial_{\rho_i}\tau_{-r} + 2 A + 4 B \delta_{ir} + C \delta (1+\delta)\rho^{\delta-1}\\
-  &+4 D \rho^{\delta-3} \big[(\delta-1)\rho_{-r}(2\rho_{-r}+\delta \rho_r)-\delta_{-ir}\rho [(\delta-2)\rho_{-r}-\delta \rho_r]\big]\\
+  \partial_{\rho_i}U_r=& \alpha_1 \partial_{\rho_i}\tau_r+\alpha_2 \partial_{\rho_i}\tau_{-r} + 2 A + 4 B (1-\delta_{ir}) + C \delta (1+\delta)\rho^{\delta-1}\\
+  &+4 D \rho^{\delta-3} \big[(\delta-1)\rho_{-r}(2\rho_{-r}+\delta \rho_r)\delta_{ir}+(1-\delta_{-ir})[\delta (\rho_{-r}^2+\rho_{r}^2)+\rho_{-r}\rho_{r}(2+\delta(\delta-1))]\big]\\
   \partial_{T}U_r =& \alpha_1 \partial_{T}\tau_r+\alpha_2 \partial_{T}\tau_{-r}
  \end{split}
 \end{equation}
@@ -463,38 +464,38 @@ The number density and kinetic density can be expressed in terms of the general 
 By inverting the expression for the density:
 \begin{equation}
  \begin{split}
-  \eta_r= F^{-1}_{1/2}\big[2 \pi^2 \rho_r(\frac{\hbar^2}{2 M_r^{*}T})^{3/2}\big]=F^{-1}_{1/2}(u_r)
+  \eta_r= F^{-1}_{1/2}\big[2 \pi^2 \rho_r(\frac{\hbar^2}{2 M_r^{*}T})^{3/2}\big]\equiv F^{-1}_{1/2}\big[\eta^{(-1)}_r\big]\leftrightarrow\\
+  \eta_r= F^{-1}_{1/2}\big[\eta^{(-1)}_r\big],\ \eta^{(-1)}_r=2 \pi^2 \rho_r(\frac{\hbar^2}{2 M_r^{*}T})^{3/2} = F_{1/2}\big[\eta_r\big]
  \end{split}
 \end{equation}
-And,
+And, 
 \begin{equation}
  \begin{split}
-  \partial_{\rho_i}u_r=&2\pi^2(\frac{\hbar^2}{2 M_r^{*}T})^{3/2}\Big[\delta_{ir}+\frac{3 \rho_r M_r^{*}}{\hbar^2}\big[\alpha_2+(\alpha_1-\alpha_2)\delta_{ir}\big]\Big]\\
-  =&\frac{F_{1/2}(\eta_r)}{\rho_r}\Big[\delta_{ir}+\frac{3 \rho_r M_r^{*}}{\hbar^2}\big[\alpha_2+(\alpha_1-\alpha_2)\delta_{ir}\big]\Big]\\
-  =&\frac{F_{1/2}(\eta_r)}{\rho_r}\Big[\delta_{ir}+\frac{3 \rho_r}{2}\big[F+G(1-2\delta_{ir})\big]\Big]\\
-  \partial_{T}u_r=&-3 \pi^2 \frac{\rho_r}{T}(\frac{\hbar^2}{2M_r^{*}T})^{3/2}
+  \partial_{\rho_i}\eta^{(-1)}_r=&\big[\frac{\delta_{ir}}{\rho_r}-\frac{3}{2}\frac{\partial_{\rho_i}M_r^{*}}{M_r^{*}}\big] \eta^{(-1)}_r\\
+  =&\Big[\frac{\delta_{ir}}{\rho_r}+\frac{3}{2}\frac{M_r^{*}}{M}\big[F+G(1-2\delta_{ir})\big]\Big] \\
+  =&\frac{F_{1/2}(\eta_r)}{\rho_r}\Big[\delta_{ir}+\frac{3\rho_r}{2}\frac{M_r^{*}}{M}\big[F+G(1-2\delta_{ir})\big]\Big]\\
+  \partial_{T}\eta^{(-1)}_r=&-\frac{3}{2}\frac{\eta_r^{(-1)}}{T}\\
+  =&-\frac{3}{2}\frac{F_{1/2}(\eta_r)}{T}
  \end{split}
 \end{equation}
 Also, $\partial_{\eta}F_n(\eta)=nF_{n-1}(\eta) \leftrightarrow \partial_{u}F^{-1}_n(u)=\frac{1}{nF_{n-1}(u)}$:
 \begin{equation}
  \begin{split}
-  \partial_{\rho_i}\eta_r=&\partial_{u}F^{-1}_{1/2}(u_r) \times \partial_{\rho_i}u_r\\
-  =&\frac{\partial{u}F_{1/2}(u_r)}{\rho_r \ F_{-1/2}(\eta_r)} \Big[\delta_{ir}+\frac{3 \rho_r M_r^{*}}{\hbar^2}\big[\alpha_2+(\alpha_1-\alpha_2)\delta_{ir}\big]\Big]\\
-  =&\frac{2F_{1/2}(u_r)}{\rho_r \ F_{-1/2}(\eta_r)} \Big[\delta_{ir}+\frac{3 \rho_r M_r^{*}}{\hbar^2}\big[\alpha_2+(\alpha_1-\alpha_2)\delta_{ir}\big]\Big]\\
-  \equiv& \frac{G_r}{\rho_r}\Big[\delta_{ir}+\frac{3 \rho_r M_r^{*}}{\hbar^2}\big[\alpha_2+(\alpha_1-\alpha_2)\delta_{ir}\big]\Big]\\
-  =& \frac{G_r}{\rho_r}\Big[\delta_{ir}+\frac{3 \rho_r}{2}\big[F+G(1-2\delta_{ir})\big]\Big]\\
-  \partial_{T}\eta_r=&\partial_{u}F^{-1}_{1/2}(u_r) \times \partial_{T}u_r\\
-  =&-\frac{6 \pi^2\rho_r}{T F_{-1/2}(u)}(\frac{\hbar^2}{2M_r^{*}T})^{3/2}\\
-  =&-\frac{3}{2} \frac{G_r}{T}
+  \partial_{\rho_i}\eta_r=&\frac{\partial_{\rho_i}\eta_r^{(-1)}}{\partial_{\eta_r}F_{1/2}(\eta_r)}\\
+  =&\frac{2F_{1/2}(\eta_r)}{F_{-1/2}(\eta_r)\rho_r}\Big[\delta_{ir}+\frac{3\rho_r}{2}\frac{M_r^{*}}{M}\big[F+G(1-2\delta_{ir})\big]\Big]\\
+  =&\frac{G_r}{\rho_r}\Big[\delta_{ir}+\frac{3\rho_r}{2}\frac{M_r^{*}}{M}\big[F+G(1-2\delta_{ir})\big]\Big]\\
+  \partial_{T}\eta_r=&\frac{\partial_{T}\eta_r^{(-1)}}{\partial_{\eta_r}F_{1/2}(\eta_r)}\\
+  =&-\frac{3}{2T}\frac{2F_{1/2}(\eta_r)}{F_{-1/2}(\eta_r)}\\
+  =&-\frac{3}{2}\frac{G_r}{T}
  \end{split}
 \end{equation}
 where, $G_r = \frac{2 F_{1/2}(\eta_r)}{F_{-1/2}(\eta_r)}$.
 Thus,
 \begin{equation}
  \begin{split}
- \partial_{\rho_i}\tau_r=&\frac{5}{4\pi^2 M^{*}_r}(\frac{2 M_r^{*}T}{\hbar^2})^{5/2}F_{3/2}(\eta_r)\partial_{\rho_i}M^{*}_r+\frac{3}{4\pi^2}(\frac{2 M_r^{*}T}{\hbar^2})^{3/2}F_{1/2}(\eta_r)\partial_{\rho_i}\eta_r\\
- =&\frac{M_r^{*}}{\hbar^2}\Big[3 T G_r \delta_{ir} +(\frac{9 M_r^{*}}{\hbar^2} T \rho_r G_r - 5 \tau_r)\big[\alpha_2+(\alpha_1-\alpha_2)\delta_{ir}\big] \Big]\\
-  =&3 T G_r\frac{M_r^{*}}{\hbar^2} \delta_{ir} +\frac{1}{2}(\frac{9 M_r^{*}}{\hbar^2} T \rho_r G_r - 5 \tau_r)\big[F+G(1-2\delta_{ir})\big]\\
+ \partial_{\rho_i}\tau_r=&\frac{5}{2}\tau_r\frac{\partial_{\rho_i}M_r^{*}}{ M_r^{*}}+\frac{3}{2}(\frac{2M_r^{*}T}{\hbar^2})\rho_r\partial_{\rho_i}\eta_r\\
+ =&-\frac{5}{2}\tau_r\frac{M_r^{*}}{M}\big[F+G(1-2\delta_{ir})\big]+\frac{3}{2}(\frac{2M_r^{*}T}{\hbar^2})G_r\Big[\delta_{ir}+\frac{3\rho_r}{2}\frac{M_r^{*}}{M}\big[F+G(1-2\delta_{ir})\big]\Big]\\
+  =&3 T G_r\frac{M_r^{*}}{\hbar^2} \delta_{ir} +\frac{1}{2}\frac{M_r^{*}}{M}(\frac{9 M_r^{*}}{\hbar^2} T \rho_r G_r - 5 \tau_r)\big[F+G(1-2\delta_{ir})\big]\\
   \partial_{T}\tau_r=&\frac{5}{4\pi^2 T}(\frac{2 M^{*}_rT}{\hbar^2})^{5/2} F_{3/2}(\eta_r)+\frac{1}{2\pi^2}(\frac{2 M_r^{*}T}{\hbar^2})^{5/2}\partial_{\eta_r}F_{3/2}(\eta_r)\partial_{T}\eta_r\\
   =&\frac{5}{2T}\tau_r-\frac{9}{8\pi^2 T}(\frac{2 M^{*}_rT}{\hbar^2})^{5/2} F_{1/2}(\eta_r)G_r\\
   =&\frac{5}{2T}\tau_r-\frac{9}{2}\frac{M_r^{*}}{\hbar^2}G_r\rho_r\\

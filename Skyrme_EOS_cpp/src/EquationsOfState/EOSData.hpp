@@ -111,10 +111,10 @@ public:
   /// Create EOSData object from temperature, baryon density, and Ye.
   static EOSData InputFromTNbYe(const double T, const double nb, const double ye);
   
-  /// Create EOSData object from entropy and densities.
+  /// Create EOSData object from entropy per baryon and densities.
   static EOSData InputFromSNnNp(const double S, const double nn, const double np);
   
-  /// Create EOSData object from entropy, baryon density, and Ye.
+  /// Create EOSData object from entropy per baryon, baryon density, and Ye.
   static EOSData InputFromSNbYe(const double S, const double nb, const double ye);
   
   /// Create EOSData object from temperature and chemical potentials.
@@ -132,13 +132,13 @@ public:
   /// from EOSBase calls.
   static EOSData Output(const double T, const double nn, const double np, 
       const double mun, const double mup,  
-      const double pp = std::numeric_limits<double>::quiet_NaN(), 
-      const double ss = std::numeric_limits<double>::quiet_NaN(), 
-      const double ee = std::numeric_limits<double>::quiet_NaN(),
+      const double pp = STDNAN, const double ss = STDNAN, const double ee = STDNAN,
       const double dpdnn=STDNAN, const double dpdnp=STDNAN, const double dpdt=STDNAN,
       const double dmundnn=STDNAN, const double dmundnp=STDNAN, const double dmundt=STDNAN,
       const double dmupdnn=STDNAN, const double dmupdnp=STDNAN, const double dmupdt=STDNAN,
-      const double dsdnn=STDNAN, const double dsnp=STDNAN, const double dsdt=STDNAN);
+      const double dsdnn=STDNAN, const double dsdnp=STDNAN, const double dsdt=STDNAN,
+      const double dednn=STDNAN, const double dednp=STDNAN, const double dedt=STDNAN,
+      const double mue = STDNAN);
 
   void SetPhases(std::vector<EOSData> phases) { mPhases = phases;} 
   
@@ -146,7 +146,7 @@ public:
   friend class boost::serialization::access; 
   template<class Archive> 
   void serialize(Archive & ar, const unsigned int /* File Version */) {
-    ar & mT & mNp & mNn & mP & mMun & mMup & mE & mS
+    ar & mT & mNp & mNn & mP & mMun & mMup & mMue & mE & mS
     & mPhases;
   }
    
@@ -178,9 +178,9 @@ public:
   double dSdNn () const {return mS.GetDNn();} /// ///< Return the derivative of S with repsect to Nn [1]
   double dSdNp () const {return mS.GetDNp();} /// ///< Return the derivative of S with repsect to Np [1]
   double dSdT () const {return mS.GetDT();} /// ///< Return the derivative of S with repsect to T [1/fm^2]
-  double dEdNn () const {return mE.GetDNn();} /// ///< Return the derivative of S with repsect to Nn [1]
-  double dEdNp () const {return mE.GetDNp();} /// ///< Return the derivative of S with repsect to Np [1]
-  double dEdT () const {return mE.GetDT();} /// ///< Return the derivative of S with repsect to T [1/fm^2]
+  double dEdNn () const {return mE.GetDNn();} /// ///< Return the derivative of E with repsect to Nn [1]
+  double dEdNp () const {return mE.GetDNp();} /// ///< Return the derivative of E with repsect to Np [1]
+  double dEdT () const {return mE.GetDT();} /// ///< Return the derivative of E with repsect to T [1/fm^2]
   
   void Set(const std::string name, const double val) { mVars[name]->Set(val);}
   double Get(const std::string name) {return mVars[name]->Get();}

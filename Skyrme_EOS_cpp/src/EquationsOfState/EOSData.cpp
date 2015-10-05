@@ -105,7 +105,9 @@ EOSData EOSData::Output(const double T, const double nn, const double np,
     const double dpdnn, const double dpdnp, const double dpdt,
     const double dmundnn, const double dmundnp, const double dmundt,
     const double dmupdnn, const double dmupdnp, const double dmupdt,
-    const double dsdnn, const double dsdnp, const double dsdt) {
+    const double dsdnn, const double dsdnp, const double dsdt,
+    const double dednn, const double dednp, const double dedt,
+    const double mue) {
   EOSData out;
    
   out.mT.Set(T); 
@@ -113,6 +115,7 @@ EOSData EOSData::Output(const double T, const double nn, const double np,
   out.mMun.Set(mun); 
   out.mNn.Set(nn); 
   out.mNp.Set(np);
+  out.mMue.Set(mue);
 
   if (!(dpdnn!=dpdnn)) out.mP.SetDNn(dpdnn);
   if (!(dpdnp!=dpdnp)) out.mP.SetDNp(dpdnp);
@@ -126,6 +129,9 @@ EOSData EOSData::Output(const double T, const double nn, const double np,
   if (!(dsdnn!=dsdnn)) out.mS.SetDNn(dsdnn);
   if (!(dsdnp!=dsdnp)) out.mS.SetDNp(dsdnp);
   if (!(dsdt!=dsdt)) out.mS.SetDT(dsdt);
+  if (!(dednn!=dednn)) out.mE.SetDNn(dednn);
+  if (!(dednp!=dednp)) out.mE.SetDNp(dednp);
+  if (!(dedt!=dedt)) out.mE.SetDT(dedt);
   
   if (!(pp!=pp)) out.mP.Set(pp);
   if (!(ss!=ss)) out.mS.Set(ss);
