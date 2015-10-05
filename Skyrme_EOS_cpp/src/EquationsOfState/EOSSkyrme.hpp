@@ -45,8 +45,7 @@ public:
    
 protected:
 
-  EOSData BaseEOSCall(const double T, const double nn, const double np);
-  void BaseEOSCallD1( EOSData& eosout );
+  EOSData BaseEOSCall(const double T, const double nn, const double np) const;
   double mA;
   double mB;
   double mC;
@@ -56,15 +55,7 @@ protected:
   double mDelta;
    
 private: 
-  double G[2]; //{Gn, Gp};
-  double mom[2]; //{momsn, momsp};
-  double dm[2][3];//{{dmndnn, dmndnp, dmndT}, {dmpdnn, dmpdnp, dmpdT}};
-  double eta[2];//{etan, etap}; 
-  double deta[2][3];//{{detandnn, detandnp, detandT}, {detapdnn, detapdnp, detapdT}};
-  double tau[2];//{taun, taup};
-  double dtau[2][3];//{{dtaundnn, dtaundnp, dtaundT}, {dtaupdnn, dtaupdnp, dtaupdT}};
-  double U[2];//{Un, Up};
-  double dU[2][3];//{{dUndnn, dUndnp, dUndT}, {dUpdnn, dUpdnp, dUpdT}};
+  
 };
 
 #endif // EOS_EOSSKYRME_HPP_
