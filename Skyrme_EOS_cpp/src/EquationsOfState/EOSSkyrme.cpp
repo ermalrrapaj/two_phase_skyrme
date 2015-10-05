@@ -168,7 +168,7 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
   double etan = ifermi12_(&invetan, &detan); 
   double etap = ifermi12_(&invetap, &detap);
   double dtaun, dtaup; 
-   double taup = pow(2.0*MNUC/momsp*T, 2.5)/(2.0*PI*PI) * zfermi32_(&etap, &dtaun);
+  double taup = pow(2.0*MNUC/momsp*T, 2.5)/(2.0*PI*PI) * zfermi32_(&etap, &dtaun);
   double taun = pow(2.0*MNUC/momsn*T, 2.5)/(2.0*PI*PI) * zfermi32_(&etan, &dtaup);
 
   
@@ -181,7 +181,7 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
       
   
   double mup = etap*T + Up; 
-  double mun = etap*T + Un; 
+  double mun = etan*T + Un; 
   
   
   double ee = taup*momsp/(2.0*MNUC) + taun*momsn/(2.0*MNUC) 

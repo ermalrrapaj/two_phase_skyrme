@@ -76,7 +76,8 @@ int main() {
   if (fabs(reverse.T()/forward.T() - 1.0) > tol) return 1;
   
   // Check for consistency of the EoS
-  EOSTestSuite test(eos2,1.e-3, true);  
+  EOSSkyrme free(0, 0, 0, 0, 0, 0, 0); 
+  EOSTestSuite test(free, 1.e-3, true);  
   std::cout << test.CheckAnalyticDerivatives(2.0/HBC, 0.08, 0.08) << std::endl;
   
   

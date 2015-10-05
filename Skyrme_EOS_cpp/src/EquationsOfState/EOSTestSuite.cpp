@@ -58,11 +58,13 @@ int EOSTestSuite::CheckAnalyticDerivatives(double T, double nn, double np) const
   EOSData state = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, nn, np));
   double errtot = 0.0; 
   double nerr = 0.0;  
-  auto CompFunc = [this, &errtot, &nerr](double nderiv, double deriv, double scale, std::string name) {
+  auto CompFunc = [this, &errtot, &nerr](double nderiv, double deriv, 
+      double scale, std::string name) {
     double err = (nderiv - deriv)/scale; 
     errtot += err;
     nerr++; 
-    if (mVerbose) std::cout << name << " " << deriv << " " << nderiv << " " << err << std::endl;  
+    if (mVerbose) std::cout << name << " " << deriv/scale << " " << nderiv/scale 
+        << " " << err << std::endl;  
   };
 
   // When the entropy is very low there seem to be problems with accuracy  
