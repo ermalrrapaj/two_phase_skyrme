@@ -148,14 +148,9 @@ EOSSkyrme EOSSkyrme::FromSaturation(const std::array<const double, 7>& param){
 EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn, 
     const double np) const {
 		
- // EOSData eosOut;
+  EOSData eosOut = EOSData::InputFromTNnNp(T, nn, np);
   const double nt = nn + np; 
   const double xp = np/(nt+1.e-40);
-  //eosOut.Set("T", T); 
- // eosOut.Set("Np", np); 
- // eosOut.Set("Nn", nn);
- // eosOut.Set("Nb", nt);
-  
  
   /* ******************************************************************* */
   
@@ -165,11 +160,24 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
   double invetan = 2.0*PI*PI * nn * pow(2.0*MNUC/momsn*T, -1.5); 
   double invetap = 2.0*PI*PI * np * pow(2.0*MNUC/momsp*T, -1.5); 
   double detan, detap;
-  double etan = ifermi12_(&invetan, &detan); 
-  double etap = ifermi12_(&invetap, &detap);
-  double dtaun, dtaup; 
-  double taup = pow(2.0*MNUC/momsp*T, 2.5)/(2.0*PI*PI) * zfermi32_(&etap, &dtaun);
-  double taun = pow(2.0*MNUC/momsn*T, 2.5)/(2.0*PI*PI) * zfermi32_(&etan, &dtaup);
+  double dtaun, dtaup;
+  
+  double ifermi12p[2], ifermi12n[2];
+  ifermi12p[0] = ifermi12_(&invetap, &ifermi12p[1]);
+  ifermi12n[0] = ifermi12_(&invetan, &ifermi12n[1]);
+
+  double etap = ifermi12p[0]; 
+  double etan = ifermi12n[0]; 
+  
+  double zfermi32p[2], zfermi32n[2];
+  zfermi32p[0] = zfermi32_(&etap, &zfermi32p[1]);
+  zfermi32n[0] = zfermi32_(&etan, &zfermi32n[1]);
+
+  //double taup = pow(2.0*MNUC/momsp*T, 2.5)/(2.0*PI*PI) * zfermi32p[0];
+  //double taun = pow(2.0*MNUC/momsn*T, 2.5)/(2.0*PI*PI) * zfermi32n[0];
+  
+  double taup = pow(2.0*MNUC*T, 2.5)/(2.0*PI*PI) * zfermi32p[0];
+  double taun = pow(2.0*MNUC*T, 2.5)/(2.0*PI*PI) * zfermi32n[0];
 
   
   double Up = (taup*(mF - mG) + taun*(mF + mG)) / (2.0*MNUC) 
@@ -182,6 +190,8 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
   
   double mup = etap*T + Up; 
   double mun = etan*T + Un; 
+  eosOut.Set("Mup", mup); 
+  eosOut.Set("Mun", mun); 
   
   
   double ee = taup*momsp/(2.0*MNUC) + taun*momsn/(2.0*MNUC) 
@@ -192,6 +202,9 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
       + (mC + 4.0*mD*xp*(1.0-xp))*mDelta*pow(nt, mDelta + 1.0);
   double ss = 5.0/(6.0*MNUC*T)*(taup*momsp + taun*momsn) - np*etap- nn*etan;
   
+  eosOut.Set("S", ss/nt); 
+  eosOut.Set("E", ee/nt); 
+  eosOut.Set("P", pp); 
   
   /* **************** 1st order derivatives ***************************** */
   
@@ -203,26 +216,36 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
   double dmndT = 0.0;
   double dmpdT = 0.0;
   
-  double Gn = 2.0*zfermi12_(&etan)/zfermim12_(&etan);
-  double Gp = 2.0*zfermi12_(&etap)/zfermim12_(&etap);
-
-
-  double detandnn = Gn/nn + 1.5*Gn*(mF-mG)*momsn;
-  double detandnp= -1.5*Gn*(mF+mG)*momsn;
+  //double Gn = 2.0*zfermi12_(&etan)/zfermim12_(&etan);
+  //double Gp = 2.0*zfermi12_(&etap)/zfermim12_(&etap);
+  double Gp = invetap * ifermi12p[1]; 
+  double Gn = invetan * ifermi12n[1]; 
+  
+  double detandnn = Gn*(1.0/nn + 1.5*(mF-mG)/momsn); 
+  double detandnp = 1.5*Gn*(mF+mG)/momsn; 
+  //double detandnn = Gn/nn + 1.5*Gn*(mF-mG)*momsn;
+  //double detandnp= -1.5*Gn*(mF+mG)*momsn;
   double detandT = -1.5*Gn/T;
   
-  double detapdnp = Gp/np + 1.5*Gp*(mF-mG)*momsp;
-  double detapdnn = -1.5*Gp*(mF+mG)*momsp;
+  double detapdnp = Gp*(1.0/np + 1.5*(mF-mG)/momsp);
+  double detapdnn = 1.5*Gp*(mF+mG)/momsp;
   double detapdT = -1.5*Gp/T;
    
-  
-  double dtaundnn = 3.0*T*Gn*MNUC/momsn+0.5*(9.0*MNUC/momsn*T*nn*Gn-5.0*taun)*(mF-mG)*momsn;
-  double dtaundnp = 0.5*(9.0*MNUC/momsn*T*nn*Gn-5.0*taun)*(mF+mG)*momsn;
-  double dtaundT = 2.5*taun/T-4.5*MNUC/momsn*nn*Gn;
-  
-  double dtaupdnp = 3.0*T*Gp*MNUC/momsp+0.5*(9.0*MNUC/momsp*T*np*Gp-5.0*taup)*(mF-mG)*momsp;
-  double dtaupdnn = 0.5*(9.0*MNUC/momsp*T*np*Gp-5.0*taup)*(mF+mG)*momsp;
-  double dtaupdT = 2.5*taup/T-4.5*MNUC/momsp*np*Gp;
+  double dtaundnn = taun * (zfermi32n[1]/zfermi32n[0]*detandnn - 2.5*(mF - mG)/momsn);
+  double dtaundnp = taun * (zfermi32n[1]/zfermi32n[0]*detandnp - 2.5*(mF + mG)/momsn);
+  double dtaundT  = taun * (zfermi32n[1]/zfermi32n[0]*detandT  + 2.5/T);
+
+  double dtaupdnn = taup * (zfermi32p[1]/zfermi32p[0]*detapdnn - 2.5*(mF + mG)/momsp);
+  double dtaupdnp = taup * (zfermi32p[1]/zfermi32p[0]*detapdnp - 2.5*(mF - mG)/momsp);
+  double dtaupdT  = taup * (zfermi32p[1]/zfermi32p[0]*detapdT  + 2.5/T);
+
+  //double dtaundnn = 3.0*T*Gn*MNUC/momsn+0.5*(9.0*MNUC/momsn*T*nn*Gn-5.0*taun)*(mF-mG)*momsn;
+  //double dtaundnp = 0.5*(9.0*MNUC/momsn*T*nn*Gn-5.0*taun)*(mF+mG)*momsn;
+  //double dtaundT = 2.5*taun/T-4.5*MNUC/momsn*nn*Gn;
+  //
+  //double dtaupdnp = 3.0*T*Gp*MNUC/momsp+0.5*(9.0*MNUC/momsp*T*np*Gp-5.0*taup)*(mF-mG)*momsp;
+  //double dtaupdnn = 0.5*(9.0*MNUC/momsp*T*np*Gp-5.0*taup)*(mF+mG)*momsp;
+  //double dtaupdT = 2.5*taup/T-4.5*MNUC/momsp*np*Gp;
   
 
  double dUndnn = 0.5*(mF-mG)/MNUC * dtaundnn + 0.5*(mF+mG)/MNUC * dtaupdnn
@@ -246,23 +269,23 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
   double dmundnn = T*detandnn + dUndnn;
   double dmundnp = T*detandnp + dUndnp;
   double dmundT = etan + T*detandT + dUndT;
- // eosOut.SetDNp("Mun", dmundnp);  
- // eosOut.SetDT( "Mun", dmundT);  
- // eosOut.SetDNn("Mun", dmundnn);
+  eosOut.SetDNp("Mun", dmundnp);  
+  eosOut.SetDT( "Mun", dmundT);  
+  eosOut.SetDNn("Mun", dmundnn);
   
   double dmupdnp = T*detapdnp + dUpdnp;
   double dmupdnn = T*detapdnn + dUpdnn;
   double dmupdT = etap + T*detapdT + dUpdT;
-  //eosOut.SetDNp("Mup", dmupdnp);  
-  //eosOut.SetDT( "Mup", dmupdT);  
-  //eosOut.SetDNn("Mup", dmupdnn);
+  eosOut.SetDNp("Mup", dmupdnp);  
+  eosOut.SetDT( "Mup", dmupdT);  
+  eosOut.SetDNn("Mup", dmupdnn);
   
   double dpdnn = nn*dmundnn + np*dmupdnn;
   double dpdnp = nn*dmundnp + np*dmupdnp;
   double dpdT = ss + nn*dmundT + np*dmupdT;
- // eosOut.SetDNp("P", dpdnp);  
- // eosOut.SetDT( "P", dpdT);  
- // eosOut.SetDNn("P", dpdnn);
+  eosOut.SetDNp("P", dpdnp);  
+  eosOut.SetDT( "P", dpdT);  
+  eosOut.SetDNn("P", dpdnn);
   
   double dssdnn = 5.0/(6.0*MNUC*T)*( momsn*(dtaundnn-taun*dmndnn* momsn/MNUC) 
 				   + momsp*(dtaupdnn-taup*dmpdnn* momsp/MNUC) )
@@ -272,14 +295,15 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
 				   - (etap + nn*detandnp + np*detapdnp);
   double dssdT = 5.0/(6.0*MNUC*T)*( momsn*(dtaundnn-taun/T) + momsp*(dtaupdnn-taup/T) )
 				  - (nn*detandT+ np*detapdT);
- 
+  dssdT = 5.0/(6.0*MNUC*T)*(dtaupdT*momsp + dtaundT*momsn) 
+      - np*detapdT - nn*detandT - 5.0/(6.0*MNUC*T*T)*(taup*momsp + taun*momsn); 
   double dsdnn = dssdnn/nt-ss/pow(nt,2.0);
   double dsdnp = dssdnp/nt-ss/pow(nt,2.0);
   double dsdT =  dssdT/nt;
    
-  //eosOut.SetDNp("S", dsdnp);  
-  //eosOut.SetDT( "S", dsdT);  
-  //eosOut.SetDNn("S", dsdnn);
+  eosOut.SetDNp("S", dsdnp);  
+  eosOut.SetDT( "S", dsdT);  
+  eosOut.SetDNn("S", dsdnn);
   
   double deednn = T*dssdnn + mun;
   double deednp = T*dssdnp + mup;
@@ -288,13 +312,18 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
   double dednn = deednn/nt-ee/pow(nt,2.0);
   double dednp = deednp/nt-ee/pow(nt,2.0);
   double dedT =  deedT/nt;
- // eosOut.SetDNp("E", dednp);  
- // eosOut.SetDT( "E", dedT);  
-  //eosOut.SetDNn("E", dednn);
+ 
+  eosOut.SetDNp("E", dednp);  
+  eosOut.SetDT( "E", dedT);  
+  eosOut.SetDNn("E", dednn);
   
+  eosOut.Set("E", taup);  
+  eosOut.SetDNp("E", dtaupdnp);  
+  eosOut.SetDT( "E", dtaupdT);  
+  eosOut.SetDNn("E", dtaupdnn);
  /* **************************************************************** */  
  
- // return eosOut;
+  return eosOut;
   
   return EOSData::Output(T, nn, np, mun, mup, pp, ss/nt, ee/nt, dpdnn, dpdnp, dpdT,
     dmundnn, dmundnp, dmundT, dmupdnn, dmupdnp, dmupdT, dsdnn, dsdnp, dsdT,dednn, dednp, dedT);  
