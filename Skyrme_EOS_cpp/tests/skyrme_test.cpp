@@ -76,11 +76,27 @@ int main() {
   if (fabs(reverse.T()/forward.T() - 1.0) > tol) return 1;
   
   // Check for consistency of the EoS
-  EOSSkyrme free(0, 0, 0, 0, 0, 0, 0); 
-  EOSTestSuite test(eos2, 1.e-3, true);  
-  std::cout << test.CheckAnalyticDerivatives(2.0/HBC, 0.08, 0.08) << std::endl;
-  
-  
-  return 0;
+  EOSTestSuite test(eos2, 1.e-6, true);  
+  int ierr = 0;
+  for (double ln=-4.0; ln<0.0; ln+=0.25) {
+    for (double lp=-4.0; lp<0.0; lp+=0.25) {
+      for (double lt=-1.0; lt<2.0; lt+=0.25) {
+        double np = pow(10.0, lp); 
+        double nn = pow(10.0, ln); 
+        double T = pow(10.0, lt); 
+        
+        ierr += test.CheckAnalyticDerivatives(T/HBC, nn, nn);
+        ierr += test.CheckThermodynamicConsistency(T/HBC, nn, np); 
+      
+      }
+    }
+  }
+
+  ierr += test.CompressionTest(0.3,0.1); 
+  ierr += test.CompressionTest(0.3,1.0); 
+  ierr += test.CompressionTest(0.3,5.0); 
+
+  std::cout << ierr << std::endl; 
+  return ierr;
 }
 
