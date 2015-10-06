@@ -182,16 +182,20 @@ public:
   double dEdNp () const {return mE.GetDNp();} /// ///< Return the derivative of E with repsect to Np [1]
   double dEdT () const {return mE.GetDT();} /// ///< Return the derivative of E with repsect to T [1/fm^2]
   
-  void Set(const std::string name, const double val) { mVars[name]->Set(val);}
+  void Set(const std::string name, const double val) { 
+      try {mVars[name]->Set(val);} catch(...){std::cerr << name << " causes an error.\n";}}
   double Get(const std::string name) {return mVars[name]->Get();}
   
-  void SetDNp(const std::string name, const double val) { mVars[name]->SetDNp(val);}
+  void SetDNp(const std::string name, const double val) { 
+      try {mVars[name]->SetDNp(val);} catch(...){std::cerr << name << " causes an error.\n";}}
   double GetDNp(const std::string name) {return mVars[name]->GetDNp();}
    
-  void SetDNn(const std::string name, const double val) { mVars[name]->SetDNn(val);}
+  void SetDNn(const std::string name, const double val) { 
+      try {mVars[name]->SetDNn(val);} catch(...){std::cerr << name << " causes an error.\n";}}
   double GetDNn(const std::string name) {return mVars[name]->GetDNn();}
    
-  void SetDT(const std::string name, const double val) { mVars[name]->SetDT(val);}
+  void SetDT(const std::string name, const double val) {
+      try {mVars[name]->SetDT(val);} catch(...){std::cerr << name << " causes an error.\n";}}
   double GetDT(const std::string name) {return mVars[name]->GetDT();}
    
 protected:
