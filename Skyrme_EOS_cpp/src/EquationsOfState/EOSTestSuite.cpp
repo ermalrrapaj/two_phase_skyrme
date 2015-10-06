@@ -21,20 +21,24 @@ int EOSTestSuite::CheckThermodynamicConsistency(double T, double nn, double np) 
   
   // Calculate derivatives in terms of baryon density and electron abundance
   double dmudt = 0.0; 
-  double dmudn = 0.0; 
+  double dmudn = 0.0;
+  double muscale = 0.0; 
   try { 
     dmudt += state.dMupdT();
     dmudn += state.Ye()*state.dMupdNp() + (1.0 - state.Ye())*state.dMupdNn();
+    muscale += state.Mup();
   } catch(...) {
   }
   try { 
     dmudt -= state.dMundT();
     dmudn -= state.Ye()*state.dMundNp() + (1.0 - state.Ye())*state.dMundNn();
+    muscale += state.Mun();
   } catch(...) {
   }
   try { 
     dmudt += state.dMuedT();
     dmudn += state.Ye()*state.dMuedNp() + (1.0 - state.Ye())*state.dMuedNn();
+    muscale += state.Mue();
   } catch(...) {
   }
   
@@ -47,8 +51,9 @@ int EOSTestSuite::CheckThermodynamicConsistency(double T, double nn, double np) 
   // Compare derivatives for consistency 
   double f1 = (dpdt + pow(state.Nb(),2)*dsdn)/(state.P()/state.T() + 1.e-50); 
   double f2 = (dpdy - pow(state.Nb(),2)*dmudn)/(state.P()/state.Ye() + 1.e-50); 
-  double f3 = (dmudt + dsdy)/(state.Mue()/state.T() + 1.e-50);  
-  std::cout << f1 <<  " " << f2 << " " << f3 << std::endl;
+  double f3 = (dmudt + dsdy)/(muscale/state.T() + 1.e-50);  
+  if (mVerbose) std::cout << "Thermodynamic Consistency " << f1 <<  " " << f2 
+      << " " << f3 << std::endl;
   if (fabs(f1) + fabs(f2) + fabs(f3) < mTol) return 0;
   return 1; 
 }
