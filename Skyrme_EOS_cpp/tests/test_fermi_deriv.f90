@@ -11,16 +11,16 @@ program test_fermi
    
   do i=-100, 100 
     eta = i/1.d3 + 6.d0 
-    dfe = ifermi12(eta*(1.d0 + delta), dfea) - ifermi12(eta*(1.d0-delta), dfea) 
+    dfe = ifermi12(eta*(1.d0 + delta), 1, dfea) - ifermi12(eta*(1.d0-delta), 1, dfea) 
     dfe = dfe/(2.d0*delta*eta)
-    ife = ifermi12(eta, dfea)
+    ife = ifermi12(eta, 1, dfea)
     f12 = zfermi12(ife)
     fm12 = zfermim12(ife) 
     err = abs((dfe-dfea)/dfea)
     max_err = max(max_err, err) 
     write(6,'(15es10.3)')eta, ife, err, dfea, dfe, (2.0/fm12 - dfea)/dfea
   enddo
-  
+  write(6,'(es10.3)') max_err  
   if (max_err>1.d-9) stop 1
   
   stop 0 

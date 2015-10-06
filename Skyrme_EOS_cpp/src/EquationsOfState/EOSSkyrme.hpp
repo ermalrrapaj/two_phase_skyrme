@@ -44,7 +44,7 @@ public:
   }
    
 protected:
-
+  template<bool first_deriv>
   EOSData BaseEOSCall(const double T, const double nn, const double np) const;
   double mA;
   double mB;
