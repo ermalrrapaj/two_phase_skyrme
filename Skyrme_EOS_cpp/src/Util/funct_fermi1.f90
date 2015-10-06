@@ -213,7 +213,7 @@
 
 
 
-      double precision function zfermi32(x, dzfermi32)
+      double precision function zfermi32(x, calc_deriv, dzfermi32)
       include 'implno.dek'
 !..
 !..this routine applies a rational function expansion to get the fermi-dirac
@@ -222,9 +222,10 @@
 !..
 !..declare
       integer          i,m1,k1,m2,k2
+      integer, intent(in) :: calc_deriv
       double precision, intent(out) :: dzfermi32
       double precision x,an,a1(12),b1(12),a2(12),b2(12),rn,den,xx
-      double precision drn, dden, dxx
+      double precision drn, dden, dxx, sqx
 !..load the coefficients of the expansion
       data  an,m1,k1,m2,k2 /1.5d0, 6, 7, 9, 10/
       data  (a1(i),i=1,7)/4.32326386604283d4,   8.55472308218786d4, &
@@ -246,50 +247,72 @@
                           6.39899717779153d-2,  3.14236143831882d-1, &
                           4.70252591891375d-1, -2.15540156936373d-2, &
                           2.34829436438087d-3/
-
+      dzfermi32 = 0.d0 
 
       if (x .lt. 2.0d0) then
        xx = exp(x)
        dxx = xx 
        rn = xx + a1(m1)
-       drn = m1*xx + (m1-1)*a1(m1)
        do i=m1-1,1,-1
         rn = rn*xx + a1(i)
-        drn = drn*xx + (i-1)*a1(i)
        enddo
-       drn = drn/xx 
 
        den = b1(k1+1)
-       dden = k1*b1(k1+1)
        do i=k1,1,-1
         den = den*xx + b1(i)
-        dden = dden*xx + (i-1)*b1(i)
        enddo
-       dden = dden/xx 
        zfermi32 = xx * rn/den
-       dzfermi32 = dxx * rn/den + xx * (dxx*drn/den - dxx*rn/den**2*dden)
+       
+       if (calc_deriv>0) then
+         drn = m1*xx + (m1-1)*a1(m1)
+         do i=m1-1,1,-1
+          drn = drn*xx + (i-1)*a1(i)
+         enddo
+         drn = drn/xx 
+         
+         dden = k1*b1(k1+1)
+         do i=k1,1,-1
+          dden = dden*xx + (i-1)*b1(i)
+         enddo
+         dden = dden/xx 
+         
+         dzfermi32 = dxx * rn/den + xx * (dxx*drn/den - dxx*rn/den**2*dden)
+       endif 
+        
       else
+      
        xx = 1.0d0/(x*x)
        dxx = -2.d0*xx/x
        rn = xx + a2(m2)
-       drn = m2*xx + (m2-1)*a2(m2)
        do i=m2-1,1,-1
         rn = rn*xx + a2(i)
-        drn = drn*xx + (i-1)*a2(i)
        enddo
-       drn = drn/xx
         
        den = b2(k2+1)
-       dden = k2*b2(k2+1)
        do i=k2,1,-1
         den = den*xx + b2(i)
-        dden = dden*xx + (i-1)*b2(i)
        enddo
-       dden = dden/xx 
-
-       zfermi32 = x*x*sqrt(x)*rn/den
-       dzfermi32 = 2.5d0*x*sqrt(x)*rn/den 
-       dzfermi32 = dzfermi32 + x*x*sqrt(x)*dxx*(drn/den - rn/den**2*dden)
+       
+       sqx = sqrt(x) 
+       zfermi32 = x*x*sqx*rn/den
+       
+       if (calc_deriv>0) then
+         drn = m2*xx + (m2-1)*a2(m2)
+         do i=m2-1,1,-1
+          drn = drn*xx + (i-1)*a2(i)
+         enddo
+         drn = drn/xx
+          
+         dden = k2*b2(k2+1)
+         do i=k2,1,-1
+          dden = dden*xx + (i-1)*b2(i)
+         enddo
+         dden = dden/xx 
+       
+         dzfermi32 = 2.5d0*x*sqx*rn/den 
+         dzfermi32 = dzfermi32 + x*x*sqx*dxx*(drn/den - rn/den**2*dden)
+       endif 
+      
       end if
       return
       end
@@ -542,7 +565,7 @@
 
 
 
-      double precision function ifermi12(f, difermi12)
+      double precision function ifermi12(f, calc_deriv, difermi12)
       include 'implno.dek'
 !..
 !..this routine applies a rational function expansion to get the inverse
@@ -554,6 +577,7 @@
       double precision f,an,a1(12),b1(12),a2(12),b2(12),rn,den,ff
       double precision drn, dden, dff
       double precision, intent(out) :: difermi12
+      integer, intent(in) :: calc_deriv
 
 !..load the coefficients of the expansion
       data  an,m1,k1,m2,k2 /0.5d0, 4, 3, 6, 5/
@@ -569,53 +593,68 @@
       data  (b2(i),i=1,6)/-9.745794806288d-3,  5.485432756838d-2, &
                           -3.299466243260d-1,  4.077841975923d-1, &
                           -1.145531476975d0,  -6.067091689181d-2/
-      
+      difermi12 = 0.d0  
 
       if (f .lt. 4.0d0) then
        
        rn = f + a1(m1) 
-       drn = m1*f + (m1-1)*a1(m1)
        do i=m1-1,1,-1
         rn = rn*f + a1(i)
-        drn = drn*f + (i-1)*a1(i)
        enddo
-       drn = drn/f
         
        den = b1(k1+1)
-       dden = b1(k1+1) * k1
        do i=k1,1,-1
         den = den*f + b1(i)
-        dden = dden*f + (i-1)*b1(i)
        enddo
-       dden = dden/f 
        
        ifermi12 = log(f * rn/den)
-       difermi12 = (rn/den + f*drn/den - f*rn*dden/den**2)/(f * rn/den) 
+       
+       if (calc_deriv>0) then
+         drn = m1*f + (m1-1)*a1(m1)
+         do i=m1-1,1,-1
+          drn = drn*f + (i-1)*a1(i)
+         enddo
+         drn = drn/f
+          
+         dden = b1(k1+1) * k1
+         do i=k1,1,-1
+          dden = dden*f + (i-1)*b1(i)
+         enddo
+         dden = dden/f 
+         
+         difermi12 = (rn/den + f*drn/den - f*rn*dden/den**2)/(f * rn/den) 
+       endif  
       
       else
        ff = 1.0d0/f**(1.0d0/(1.0d0 + an))
        dff = -1.d0/(1.0d0 + an)*ff/f
        
        rn = ff + a2(m2)
-       drn = m2*ff + (m2-1)*a2(m2)
        do i=m2-1,1,-1
         rn = rn*ff + a2(i)
-        drn = drn*ff + (i-1)*a2(i) 
        enddo
-       drn = drn/ff
        
        den = b2(k2+1)
-       dden = k2*b2(k2+1)
        do i=k2,1,-1
         den = den*ff + b2(i)
-        dden = dden*ff + (i-1)*b2(i)
        enddo
-       dden = dden/ff
 
-       !ifermi12 = 1.d0/(ff) 
-       !difermi12= -dff/() * (dden/den)
        ifermi12 = rn/(den*ff)
-       difermi12 = dff*drn/(den*ff) - dff*rn/(den**2*ff)*dden - rn/(den*ff**2)*dff
+       if (calc_deriv>0) then
+         drn = m2*ff + (m2-1)*a2(m2)
+         do i=m2-1,1,-1
+          drn = drn*ff + (i-1)*a2(i) 
+         enddo
+         drn = drn/ff
+         
+         dden = k2*b2(k2+1)
+         do i=k2,1,-1
+          dden = dden*ff + (i-1)*b2(i)
+         enddo
+         dden = dden/ff
+
+         difermi12 = dff*drn/(den*ff) - dff*rn/(den**2*ff)*dden - rn/(den*ff**2)*dff
+       endif 
       end if
 
       return

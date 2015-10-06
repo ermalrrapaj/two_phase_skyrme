@@ -7,6 +7,7 @@
 #include "EquationsOfState/EOSSkyrme.hpp" 
 #include "EquationsOfState/GibbsPhaseConstruct.hpp"
 #include "EquationsOfState/SkyrmeParameters.hpp"
+#include "EquationsOfState/EOSTestSuite.hpp" 
 
 int main() {
   const double HBC = Constants::HBCFmMeV;
@@ -24,16 +25,34 @@ int main() {
 	EOSData state2 = eos2.FromNAndT(eosIn);
   EOSData state4 = eos4.FromNAndT(eosIn);
 
-  // Check that the two ways of getting the parameters work    
-  std::cout << state2.Np() << " " << state2.Nn() << " " << state2.Ye() << " "
-  << state2.T()*HBC << " " << state2.E()*HBC << " " << state2.S()  << " "
-  << state4.Mun()*HBC << " " << state4.Mup()*HBC  << " " 
+  // Check that the two ways of getting the parameters work  
+  std::cout << "Ska35S2009 from parameters:\n"; 
+  std::cout << "Np = "<<state2.Np() << ", Nn =" << state2.Nn() << ", Ye = " << state2.Ye() << ", T =  "
+  << state2.T()*HBC << ", E =  " << state2.E()*HBC << ", S =  " << state2.S()  << ", Mun = "
+  << state2.Mun()*HBC << ", Mup =  " << state2.Mup()*HBC  << ", P = " 
+  << state2.P()*HBC << " " << std::endl;
+  std :: cout << "dMundNn = "<<state2.dMundNn() <<", dMundNp = "<<state2.dMundNp() <<", dMundT = "<<state2.dMundT()
+  << ", dMupdNn = "<<state2.dMupdNn() <<", dMupdNp = "<<state2.dMupdNp() <<", dMupdT = "<<state2.dMupdT() 
+  << std::endl;
+  std :: cout << "dPdNn = "<<state2.dPdNn() <<", dPdNp = "<<state2.dPdNp() <<", dPdT = "<<state2.dPdT()
+  << ", dSdNn = "<<state2.dSdNn() <<", dSdNp = "<<state2.dSdNp() <<", dSdT = "<<state2.dMupdT() 
+  << std::endl;
+  std :: cout << "dEdNn = "<<state2.dEdNn() <<", dEdNp = "<<state2.dEdNp() <<", dEdT = "<<state2.dEdT() 
+  << std::endl << std::endl;
+ std::cout << "Ska35S2009 from saturation data:\n";
+  std::cout << "Np = "<< state4.Np() << ", Nn = " << state4.Nn() << ", Ye =  " << state4.Ye() << ", T = "
+  << state4.T()*HBC << ", E = " << state4.E()*HBC << ", S = " << state4.S() << ", Mun = " 
+  << state4.Mun()*HBC << ", Mup = " << state4.Mup()*HBC << ", P = " 
   << state4.P()*HBC << " " << std::endl;
-  
-  std::cout << state4.Np() << " " << state4.Nn() << " " << state4.Ye() << " "
-  << state4.T()*HBC << " " << state4.E()*HBC << " " << state4.S() << " " 
-  << state4.Mun()*HBC << " " << state4.Mup()*HBC << " " 
-  << state4.P()*HBC << " " << std::endl;
+  std :: cout << "dMundNn = "<<state4.dMundNn() <<", dMundNp = "<<state4.dMundNp() <<", dMundT = "<<state4.dMundT()
+  << ", dMupdNn = "<<state4.dMupdNn() <<", dMupdNp = "<<state4.dMupdNp() <<", dMupdT = "<<state4.dMupdT() 
+  << std::endl;
+   std :: cout << "dPdNn = "<<state4.dPdNn() <<", dPdNp = "<<state4.dPdNp() <<", dPdT = "<<state4.dPdT()
+  << ", dSdNn = "<<state4.dSdNn() <<", dSdNp = "<<state4.dSdNp() <<", dSdT = "<<state4.dMupdT() 
+  << std::endl;  
+   std :: cout << "dEdNn = "<<state4.dEdNn() <<", dEdNp = "<<state4.dEdNp() <<", dEdT = "<<state4.dEdT() 
+  << std::endl << std::endl;
+
   
   double tol = 1.e-2; // We seem to only get about 1% agreement
   //if (fabs(state4.E()/state2.E() - 1.0)>tol) return 1;
@@ -55,6 +74,29 @@ int main() {
   reverse = eos2.FromNAndS(
       EOSData::InputFromSNnNp(forward.S(), forward.Nn(), forward.Np()));
   if (fabs(reverse.T()/forward.T() - 1.0) > tol) return 1;
-  return 0;
+  
+  // Check for consistency of the EoS
+  EOSTestSuite test(eos2, 1.e-6, true);  
+  int ierr = 0;
+  for (double ln=-4.0; ln<0.0; ln+=0.25) {
+    for (double lp=-4.0; lp<0.0; lp+=0.25) {
+      for (double lt=-1.0; lt<2.0; lt+=0.25) {
+        double np = pow(10.0, lp); 
+        double nn = pow(10.0, ln); 
+        double T = pow(10.0, lt); 
+        
+        ierr += test.CheckAnalyticDerivatives(T/HBC, nn, nn);
+        ierr += test.CheckThermodynamicConsistency(T/HBC, nn, np); 
+      
+      }
+    }
+  }
+
+  ierr += test.CompressionTest(0.3,0.1); 
+  ierr += test.CompressionTest(0.3,1.0); 
+  ierr += test.CompressionTest(0.3,5.0); 
+
+  std::cout << ierr << std::endl; 
+  return ierr;
 }
 

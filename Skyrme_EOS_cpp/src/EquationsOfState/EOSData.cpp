@@ -24,19 +24,7 @@ EOSData::EOSData() :
     mMue(EOSDatum("Electron chemical potential")), 
     mP  (EOSDatum("Pressure")), 
     mE  (EOSDatum("Energy per baryon")),
-    mS  (EOSDatum("Entropy per baryon")),
-    mdPdNn (EOSDatum("Derivative of Pressure with respect to Neutron Density")),
-    mdPdNp (EOSDatum("Derivative of Pressure with respect to Protron Density")),
-    mdPdT (EOSDatum("Derivative of Pressure with respect to Temperature")),
-    mdMundNn (EOSDatum("Derivative of Neutron chemical potential with respect to Neutron Density")),
-    mdMundNp (EOSDatum("Derivative of Neutron chemical potential with respect to Protron Density")),
-    mdMundT (EOSDatum("Derivative of Neutron chemical potential with respect to Temperature")),
-    mdMupdNn (EOSDatum("Derivative of Protron chemical potential with respect to Neutron Density")),
-    mdMupdNp (EOSDatum("Derivative of Protron chemical potential with respect to Protron Density")),
-    mdMupdT (EOSDatum("Derivative of Protron chemical potential with respect to Temperature")),
-    mdSdNn (EOSDatum("Derivative of Entropy per baryon with respect to Neutron Density")),
-    mdSdNp (EOSDatum("Derivative of Entropy per baryon with respect to Protron Density")),
-    mdSdT (EOSDatum("Derivative of Entropy per baryon with respect to Temperature")) {
+    mS  (EOSDatum("Entropy per baryon")) { 
   mVars["T"] = &mT;
   mVars["Np"] = &mNp;
   mVars["Nn"] = &mNn;
@@ -46,18 +34,6 @@ EOSData::EOSData() :
   mVars["P"] = &mP;
   mVars["E"] = &mE;
   mVars["S"] = &mS;
-  mVars["dPdNn"] = &mdPdNn;
-  mVars["dPdNp"] = &mdPdNp;
-  mVars["dPdT"] = &mdPdT;
-  mVars["dMundNn"] = &mdMundNn;
-  mVars["dMundNp"] = &mdMundNp;
-  mVars["dMundT"] = &mdMundT;
-  mVars["dMupdNn"] = &mdMupdNn;
-  mVars["dMupdNp"] = &mdMupdNp;
-  mVars["dMupdT"] = &mdMupdT;
-  mVars["dSdNn"] = &mdSdNn;
-  mVars["dSdNp"] = &mdSdNp;
-  mVars["dSdT"] = &mdSdT;
 }
   
 EOSData EOSData::InputFromTNnNp(const double T, const double nn, 
@@ -129,7 +105,9 @@ EOSData EOSData::Output(const double T, const double nn, const double np,
     const double dpdnn, const double dpdnp, const double dpdt,
     const double dmundnn, const double dmundnp, const double dmundt,
     const double dmupdnn, const double dmupdnp, const double dmupdt,
-    const double dsdnn, const double dsdnp, const double dsdt) {
+    const double dsdnn, const double dsdnp, const double dsdt,
+    const double dednn, const double dednp, const double dedt,
+    const double mue) {
   EOSData out;
    
   out.mT.Set(T); 
@@ -137,19 +115,23 @@ EOSData EOSData::Output(const double T, const double nn, const double np,
   out.mMun.Set(mun); 
   out.mNn.Set(nn); 
   out.mNp.Set(np);
+  out.mMue.Set(mue);
 
-  if (!(dpdnn!=dpdnn)) out.mdPdNn.Set(dpdnn);
-  if (!(dpdnp!=dpdnp)) out.mdPdNp.Set(dpdnp);
-  if (!(dpdt!=dpdt)) out.mdPdT.Set(dpdt);
-  if (!(dmundnn!=dmundnn)) out.mdMundNn.Set(dmundnn);
-  if (!(dmundnp!=dmundnp)) out.mdMundNp.Set(dmundnp);
-  if (!(dmundt!=dmundt)) out.mdMundT.Set(dmundt);
-  if (!(dmupdnn!=dmupdnn)) out.mdMupdNn.Set(dmupdnn);
-  if (!(dmupdnp!=dmupdnp)) out.mdMupdNp.Set(dmupdnp);
-  if (!(dmupdt!=dmupdt)) out.mdMupdT.Set(dmupdt); 
-  if (!(dsdnn!=dsdnn)) out.mdSdNn.Set(dsdnn);
-  if (!(dsdnp!=dsdnp)) out.mdSdNp.Set(dsdnp);
-  if (!(dsdt!=dsdt)) out.mdSdT.Set(dsdt);
+  if (!(dpdnn!=dpdnn)) out.mP.SetDNn(dpdnn);
+  if (!(dpdnp!=dpdnp)) out.mP.SetDNp(dpdnp);
+  if (!(dpdt!=dpdt)) out.mP.SetDT(dpdt);
+  if (!(dmundnn!=dmundnn)) out.mMun.SetDNn(dmundnn);
+  if (!(dmundnp!=dmundnp)) out.mMun.SetDNp(dmundnp);
+  if (!(dmundt!=dmundt)) out.mMun.SetDT(dmundt);
+  if (!(dmupdnn!=dmupdnn)) out.mMup.SetDNn(dmupdnn);
+  if (!(dmupdnp!=dmupdnp)) out.mMup.SetDNp(dmupdnp);
+  if (!(dmupdt!=dmupdt)) out.mMup.SetDT(dmupdt); 
+  if (!(dsdnn!=dsdnn)) out.mS.SetDNn(dsdnn);
+  if (!(dsdnp!=dsdnp)) out.mS.SetDNp(dsdnp);
+  if (!(dsdt!=dsdt)) out.mS.SetDT(dsdt);
+  if (!(dednn!=dednn)) out.mE.SetDNn(dednn);
+  if (!(dednp!=dednp)) out.mE.SetDNp(dednp);
+  if (!(dedt!=dedt)) out.mE.SetDT(dedt);
   
   if (!(pp!=pp)) out.mP.Set(pp);
   if (!(ss!=ss)) out.mS.Set(ss);

@@ -1,5 +1,6 @@
 set(eos_files
-  electron_eos_luke.f90 
+  fermidirac_integrals.f90
+  EOSTestSuite.cpp
   EOSData.cpp
   EOSSingleNucleus.cpp
   EOSSkyrme.cpp

@@ -44,9 +44,8 @@ public:
   }
    
 protected:
-
+  template<bool first_deriv>
   EOSData BaseEOSCall(const double T, const double nn, const double np) const;
-  
   double mA;
   double mB;
   double mC;
@@ -56,6 +55,7 @@ protected:
   double mDelta;
    
 private: 
+  
 };
 
 #endif // EOS_EOSSKYRME_HPP_
