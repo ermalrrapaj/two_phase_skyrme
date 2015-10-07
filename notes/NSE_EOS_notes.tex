@@ -98,11 +98,12 @@ our model Helmholtz free energy for nuclear matter is
 \begin{equation}
 F = \sum_i^{\textrm{nuclei}} F_i(v_i,n_i,T) + V_o f_{B}(n_{p,o},n_{n,o},T).
 \end{equation}
-Here $f_B$ is the free energy of homogeneous nuclear matter, $n_x$ is the number
-density of species $x$, $v_i$ is the volume of nucleus (or phase) $i$, the
-subscript $o$ denotes nucleons outside of nuclei and corresponds to the low
-density phase (at densities below pasta formation).  The total free energy of
-phase $i$ is modeled as 
+where $f_B$ is the free energy of homogeneous nuclear matter per volume, $n_x$
+is the number density of species $x$, $v_i$ is the volume of nucleus (or phase)
+$i$, the subscript $o$ denotes nucleons outside of nuclei and corresponds to the
+low density phase (at densities below pasta formation).  Here, $V_o = V - \sum v_i \mathcal{N}_i$ is the volume 
+not taken up by nuclei.  The total free energy
+of phase $i$ is modeled as 
 \begin{equation}
 F_i = \mathcal{N}_i \left[ v_i f_B(\frac{Z_i}{v_i},\frac{N_i}{v_i},T) 
 + F_{FS}(v_i,Z_i,N_i,n_{p,o},n_{n,o},n_e,T) + T \ln \left(\frac{n_i}{n_Q A_i^{3/2}}\right) 
@@ -149,8 +150,70 @@ $P_{FS,i} = -\partial (F_{S,i}) / \partial v_i$.
 
 
 \subsection{Connection to NSE} 
-These constraint equations bear a strong resemblance to the standard NSE 
-equations.  This can be seen by recasting equation \ref{eq:dFdN} to 
+For a reaction $i \leftrightarrow j + k$, it is easy to show that the principle
+of detailed balance implies that 
+\begin{equation*}
+\mu_i = \mu_j + \mu_k 
+\end{equation*} 
+holds when the forward rate balances the backward rate.  When all strong
+interactions are in equilibrium with their inverses, invoking detailed balance
+for all of the reactions implies that 
+\begin{equation*}
+\mu_i = N_i \mu_n + Z_i \mu_p. 
+\end{equation*} 
+where $N_i$ is the number of neutrons and $Z_i$ is the number of protons in a
+nucleus of species $i$.
+This of course implies that if the neutron and proton number densities are
+known, the number densities of all other species in the medium are known.
+Assuming that the heavy nuclei obey Boltzmann statistics (i.e. $\mu_i = m_i + T
+\ln \left[n_i/(G_i n_Q)\right]$ gives 
+\begin{equation*}
+n_i = A_i^{3/2} G_i(T) n_Q \exp\left(\left[Z_i \mu_p + N_i \mu_n
+- m_i \right]/T\right), 
+\end{equation*} 
+where $G_i$ is the temperature dependent internal partition function of species
+$i$.  When neutrons and protons also obey Boltzmann statistics, the number
+density can be expressed as 
+\begin{equation*} 
+n_i = \frac{A_i^{3/2} G_i(T)}{2^{A_i}n_Q^{A_i-1}}  n_n^{N_i} n_p^{Z_i}
+\exp(BE_i/T), 
+\end{equation*} 
+where $BE_i$ is the binding energy of species $i$.  
+
+Rather than being given the free proton and neutron densities, we often
+only know the total neutron and proton densities.  In that case the equations of
+neutron and proton number conservation must be solved as functions of the free
+proton and neutron number densities
+\begin{eqnarray*}
+&&\sum_i N_i n_i(n_{n,o}, n_{p,o}) = n_n, \\
+&&\sum_i Z_i n_i(n_{n,o}, n_{p,o}) = n_p.
+\end{eqnarray*}  
+
+The equations of NSE can also be derived by writing minimizing the free energy of a 
+multi-component gas subject to the constraints of neutron and proton number
+conservation.  The free energy is just 
+\begin{equation*}
+F_{NSE} = \sum_i^{\textrm{nuclei, n, p}} V f_i(\mathcal{N}_i/V, T), 
+\end{equation*} 
+where $V$ is the total volume of the system and $\mathcal{N}_i$ is the total number of particles of species $i$.  The NSE equations result if this free energy is minimized.  
+A slightly more complicated for nuclei in a medium takes into account that the nuclei
+take up volume.  The nuclei can exist in the whole volume, but neutrons and protons 
+can only exist in the volume not taken up by nuclei.  The free energy for this system
+can be written as 
+\begin{equation*}
+F_{EV} = \sum_i^{\textrm{nuclei}} V f_i(\mathcal{N}_i/V, T) 
++ \left (1 - \sum_i^{\textrm{nuclei}}\mathcal{N}_i v_i\right) V \left[f_n + f_p\right].
+\end{equation*}
+Minimizing this free energy results in a very similar set of equations to the NSE 
+equations, but with a correction term to the number density of species $i$ because of 
+the energetic cost of excluding nucleons from its volume 
+\begin{equation*}
+n_{i,EV} = A_i^{3/2} G_i(T) n_Q \exp\left(\left[Z_i \mu_p + N_i \mu_n - m_i - v_i(P_n + P_p) \right]/T\right).
+\end{equation*} 
+
+The constraint equations for our model free energy bear a strong resemblance 
+to the excluded volume NSE equations (by construction).  This can be seen by recasting 
+equation \ref{eq:dFdN} to 
 \begin{equation*}
 n_i = A_i^{3/2} n_Q \exp(Z_i \mu_{p,o} + N_i \mu_{n,o} - \tilde B_i - v_i P_o),
 \end{equation*}
@@ -279,6 +342,7 @@ voids.  Derivatives of this are also required
 \todo{Write up what you are doing} 
 \subsection{Gibbs Phase Equilibrium Solver}
 \subsection{NSE Solver}
+The NSE solver and equation of state are found in the file \texttt{src/EquationsOfState/EOSNSE.hpp} 
 
 \begin{figure}[t]
 \centering

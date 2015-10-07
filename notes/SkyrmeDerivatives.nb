@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     48547,       1115]
-NotebookOptionsPosition[     47306,       1069]
-NotebookOutlinePosition[     47662,       1085]
-CellTagsIndexPosition[     47619,       1082]
+NotebookDataLength[     78961,       1689]
+NotebookOptionsPosition[     77506,       1637]
+NotebookOutlinePosition[     77863,       1653]
+CellTagsIndexPosition[     77820,       1650]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -38,6 +38,11 @@ Cell[BoxData[""], "Input",
   3.6528229428295183`*^9, 3.6528229455313663`*^9}}],
 
 Cell[BoxData[{
+ RowBox[{"rules", "=", 
+  RowBox[{"{", 
+   RowBox[{
+    RowBox[{"nn", "+", "np"}], "\[Rule]", "nt"}], 
+   "}"}]}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{
    RowBox[{"clean", "[", "expr_", "]"}], ":=", 
@@ -128,6 +133,22 @@ Cell[BoxData[{
          RowBox[{"var", "\[Rule]", "\"\<\>\""}]}], "]"}]}]}]}], "]"}]}], 
   ";"}], "\[IndentingNewLine]", 
  RowBox[{
+  RowBox[{
+   RowBox[{"ReplaceNoDerivTwoVar", "[", 
+    RowBox[{"str_", ",", "var_"}], "]"}], ":=", 
+   RowBox[{"StringReplace", "[", 
+    RowBox[{"str", ",", 
+     RowBox[{
+      RowBox[{"a", ":", 
+       RowBox[{"RegularExpression", "[", 
+        RowBox[{"var", "~~", "\"\<[^\\\\[]\>\""}], "]"}]}], "\[RuleDelayed]", 
+      
+      RowBox[{"var", "~~", "\"\<[0][0]\>\"", "~~", 
+       RowBox[{"StringReplace", "[", 
+        RowBox[{"a", ",", 
+         RowBox[{"var", "\[Rule]", "\"\<\>\""}]}], "]"}]}]}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{
   RowBox[{"MakeTable", "[", 
    RowBox[{"var_", ",", "name_"}], "]"}], ":=", 
   RowBox[{
@@ -140,17 +161,21 @@ Cell[BoxData[{
        RowBox[{"ToString", "[", "k", "]"}], "~~", "\"\<] = \>\"", "~~", 
        RowBox[{"StringReplace", "[", 
         RowBox[{
-         RowBox[{"ReplaceNoDerivOneVar", "[", 
+         RowBox[{"ReplaceNoDerivTwoVar", "[", 
           RowBox[{
-           RowBox[{"ReplaceNoDerivOneVar", "[", 
+           RowBox[{"ReplaceNoDerivTwoVar", "[", 
             RowBox[{
              RowBox[{"ReplaceNoDerivOneVar", "[", 
               RowBox[{
                RowBox[{"ReplaceNoDerivOneVar", "[", 
                 RowBox[{
-                 RowBox[{"ReplaceNoDeriv", "[", 
+                 RowBox[{"ReplaceNoDerivOneVar", "[", 
                   RowBox[{
-                   RowBox[{"ReplaceNoDeriv", "[", 
+                   RowBox[{"ReplaceNoDerivOneVar", "[", 
+                    RowBox[{
+                    RowBox[{"ReplaceNoDeriv", "[", 
+                    RowBox[{
+                    RowBox[{"ReplaceNoDeriv", "[", 
                     RowBox[{
                     RowBox[{
                     RowBox[{"(", 
@@ -166,15 +191,13 @@ Cell[BoxData[{
                     RowBox[{"{", 
                     RowBox[{"np", ",", "j"}], "}"}], ",", 
                     RowBox[{"{", 
-                    RowBox[{"T", ",", "k"}], "}"}]}], "]"}], "//.", 
-                    RowBox[{"{", 
-                    RowBox[{
-                    RowBox[{"nn", "+", "np"}], "\[Rule]", "nt"}], "}"}]}], 
-                    "]"}], "//", "CDeriv"}], ")"}], "~~", "\"\<;\>\""}], ",", 
-                    "\"\<taun\>\""}], "]"}], ",", "\"\<taup\>\""}], "]"}], 
-                 ",", "\"\<zfermi32n\>\""}], "]"}], ",", 
-               "\"\<ifermi12n\>\""}], "]"}], ",", "\"\<zfermi32p\>\""}], 
-            "]"}], ",", "\"\<ifermi12p\>\""}], "]"}], ",", 
+                    RowBox[{"T", ",", "k"}], "}"}]}], "]"}], "//.", "rules"}],
+                     "]"}], "//", "CDeriv"}], ")"}], "~~", "\"\<;\>\""}], 
+                    ",", "\"\<taun\>\""}], "]"}], ",", "\"\<taup\>\""}], 
+                    "]"}], ",", "\"\<zfermi32n\>\""}], "]"}], ",", 
+                   "\"\<ifermi12n\>\""}], "]"}], ",", "\"\<zfermi32p\>\""}], 
+                "]"}], ",", "\"\<ifermi12p\>\""}], "]"}], ",", 
+             "\"\<momsp\>\""}], "]"}], ",", "\"\<momsn\>\""}], "]"}], ",", 
          RowBox[{"\"\<Power\>\"", "\[Rule]", "\"\<pow\>\""}]}], "]"}]}], ",", 
       
       RowBox[{"{", 
@@ -193,8 +216,10 @@ Cell[BoxData[{
    3.652809496787558*^9, 3.652809509882433*^9}, {3.652809595028335*^9, 
    3.652809595778809*^9}, {3.652810621330782*^9, 3.6528106355680037`*^9}, {
    3.652810667419648*^9, 3.652810678210916*^9}, {3.6528229469306087`*^9, 
-   3.652822967833606*^9}, {3.652823454765163*^9, 3.6528234787853518`*^9}}]
-}, Closed]],
+   3.652822967833606*^9}, {3.652823454765163*^9, 3.6528234787853518`*^9}, {
+   3.653073285453299*^9, 3.653073332989284*^9}, {3.653074070581503*^9, 
+   3.653074079939314*^9}}]
+}, Open  ]],
 
 Cell[CellGroupData[{
 
@@ -204,214 +229,223 @@ Cell["Thermodynamic quantities", "Subsection",
   3.652810402352602*^9}, {3.652810482056505*^9, 3.652810486830245*^9}, {
   3.6528108818106728`*^9, 3.652810890112721*^9}}],
 
-Cell[BoxData[{
- RowBox[{
+Cell[BoxData[
+ RowBox[{"\[IndentingNewLine]", 
   RowBox[{
-   RowBox[{"momsp", "[", 
-    RowBox[{"nn_", ",", "np_", ",", "T_"}], "]"}], ":=", 
-   RowBox[{"1", "+", 
-    RowBox[{"mF", "*", 
-     RowBox[{"(", 
-      RowBox[{"nn", "+", "np"}], ")"}]}], "+", 
-    RowBox[{"mG", "*", 
-     RowBox[{"(", 
-      RowBox[{"nn", "-", "np"}], ")"}]}]}]}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{
-   RowBox[{"momsn", "[", 
-    RowBox[{"nn_", ",", "np_", ",", "T_"}], "]"}], ":=", 
-   RowBox[{"1", "+", 
-    RowBox[{"mF", "*", 
-     RowBox[{"(", 
-      RowBox[{"nn", "+", "np"}], ")"}]}], "-", 
-    RowBox[{"mG", "*", 
-     RowBox[{"(", 
-      RowBox[{"nn", "-", "np"}], ")"}]}]}]}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{
-   RowBox[{"ee", "[", 
-    RowBox[{"nn_", ",", "np_", ",", "T_"}], "]"}], ":=", 
    RowBox[{
     RowBox[{
-     RowBox[{"taup", "[", 
-      RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
+     RowBox[{"ee", "[", 
+      RowBox[{"nn_", ",", "np_", ",", "T_"}], "]"}], ":=", 
      RowBox[{
-      RowBox[{"momsp", "[", 
-       RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "/", 
+      RowBox[{
+       RowBox[{"taup", "[", 
+        RowBox[{"nn", ",", "np"}], "]"}], "*", 
+       RowBox[{
+        RowBox[{"momsp", "[", 
+         RowBox[{"nn", ",", "np"}], "]"}], "/", 
+        RowBox[{"(", 
+         RowBox[{"2", "*", "MNUC"}], ")"}]}]}], "+", 
+      RowBox[{
+       RowBox[{"taun", "[", 
+        RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
+       RowBox[{
+        RowBox[{"momsn", "[", 
+         RowBox[{"nn", ",", "np"}], "]"}], "/", 
+        RowBox[{"(", 
+         RowBox[{"2", "*", "MNUC"}], ")"}]}]}], "+", 
       RowBox[{"(", 
-       RowBox[{"2", "*", "MNUC"}], ")"}]}]}], "+", 
-    RowBox[{
-     RowBox[{"taun", "[", 
-      RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
-     RowBox[{
-      RowBox[{"momsn", "[", 
-       RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "/", 
-      RowBox[{"(", 
-       RowBox[{"2", "*", "MNUC"}], ")"}]}]}], "+", 
-    RowBox[{"(", 
-     RowBox[{
-      RowBox[{"mA", "*", 
+       RowBox[{
+        RowBox[{"mA", "*", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"nn", "+", "np"}], ")"}], "^", "2"}]}], "+", 
+        RowBox[{"4", "*", "mB", "*", "nn", "*", "np"}]}], ")"}], "+", 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"mC", "*", 
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{"nn", "+", "np"}], ")"}], "^", "2"}]}], "+", 
+         RowBox[{"4", "*", "mD", "*", "nn", "*", "np"}]}], ")"}], "*", 
        RowBox[{
         RowBox[{"(", 
-         RowBox[{"nn", "+", "np"}], ")"}], "^", "2"}]}], "+", 
-      RowBox[{"4", "*", "mB", "*", "nn", "*", "np"}]}], ")"}], "+", 
-    RowBox[{
-     RowBox[{"(", 
-      RowBox[{
-       RowBox[{"mC", "*", 
-        RowBox[{
-         RowBox[{"(", 
-          RowBox[{"nn", "+", "np"}], ")"}], "^", "2"}]}], "+", 
-       RowBox[{"4", "*", "mD", "*", "nn", "*", "np"}]}], ")"}], "*", 
-     RowBox[{
-      RowBox[{"(", 
-       RowBox[{"nn", "+", "np"}], ")"}], "^", 
-      RowBox[{"(", 
-       RowBox[{"mDelta", "-", "1"}], ")"}]}]}]}]}], 
-  ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{
-   RowBox[{"pp", "[", 
-    RowBox[{"nn_", ",", "np_", ",", "T_"}], "]"}], ":=", 
+         RowBox[{"nn", "+", "np"}], ")"}], "^", 
+        RowBox[{"(", 
+         RowBox[{"mDelta", "-", "1"}], ")"}]}]}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
    RowBox[{
     RowBox[{
-     RowBox[{"taup", "[", 
-      RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
+     RowBox[{"pp", "[", 
+      RowBox[{"nn_", ",", "np_", ",", "T_"}], "]"}], ":=", 
      RowBox[{
-      RowBox[{"(", 
-       RowBox[{
-        RowBox[{
-         RowBox[{"5", "/", "6"}], 
-         RowBox[{"momsp", "[", 
-          RowBox[{"nn", ",", "np", ",", "T"}], "]"}]}], "-", 
-        RowBox[{"1", "/", "2"}]}], ")"}], "/", 
-      RowBox[{"(", "MNUC", ")"}]}]}], "+", 
-    RowBox[{
-     RowBox[{"taun", "[", 
-      RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
-     RowBox[{
-      RowBox[{"(", 
-       RowBox[{
-        RowBox[{
-         RowBox[{"5", "/", "6"}], 
-         RowBox[{"momsn", "[", 
-          RowBox[{"nn", ",", "np", ",", "T"}], "]"}]}], "-", 
-        RowBox[{"1", "/", "2"}]}], ")"}], "/", 
-      RowBox[{"(", "MNUC", ")"}]}]}], "+", 
-    RowBox[{"(", 
-     RowBox[{
-      RowBox[{"mA", "*", 
+      RowBox[{
+       RowBox[{"taup", "[", 
+        RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
        RowBox[{
         RowBox[{"(", 
-         RowBox[{"nn", "+", "np"}], ")"}], "^", "2"}]}], "+", 
-      RowBox[{"4", "*", "mB", "*", "nn", "*", "np"}]}], ")"}], "+", 
-    RowBox[{"mDelta", "*", 
-     RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"5", "/", "6"}], 
+           RowBox[{"momsp", "[", 
+            RowBox[{"nn", ",", "np"}], "]"}]}], "-", 
+          RowBox[{"1", "/", "2"}]}], ")"}], "/", "MNUC"}]}], "+", 
       RowBox[{
-       RowBox[{"mC", "*", 
+       RowBox[{"taun", "[", 
+        RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"5", "/", "6"}], 
+           RowBox[{"momsn", "[", 
+            RowBox[{"nn", ",", "np"}], "]"}]}], "-", 
+          RowBox[{"1", "/", "2"}]}], ")"}], "/", "MNUC"}]}], "+", 
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"mA", "*", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"nn", "+", "np"}], ")"}], "^", "2"}]}], "+", 
+        RowBox[{"4", "*", "mB", "*", "nn", "*", "np"}]}], ")"}], "+", 
+      RowBox[{"mDelta", "*", 
+       RowBox[{"(", 
         RowBox[{
-         RowBox[{"(", 
-          RowBox[{"nn", "+", "np"}], ")"}], "^", "2"}]}], "+", 
-       RowBox[{"4", "*", "mD", "*", "nn", "*", "np"}]}], ")"}], "*", 
-     RowBox[{
-      RowBox[{"(", 
-       RowBox[{"nn", "+", "np"}], ")"}], "^", 
-      RowBox[{"(", 
-       RowBox[{"mDelta", "-", "1"}], ")"}]}]}]}]}], 
-  ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{
-   RowBox[{"up", "[", 
-    RowBox[{"nn_", ",", "np_", ",", "T_"}], "]"}], ":=", 
+         RowBox[{"mC", "*", 
+          RowBox[{
+           RowBox[{"(", 
+            RowBox[{"nn", "+", "np"}], ")"}], "^", "2"}]}], "+", 
+         RowBox[{"4", "*", "mD", "*", "nn", "*", "np"}]}], ")"}], "*", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"nn", "+", "np"}], ")"}], "^", 
+        RowBox[{"(", 
+         RowBox[{"mDelta", "-", "1"}], ")"}]}]}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
    RowBox[{
     RowBox[{
-     RowBox[{"(", 
-      RowBox[{
-       RowBox[{
-        RowBox[{"taup", "[", 
-         RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
-        RowBox[{"(", 
-         RowBox[{"mF", "-", "mG"}], ")"}]}], "+", 
-       RowBox[{
-        RowBox[{"taun", "[", 
-         RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
-        RowBox[{"(", 
-         RowBox[{"mF", "+", "mG"}], ")"}]}]}], ")"}], "/", 
-     RowBox[{"(", 
-      RowBox[{"2", "*", "MNUC"}], ")"}]}], "+", 
-    RowBox[{"2", "*", "mA", "*", 
-     RowBox[{"(", 
-      RowBox[{"nn", "+", "np"}], ")"}]}], "+", 
-    RowBox[{"4", "*", "mB", "*", "nn"}], "+", 
-    RowBox[{"mC", "*", 
-     RowBox[{"(", 
-      RowBox[{"1", "+", "mDelta"}], ")"}], "*", 
+     RowBox[{"ss", "[", 
+      RowBox[{"nn_", ",", "np_", ",", "T_"}], "]"}], ":=", 
      RowBox[{
-      RowBox[{"(", 
-       RowBox[{"nn", "+", "np"}], ")"}], "^", "mDelta"}]}], "+", 
-    RowBox[{"4", "*", "mD", "*", 
-     RowBox[{
-      RowBox[{"(", 
-       RowBox[{"nn", "+", "np"}], ")"}], "^", 
-      RowBox[{"(", 
-       RowBox[{"mDelta", "-", "1"}], ")"}]}], "*", 
-     RowBox[{"(", 
       RowBox[{
-       RowBox[{"nn", "*", 
+       RowBox[{"5", "/", 
         RowBox[{"(", 
-         RowBox[{"nn", "+", "np"}], ")"}]}], "+", 
-       RowBox[{
-        RowBox[{"(", 
-         RowBox[{"mDelta", "-", "1"}], ")"}], "*", "nn", "*", "np"}]}], 
-      ")"}]}]}]}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{
-   RowBox[{"un", "[", 
-    RowBox[{"nn_", ",", "np_", ",", "T_"}], "]"}], ":=", 
+         RowBox[{"6", "*", "MNUC", "*", "T"}], ")"}]}], "*", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"taup", "[", 
+           RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
+          RowBox[{"momsp", "[", 
+           RowBox[{"nn", ",", "np"}], "]"}]}], "+", 
+         RowBox[{
+          RowBox[{"taun", "[", 
+           RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
+          RowBox[{"momsn", "[", 
+           RowBox[{"nn", ",", "np"}], "]"}]}]}], ")"}]}], " ", "-", 
+      RowBox[{"np", "*", 
+       RowBox[{"etap", "[", 
+        RowBox[{"nn", ",", "np", ",", "T"}], "]"}]}], "-", 
+      RowBox[{"nn", "*", 
+       RowBox[{"etan", "[", 
+        RowBox[{"nn", ",", "np", ",", "T"}], "]"}]}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
    RowBox[{
     RowBox[{
-     RowBox[{"(", 
-      RowBox[{
-       RowBox[{
-        RowBox[{"taup", "[", 
-         RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
-        RowBox[{"(", 
-         RowBox[{"mF", "+", "mG"}], ")"}]}], "+", 
-       RowBox[{
-        RowBox[{"taun", "[", 
-         RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
-        RowBox[{"(", 
-         RowBox[{"mF", "-", "mG"}], ")"}]}]}], ")"}], "/", 
-     RowBox[{"(", 
-      RowBox[{"2", "*", "MNUC"}], ")"}]}], "+", 
-    RowBox[{"2", "*", "mA", "*", 
-     RowBox[{"(", 
-      RowBox[{"nn", "+", "np"}], ")"}]}], "+", 
-    RowBox[{"4", "*", "mB", "*", "np"}], "+", 
-    RowBox[{"mC", "*", 
-     RowBox[{"(", 
-      RowBox[{"1", "+", "mDelta"}], ")"}], "*", 
+     RowBox[{"up", "[", 
+      RowBox[{"nn_", ",", "np_", ",", "T_"}], "]"}], ":=", 
      RowBox[{
-      RowBox[{"(", 
-       RowBox[{"nn", "+", "np"}], ")"}], "^", "mDelta"}]}], "+", 
-    RowBox[{"4", "*", "mD", "*", 
-     RowBox[{
-      RowBox[{"(", 
-       RowBox[{"nn", "+", "np"}], ")"}], "^", 
-      RowBox[{"(", 
-       RowBox[{"mDelta", "-", "1"}], ")"}]}], "*", 
-     RowBox[{"(", 
       RowBox[{
-       RowBox[{"np", "*", 
-        RowBox[{"(", 
-         RowBox[{"nn", "+", "np"}], ")"}]}], "+", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"taup", "[", 
+           RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
+          RowBox[{"(", 
+           RowBox[{"mF", "-", "mG"}], ")"}]}], "+", 
+         RowBox[{
+          RowBox[{"taun", "[", 
+           RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
+          RowBox[{"(", 
+           RowBox[{"mF", "+", "mG"}], ")"}]}]}], ")"}], "/", 
+       RowBox[{"(", 
+        RowBox[{"2", "*", "MNUC"}], ")"}]}], "+", 
+      RowBox[{"2", "*", "mA", "*", 
+       RowBox[{"(", 
+        RowBox[{"nn", "+", "np"}], ")"}]}], "+", 
+      RowBox[{"4", "*", "mB", "*", "nn"}], "+", 
+      RowBox[{"mC", "*", 
+       RowBox[{"(", 
+        RowBox[{"1", "+", "mDelta"}], ")"}], "*", 
        RowBox[{
         RowBox[{"(", 
-         RowBox[{"mDelta", "-", "1"}], ")"}], "*", "nn", "*", "np"}]}], 
-      ")"}]}]}]}], ";"}]}], "Input",
+         RowBox[{"nn", "+", "np"}], ")"}], "^", "mDelta"}]}], "+", 
+      RowBox[{"4", "*", "mD", "*", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"nn", "+", "np"}], ")"}], "^", 
+        RowBox[{"(", 
+         RowBox[{"mDelta", "-", "2"}], ")"}]}], "*", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"nn", "*", 
+          RowBox[{"(", 
+           RowBox[{"nn", "+", "np"}], ")"}]}], "+", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"mDelta", "-", "1"}], ")"}], "*", "nn", "*", "np"}]}], 
+        ")"}]}]}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"un", "[", 
+      RowBox[{"nn_", ",", "np_", ",", "T_"}], "]"}], ":=", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"taup", "[", 
+           RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
+          RowBox[{"(", 
+           RowBox[{"mF", "+", "mG"}], ")"}]}], "+", 
+         RowBox[{
+          RowBox[{"taun", "[", 
+           RowBox[{"nn", ",", "np", ",", "T"}], "]"}], "*", 
+          RowBox[{"(", 
+           RowBox[{"mF", "-", "mG"}], ")"}]}]}], ")"}], "/", 
+       RowBox[{"(", 
+        RowBox[{"2", "*", "MNUC"}], ")"}]}], "+", 
+      RowBox[{"2", "*", "mA", "*", 
+       RowBox[{"(", 
+        RowBox[{"nn", "+", "np"}], ")"}]}], "+", 
+      RowBox[{"4", "*", "mB", "*", "np"}], "+", 
+      RowBox[{"mC", "*", 
+       RowBox[{"(", 
+        RowBox[{"1", "+", "mDelta"}], ")"}], "*", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"nn", "+", "np"}], ")"}], "^", "mDelta"}]}], "+", 
+      RowBox[{"4", "*", "mD", "*", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{"nn", "+", "np"}], ")"}], "^", 
+        RowBox[{"(", 
+         RowBox[{"mDelta", "-", "2"}], ")"}]}], "*", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"np", "*", 
+          RowBox[{"(", 
+           RowBox[{"nn", "+", "np"}], ")"}]}], "+", 
+         RowBox[{
+          RowBox[{"(", 
+           RowBox[{"mDelta", "-", "1"}], ")"}], "*", "nn", "*", "np"}]}], 
+        ")"}]}]}]}], ";"}]}]}]], "Input",
  CellChangeTimes->{{3.652810970867793*^9, 3.652811211122774*^9}, {
-  3.652811241953678*^9, 3.652811243328513*^9}, {3.652820681963666*^9, 
-  3.652820694939927*^9}}],
+   3.652811241953678*^9, 3.652811243328513*^9}, {3.652820681963666*^9, 
+   3.652820694939927*^9}, {3.653072661350958*^9, 3.6530726632567987`*^9}, {
+   3.653072756286653*^9, 3.653072762267304*^9}, {3.6530727999311457`*^9, 
+   3.653072878968364*^9}, {3.653073024539625*^9, 3.653073054310256*^9}, 
+   3.653073096257607*^9}],
 
 Cell["\<\
 Run this command with the different thermodynamic quantities to calculate to \
@@ -430,9 +464,11 @@ Cell[BoxData[{
   RowBox[{"un", ",", "\"\<Un\>\""}], "]"}], "\[IndentingNewLine]", 
  RowBox[{"MakeTable", "[", 
   RowBox[{"ee", ",", "\"\<ee\>\""}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{"MakeTable", "[", 
+  RowBox[{"pp", ",", "\"\<pp\>\""}], "]"}], "\[IndentingNewLine]", 
  RowBox[{
   RowBox[{"MakeTable", "[", 
-   RowBox[{"pp", ",", "\"\<pp\>\""}], "]"}], 
+   RowBox[{"pp", ",", "\"\<ss\>\""}], "]"}], 
   "\[IndentingNewLine]"}], "\[IndentingNewLine]"}], "Input",
  CellChangeTimes->{{3.652802605289822*^9, 3.652802616911924*^9}, {
    3.652802651644147*^9, 3.652802690215288*^9}, {3.6528027400376663`*^9, 
@@ -458,35 +494,111 @@ Cell[BoxData[{
    3.6528200671030807`*^9}, {3.652820103885272*^9, 3.652820109396429*^9}, {
    3.652820753407897*^9, 3.652820854752556*^9}, {3.652822855910762*^9, 
    3.6528228969943743`*^9}, {3.652823008697789*^9, 3.652823017665325*^9}, {
-   3.652823074860483*^9, 3.6528231176076727`*^9}}],
+   3.652823074860483*^9, 3.6528231176076727`*^9}, {3.653072883062664*^9, 
+   3.653072885894861*^9}}],
 
 Cell[BoxData[
  TagBox[
   TagBox[GridBox[{
      {"\<\"Up[0][0][0] = 4*mB*nn + 2*mA*nt + mC*(1 + mDelta)*pow(nt,mDelta) + \
-4*mD*nn*pow(nt,-1 + mDelta)*((-1 + mDelta)*np + nt) + ((mF + \
-mG)*taun[0][0][0] + (mF - mG)*taup[0][0][0])/(2.*MNUC);\"\>"},
-     {"\<\"Up[0][0][1] = ((mF + mG)*taun[0][0][1] + (mF - \
-mG)*taup[0][0][1])/(2.*MNUC);\"\>"},
-     {"\<\"Up[0][1][0] = (2*MNUC*(2*mA*pow(nt,2) + \
-pow(nt,mDelta)*(mC*mDelta*(1 + mDelta)*nt + 4*mD*nn*(pow(-1 + mDelta,2)*np + \
-(-1 + 2*mDelta)*nt))) + (mF + mG)*pow(nt,2)*taun[0][1][0] + (mF - \
-mG)*pow(nt,2)*taup[0][1][0])/(2.*MNUC*pow(nt,2));\"\>"},
-     {"\<\"Up[0][1][1] = ((mF + mG)*taun[0][1][1] + (mF - \
-mG)*taup[0][1][1])/(2.*MNUC);\"\>"},
-     {"\<\"Up[1][0][0] = (2*MNUC*(2*mA*pow(nt,2) + 4*mB*pow(nt,2) + \
-pow(nt,mDelta)*(mC*mDelta*(1 + mDelta)*nt + 4*mD*(mDelta*np*nt + nn*(pow(-1 + \
-mDelta,2)*np + (1 + mDelta)*nt)))) + (mF + mG)*pow(nt,2)*taun[1][0][0] + (mF \
-- mG)*pow(nt,2)*taup[1][0][0])/(2.*MNUC*pow(nt,2));\"\>"},
-     {"\<\"Up[1][0][1] = ((mF + mG)*taun[1][0][1] + (mF - \
-mG)*taup[1][0][1])/(2.*MNUC);\"\>"},
-     {"\<\"Up[1][1][0] = (2*MNUC*pow(nt,mDelta)*(mC*mDelta*(-1 + \
-pow(mDelta,2))*nt + 4*mD*(mDelta*nt*((-1 + mDelta)*np + nt) + (-1 + \
-mDelta)*nn*((2 - 3*mDelta + pow(mDelta,2))*np + 2*mDelta*nt))) + (mF + \
-mG)*pow(nt,3)*taun[1][1][0] + (mF - \
-mG)*pow(nt,3)*taup[1][1][0])/(2.*MNUC*pow(nt,3));\"\>"},
-     {"\<\"Up[1][1][1] = ((mF + mG)*taun[1][1][1] + (mF - \
-mG)*taup[1][1][1])/(2.*MNUC);\"\>"}
+4*mD*nn*pow(nt,-2 + mDelta)*((-1 + mDelta)*np + nt) + (Sqrt(2)*((mF + \
+mG)*pow((MNUC*T)/momsn[0][0],2.5)*zfermi32n[0] + (mF - \
+mG)*pow((MNUC*T)/momsp[0][0],2.5)*zfermi32p[0]))/(MNUC*pow(Pi,2));\"\>"},
+     {"\<\"Up[0][0][1] = (MNUC*T*((mF + \
+mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],2)*(5*zfermi32n[0] + \
+2*T*zfermi32n[1]*etan[0][0][1]) + (mF - \
+mG)*pow(momsn[0][0],2)*Sqrt((MNUC*T)/momsp[0][0])*(5*zfermi32p[0] + \
+2*T*zfermi32p[1]*etap[0][0][1])))/(Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],2)*pow(\
+momsp[0][0],2));\"\>"},
+     {"\<\"Up[0][1][0] = 2*mA + 4*mD*mDelta*nn*pow(nt,-2 + mDelta) + \
+mC*mDelta*(1 + mDelta)*pow(nt,-1 + mDelta) + 4*mD*(-2 + mDelta)*nn*pow(nt,-3 \
++ mDelta)*((-1 + mDelta)*np + nt) + (MNUC*pow(T,2)*(5*(-mF + \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*zfermi32p[0]*momsp[0][1] + \
+(mF + mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],3)*(-5*zfermi32n[0]*\
+momsn[0][1] + 2*momsn[0][0]*zfermi32n[1]*etan[0][1][0]) + 2*(mF - \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][0]*zfermi32p[1]*\
+etap[0][1][0]))/(Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*pow(momsp[0][0],3));\"\>\
+"},
+     {"\<\"Up[0][1][1] = (MNUC*T*(-5*(mF - \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][1]*(5*zfermi32p[0] \
++ 2*T*zfermi32p[1]*etap[0][0][1]) + (mF + \
+mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],3)*(-25*zfermi32n[0]*momsn[0][\
+1] + 2*(2*T*momsn[0][0]*zfermi32n[2]*etan[0][0][1]*etan[0][1][0] + \
+zfermi32n[1]*(-5*T*momsn[0][1]*etan[0][0][1] + momsn[0][0]*(5*etan[0][1][0] + \
+2*T*etan[0][1][1])))) + 2*(mF - \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][0]*(2*T*zfermi32p[\
+2]*etap[0][0][1]*etap[0][1][0] + zfermi32p[1]*(5*etap[0][1][0] + \
+2*T*etap[0][1][1]))))/(2.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*pow(momsp[0][0]\
+,3));\"\>"},
+     {"\<\"Up[1][0][0] = 2*mA + 4*mB + 4*mD*(2*nn + mDelta*np)*pow(nt,-2 + \
+mDelta) + mC*mDelta*(1 + mDelta)*pow(nt,-1 + mDelta) + 4*mD*(-2 + \
+mDelta)*nn*pow(nt,-3 + mDelta)*((-1 + mDelta)*np + nt) + \
+(MNUC*pow(T,2)*(5*(-mF + \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*zfermi32p[0]*momsp[1][0] + \
+(mF + mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],3)*(-5*zfermi32n[0]*\
+momsn[1][0] + 2*momsn[0][0]*zfermi32n[1]*etan[1][0][0]) + 2*(mF - \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][0]*zfermi32p[1]*\
+etap[1][0][0]))/(Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*pow(momsp[0][0],3));\"\>\
+"},
+     {"\<\"Up[1][0][1] = (MNUC*T*(-5*(mF - \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[1][0]*(5*zfermi32p[0] \
++ 2*T*zfermi32p[1]*etap[0][0][1]) + (mF + \
+mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],3)*(-25*zfermi32n[0]*momsn[1][\
+0] + 2*(2*T*momsn[0][0]*zfermi32n[2]*etan[0][0][1]*etan[1][0][0] + \
+zfermi32n[1]*(-5*T*momsn[1][0]*etan[0][0][1] + momsn[0][0]*(5*etan[1][0][0] + \
+2*T*etan[1][0][1])))) + 2*(mF - \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][0]*(2*T*zfermi32p[\
+2]*etap[0][0][1]*etap[1][0][0] + zfermi32p[1]*(5*etap[1][0][0] + \
+2*T*etap[1][0][1]))))/(2.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*pow(momsp[0][0]\
+,3));\"\>"},
+     {"\<\"Up[1][1][0] = (35*Sqrt(2)*(mF + \
+mG)*MNUC*pow(nt,4)*pow(T,2)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],4)*\
+zfermi32n[0]*momsn[0][1]*momsn[1][0] - 10*Sqrt(2)*(mF + \
+mG)*pow(nt,4)*T*pow((MNUC*T)/momsn[0][0],1.5)*pow(momsn[0][0],2)*pow(momsp[0][\
+0],4)*(zfermi32n[0]*momsn[1][1] + zfermi32n[1]*(momsn[1][0]*etan[0][1][0] + \
+momsn[0][1]*etan[1][0][0])) + 4*Sqrt(2)*(mF + \
+mG)*pow(nt,4)*T*pow((MNUC*T)/momsn[0][0],1.5)*pow(momsn[0][0],3)*pow(momsp[0][\
+0],4)*(zfermi32n[2]*etan[0][1][0]*etan[1][0][0] + zfermi32n[1]*etan[1][1][0]) \
++ pow(momsn[0][0],4)*(4*pow(nt,mDelta)*(mC*mDelta*(-1 + \
+pow(mDelta,2))*pow(nt,2) + 4*mD*(mDelta*nt*((-2 + mDelta)*np + nt) + (-2 + \
+mDelta)*nn*((3 - 4*mDelta + pow(mDelta,2))*np + (-1 + \
+2*mDelta)*nt)))*pow(Pi,2)*pow(momsp[0][0],4) + 35*Sqrt(2)*(mF - \
+mG)*MNUC*pow(nt,4)*pow(T,2)*Sqrt((MNUC*T)/momsp[0][0])*zfermi32p[0]*momsp[0][\
+1]*momsp[1][0] - 10*Sqrt(2)*(mF - \
+mG)*pow(nt,4)*T*pow((MNUC*T)/momsp[0][0],1.5)*pow(momsp[0][0],2)*(zfermi32p[0]\
+*momsp[1][1] + zfermi32p[1]*(momsp[1][0]*etap[0][1][0] + \
+momsp[0][1]*etap[1][0][0])) + 4*Sqrt(2)*(mF - \
+mG)*pow(nt,4)*T*pow((MNUC*T)/momsp[0][0],1.5)*pow(momsp[0][0],3)*(zfermi32p[2]\
+*etap[0][1][0]*etap[1][0][0] + \
+zfermi32p[1]*etap[1][1][0])))/(4.*pow(nt,4)*pow(Pi,2)*pow(momsn[0][0],4)*pow(\
+momsp[0][0],4));\"\>"},
+     {"\<\"Up[1][1][1] = (pow((MNUC*T)/momsn[0][0],1.5)*(35*(mF - \
+mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsn[0][0],5)*momsp[0][1]*momsp[1][0]*(5*\
+zfermi32p[0] + 2*T*zfermi32p[1]*etap[0][0][1]) - 10*(mF - \
+mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsn[0][0],5)*momsp[0][0]*(5*zfermi32p[0]*\
+momsp[1][1] + 2*T*zfermi32p[2]*etap[0][0][1]*(momsp[1][0]*etap[0][1][0] + \
+momsp[0][1]*etap[1][0][0]) + zfermi32p[1]*(2*T*momsp[1][1]*etap[0][0][1] + \
+momsp[1][0]*(5*etap[0][1][0] + 2*T*etap[0][1][1]) + \
+momsp[0][1]*(5*etap[1][0][0] + 2*T*etap[1][0][1]))) + (mF + \
+mG)*Sqrt((MNUC*T)/momsp[0][0])*pow(momsp[0][0],5)*(25*zfermi32n[0]*(7*momsn[0]\
+[1]*momsn[1][0] - 2*momsn[0][0]*momsn[1][1]) + \
+4*momsn[0][0]*(2*T*momsn[0][0]*zfermi32n[3]*etan[0][0][1]*etan[0][1][0]*etan[\
+1][0][0] + zfermi32n[2]*(-5*T*momsn[1][0]*etan[0][0][1]*etan[0][1][0] - \
+5*T*momsn[0][1]*etan[0][0][1]*etan[1][0][0] + \
+momsn[0][0]*(etan[0][1][0]*(5*etan[1][0][0] + 2*T*etan[1][0][1]) + \
+2*T*(etan[0][1][1]*etan[1][0][0] + etan[0][0][1]*etan[1][1][0])))) + \
+zfermi32n[1]*(10*momsn[0][1]*(7*T*momsn[1][0]*etan[0][0][1] - \
+momsn[0][0]*(5*etan[1][0][0] + 2*T*etan[1][0][1])) + \
+2*momsn[0][0]*(-10*T*momsn[1][1]*etan[0][0][1] - \
+5*momsn[1][0]*(5*etan[0][1][0] + 2*T*etan[0][1][1]) + \
+2*momsn[0][0]*(5*etan[1][1][0] + 2*T*etan[1][1][1])))) + 4*(mF - \
+mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsn[0][0],5)*pow(momsp[0][0],2)*(2*T*\
+zfermi32p[3]*etap[0][0][1]*etap[0][1][0]*etap[1][0][0] + \
+zfermi32p[2]*(etap[0][1][0]*(5*etap[1][0][0] + 2*T*etap[1][0][1]) + \
+2*T*(etap[0][1][1]*etap[1][0][0] + etap[0][0][1]*etap[1][1][0])) + \
+zfermi32p[1]*(5*etap[1][1][0] + \
+2*T*etap[1][1][1]))))/(4.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/\
+momsp[0][0])*pow(momsp[0][0],5));\"\>"}
     },
     GridBoxAlignment->{
      "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
@@ -505,35 +617,111 @@ mG)*taup[1][1][1])/(2.*MNUC);\"\>"}
   3.652820784815481*^9, {3.652820821828999*^9, 3.6528208556997557`*^9}, 
    3.6528229031730556`*^9, 3.652822985775559*^9, 3.652823018076873*^9, {
    3.6528230801693983`*^9, 3.6528231183840313`*^9}, 3.652823332873685*^9, 
-   3.652823420914359*^9}],
+   3.652823420914359*^9, 3.653072895666217*^9, 3.65307315554976*^9, 
+   3.65307334507345*^9}],
 
 Cell[BoxData[
  TagBox[
   TagBox[GridBox[{
      {"\<\"Un[0][0][0] = 4*mB*np + 2*mA*nt + mC*(1 + mDelta)*pow(nt,mDelta) + \
-4*mD*np*pow(nt,-1 + mDelta)*((-1 + mDelta)*nn + nt) + ((mF - \
-mG)*taun[0][0][0] + (mF + mG)*taup[0][0][0])/(2.*MNUC);\"\>"},
-     {"\<\"Un[0][0][1] = ((mF - mG)*taun[0][0][1] + (mF + \
-mG)*taup[0][0][1])/(2.*MNUC);\"\>"},
-     {"\<\"Un[0][1][0] = (2*MNUC*(2*mA*pow(nt,2) + 4*mB*pow(nt,2) + \
-pow(nt,mDelta)*(mC*mDelta*(1 + mDelta)*nt + 4*mD*((1 + mDelta)*np*nt + \
-nn*(pow(-1 + mDelta,2)*np + mDelta*nt)))) + (mF - mG)*pow(nt,2)*taun[0][1][0] \
-+ (mF + mG)*pow(nt,2)*taup[0][1][0])/(2.*MNUC*pow(nt,2));\"\>"},
-     {"\<\"Un[0][1][1] = ((mF - mG)*taun[0][1][1] + (mF + \
-mG)*taup[0][1][1])/(2.*MNUC);\"\>"},
-     {"\<\"Un[1][0][0] = (2*MNUC*(2*mA*pow(nt,2) + \
-pow(nt,mDelta)*(mC*mDelta*(1 + mDelta)*nt + 4*mD*np*(pow(-1 + mDelta,2)*nn + \
-(-1 + 2*mDelta)*nt))) + (mF - mG)*pow(nt,2)*taun[1][0][0] + (mF + \
-mG)*pow(nt,2)*taup[1][0][0])/(2.*MNUC*pow(nt,2));\"\>"},
-     {"\<\"Un[1][0][1] = ((mF - mG)*taun[1][0][1] + (mF + \
-mG)*taup[1][0][1])/(2.*MNUC);\"\>"},
-     {"\<\"Un[1][1][0] = (2*MNUC*pow(nt,mDelta)*(mC*mDelta*(-1 + \
-pow(mDelta,2))*nt + 4*mD*(mDelta*nt*(2*(-1 + mDelta)*np + nt) + (-1 + \
-mDelta)*nn*((2 - 3*mDelta + pow(mDelta,2))*np + mDelta*nt))) + (mF - \
-mG)*pow(nt,3)*taun[1][1][0] + (mF + \
-mG)*pow(nt,3)*taup[1][1][0])/(2.*MNUC*pow(nt,3));\"\>"},
-     {"\<\"Un[1][1][1] = ((mF - mG)*taun[1][1][1] + (mF + \
-mG)*taup[1][1][1])/(2.*MNUC);\"\>"}
+4*mD*np*pow(nt,-2 + mDelta)*((-1 + mDelta)*nn + nt) + (Sqrt(2)*((mF - \
+mG)*pow((MNUC*T)/momsn[0][0],2.5)*zfermi32n[0] + (mF + \
+mG)*pow((MNUC*T)/momsp[0][0],2.5)*zfermi32p[0]))/(MNUC*pow(Pi,2));\"\>"},
+     {"\<\"Un[0][0][1] = (MNUC*T*((mF - \
+mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],2)*(5*zfermi32n[0] + \
+2*T*zfermi32n[1]*etan[0][0][1]) + (mF + \
+mG)*pow(momsn[0][0],2)*Sqrt((MNUC*T)/momsp[0][0])*(5*zfermi32p[0] + \
+2*T*zfermi32p[1]*etap[0][0][1])))/(Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],2)*pow(\
+momsp[0][0],2));\"\>"},
+     {"\<\"Un[0][1][0] = 2*mA + 4*mB + 4*mD*(mDelta*nn + 2*np)*pow(nt,-2 + \
+mDelta) + mC*mDelta*(1 + mDelta)*pow(nt,-1 + mDelta) + 4*mD*(-2 + \
+mDelta)*np*pow(nt,-3 + mDelta)*((-1 + mDelta)*nn + nt) + \
+(MNUC*pow(T,2)*(-5*(mF + \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*zfermi32p[0]*momsp[0][1] + \
+(mF - mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],3)*(-5*zfermi32n[0]*\
+momsn[0][1] + 2*momsn[0][0]*zfermi32n[1]*etan[0][1][0]) + 2*(mF + \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][0]*zfermi32p[1]*\
+etap[0][1][0]))/(Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*pow(momsp[0][0],3));\"\>\
+"},
+     {"\<\"Un[0][1][1] = (MNUC*T*(-5*(mF + \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][1]*(5*zfermi32p[0] \
++ 2*T*zfermi32p[1]*etap[0][0][1]) + (mF - \
+mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],3)*(-25*zfermi32n[0]*momsn[0][\
+1] + 2*(2*T*momsn[0][0]*zfermi32n[2]*etan[0][0][1]*etan[0][1][0] + \
+zfermi32n[1]*(-5*T*momsn[0][1]*etan[0][0][1] + momsn[0][0]*(5*etan[0][1][0] + \
+2*T*etan[0][1][1])))) + 2*(mF + \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][0]*(2*T*zfermi32p[\
+2]*etap[0][0][1]*etap[0][1][0] + zfermi32p[1]*(5*etap[0][1][0] + \
+2*T*etap[0][1][1]))))/(2.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*pow(momsp[0][0]\
+,3));\"\>"},
+     {"\<\"Un[1][0][0] = 2*mA + 4*mD*mDelta*np*pow(nt,-2 + mDelta) + \
+mC*mDelta*(1 + mDelta)*pow(nt,-1 + mDelta) + 4*mD*(-2 + mDelta)*np*pow(nt,-3 \
++ mDelta)*((-1 + mDelta)*nn + nt) + (MNUC*pow(T,2)*(-5*(mF + \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*zfermi32p[0]*momsp[1][0] + \
+(mF - mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],3)*(-5*zfermi32n[0]*\
+momsn[1][0] + 2*momsn[0][0]*zfermi32n[1]*etan[1][0][0]) + 2*(mF + \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][0]*zfermi32p[1]*\
+etap[1][0][0]))/(Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*pow(momsp[0][0],3));\"\>\
+"},
+     {"\<\"Un[1][0][1] = (MNUC*T*(-5*(mF + \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[1][0]*(5*zfermi32p[0] \
++ 2*T*zfermi32p[1]*etap[0][0][1]) + (mF - \
+mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],3)*(-25*zfermi32n[0]*momsn[1][\
+0] + 2*(2*T*momsn[0][0]*zfermi32n[2]*etan[0][0][1]*etan[1][0][0] + \
+zfermi32n[1]*(-5*T*momsn[1][0]*etan[0][0][1] + momsn[0][0]*(5*etan[1][0][0] + \
+2*T*etan[1][0][1])))) + 2*(mF + \
+mG)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][0]*(2*T*zfermi32p[\
+2]*etap[0][0][1]*etap[1][0][0] + zfermi32p[1]*(5*etap[1][0][0] + \
+2*T*etap[1][0][1]))))/(2.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*pow(momsp[0][0]\
+,3));\"\>"},
+     {"\<\"Un[1][1][0] = (35*Sqrt(2)*(mF - \
+mG)*MNUC*pow(nt,4)*pow(T,2)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],4)*\
+zfermi32n[0]*momsn[0][1]*momsn[1][0] - 10*Sqrt(2)*(mF - \
+mG)*pow(nt,4)*T*pow((MNUC*T)/momsn[0][0],1.5)*pow(momsn[0][0],2)*pow(momsp[0][\
+0],4)*(zfermi32n[0]*momsn[1][1] + zfermi32n[1]*(momsn[1][0]*etan[0][1][0] + \
+momsn[0][1]*etan[1][0][0])) + 4*Sqrt(2)*(mF - \
+mG)*pow(nt,4)*T*pow((MNUC*T)/momsn[0][0],1.5)*pow(momsn[0][0],3)*pow(momsp[0][\
+0],4)*(zfermi32n[2]*etan[0][1][0]*etan[1][0][0] + zfermi32n[1]*etan[1][1][0]) \
++ pow(momsn[0][0],4)*(4*pow(nt,mDelta)*(mC*mDelta*(-1 + \
+pow(mDelta,2))*pow(nt,2) + 4*mD*((-2 + mDelta)*nn*((3 - 4*mDelta + \
+pow(mDelta,2))*np + mDelta*nt) + nt*((2 - 5*mDelta + 2*pow(mDelta,2))*np + \
+mDelta*nt)))*pow(Pi,2)*pow(momsp[0][0],4) + 35*Sqrt(2)*(mF + \
+mG)*MNUC*pow(nt,4)*pow(T,2)*Sqrt((MNUC*T)/momsp[0][0])*zfermi32p[0]*momsp[0][\
+1]*momsp[1][0] - 10*Sqrt(2)*(mF + \
+mG)*pow(nt,4)*T*pow((MNUC*T)/momsp[0][0],1.5)*pow(momsp[0][0],2)*(zfermi32p[0]\
+*momsp[1][1] + zfermi32p[1]*(momsp[1][0]*etap[0][1][0] + \
+momsp[0][1]*etap[1][0][0])) + 4*Sqrt(2)*(mF + \
+mG)*pow(nt,4)*T*pow((MNUC*T)/momsp[0][0],1.5)*pow(momsp[0][0],3)*(zfermi32p[2]\
+*etap[0][1][0]*etap[1][0][0] + \
+zfermi32p[1]*etap[1][1][0])))/(4.*pow(nt,4)*pow(Pi,2)*pow(momsn[0][0],4)*pow(\
+momsp[0][0],4));\"\>"},
+     {"\<\"Un[1][1][1] = (pow((MNUC*T)/momsn[0][0],1.5)*(35*(mF + \
+mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsn[0][0],5)*momsp[0][1]*momsp[1][0]*(5*\
+zfermi32p[0] + 2*T*zfermi32p[1]*etap[0][0][1]) - 10*(mF + \
+mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsn[0][0],5)*momsp[0][0]*(5*zfermi32p[0]*\
+momsp[1][1] + 2*T*zfermi32p[2]*etap[0][0][1]*(momsp[1][0]*etap[0][1][0] + \
+momsp[0][1]*etap[1][0][0]) + zfermi32p[1]*(2*T*momsp[1][1]*etap[0][0][1] + \
+momsp[1][0]*(5*etap[0][1][0] + 2*T*etap[0][1][1]) + \
+momsp[0][1]*(5*etap[1][0][0] + 2*T*etap[1][0][1]))) + (mF - \
+mG)*Sqrt((MNUC*T)/momsp[0][0])*pow(momsp[0][0],5)*(25*zfermi32n[0]*(7*momsn[0]\
+[1]*momsn[1][0] - 2*momsn[0][0]*momsn[1][1]) + \
+4*momsn[0][0]*(2*T*momsn[0][0]*zfermi32n[3]*etan[0][0][1]*etan[0][1][0]*etan[\
+1][0][0] + zfermi32n[2]*(-5*T*momsn[1][0]*etan[0][0][1]*etan[0][1][0] - \
+5*T*momsn[0][1]*etan[0][0][1]*etan[1][0][0] + \
+momsn[0][0]*(etan[0][1][0]*(5*etan[1][0][0] + 2*T*etan[1][0][1]) + \
+2*T*(etan[0][1][1]*etan[1][0][0] + etan[0][0][1]*etan[1][1][0])))) + \
+zfermi32n[1]*(10*momsn[0][1]*(7*T*momsn[1][0]*etan[0][0][1] - \
+momsn[0][0]*(5*etan[1][0][0] + 2*T*etan[1][0][1])) + \
+2*momsn[0][0]*(-10*T*momsn[1][1]*etan[0][0][1] - \
+5*momsn[1][0]*(5*etan[0][1][0] + 2*T*etan[0][1][1]) + \
+2*momsn[0][0]*(5*etan[1][1][0] + 2*T*etan[1][1][1])))) + 4*(mF + \
+mG)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsn[0][0],5)*pow(momsp[0][0],2)*(2*T*\
+zfermi32p[3]*etap[0][0][1]*etap[0][1][0]*etap[1][0][0] + \
+zfermi32p[2]*(etap[0][1][0]*(5*etap[1][0][0] + 2*T*etap[1][0][1]) + \
+2*T*(etap[0][1][1]*etap[1][0][0] + etap[0][0][1]*etap[1][1][0])) + \
+zfermi32p[1]*(5*etap[1][1][0] + \
+2*T*etap[1][1][1]))))/(4.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/\
+momsp[0][0])*pow(momsp[0][0],5));\"\>"}
     },
     GridBoxAlignment->{
      "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
@@ -552,45 +740,75 @@ mG)*taup[1][1][1])/(2.*MNUC);\"\>"}
   3.652820784815481*^9, {3.652820821828999*^9, 3.6528208556997557`*^9}, 
    3.6528229031730556`*^9, 3.652822985775559*^9, 3.652823018076873*^9, {
    3.6528230801693983`*^9, 3.6528231183840313`*^9}, 3.652823332873685*^9, 
-   3.652823421455502*^9}],
+   3.652823420914359*^9, 3.653072895666217*^9, 3.65307315554976*^9, 
+   3.653073348935009*^9}],
 
 Cell[BoxData[
  TagBox[
   TagBox[GridBox[{
-     {"\<\"ee[0][0][0] = 4*mB*nn*np + mA*pow(nt,2) + pow(nt,-1 + \
-mDelta)*(4*mD*nn*np + mC*pow(nt,2)) + ((1 + mG*(-nn + np) + \
-mF*nt)*taun[0][0][0])/(2.*MNUC) + ((1 + mG*(nn - np) + \
-mF*nt)*taup[0][0][0])/(2.*MNUC);\"\>"},
-     {"\<\"ee[0][0][1] = ((1 + mG*(-nn + np) + mF*nt)*taun[0][0][1] + (1 + \
-mG*(nn - np) + mF*nt)*taup[0][0][1])/(2.*MNUC);\"\>"},
-     {"\<\"ee[0][1][0] = (8*mB*nn + 4*mA*nt + 4*pow(nt,-1 + mDelta)*(2*mD*nn \
-+ mC*nt) + 2*(-1 + mDelta)*pow(nt,-2 + mDelta)*(4*mD*nn*np + mC*pow(nt,2)) + \
-((mF + mG)*taun[0][0][0])/MNUC + ((mF - mG)*taup[0][0][0])/MNUC + ((1 + \
-mG*(-nn + np) + mF*nt)*taun[0][1][0])/MNUC + ((1 + mG*(nn - np) + \
-mF*nt)*taup[0][1][0])/MNUC)/2.;\"\>"},
-     {"\<\"ee[0][1][1] = ((mF + mG)*taun[0][0][1] + (mF - mG)*taup[0][0][1] + \
-(1 + mG*(-nn + np) + mF*nt)*taun[0][1][1] + (1 + mG*(nn - np) + \
-mF*nt)*taup[0][1][1])/(2.*MNUC);\"\>"},
-     {"\<\"ee[1][0][0] = (8*mB*np + 4*mA*nt + 4*pow(nt,-1 + mDelta)*(2*mD*np \
-+ mC*nt) + 2*(-1 + mDelta)*pow(nt,-2 + mDelta)*(4*mD*nn*np + mC*pow(nt,2)) + \
-((mF - mG)*taun[0][0][0])/MNUC + ((mF + mG)*taup[0][0][0])/MNUC + ((1 + \
-mG*(-nn + np) + mF*nt)*taun[1][0][0])/MNUC + ((1 + mG*(nn - np) + \
-mF*nt)*taup[1][0][0])/MNUC)/2.;\"\>"},
-     {"\<\"ee[1][0][1] = ((mF - mG)*taun[0][0][1] + (mF + mG)*taup[0][0][1] + \
-(1 + mG*(-nn + np) + mF*nt)*taun[1][0][1] + (1 + mG*(nn - np) + \
-mF*nt)*taup[1][0][1])/(2.*MNUC);\"\>"},
-     {"\<\"ee[1][1][0] = (4*mA + 8*mB + 4*(mC + 2*mD)*pow(nt,-1 + mDelta) + \
-4*(-1 + mDelta)*pow(nt,-2 + mDelta)*(2*mD*nn + mC*nt) + 4*(-1 + \
-mDelta)*pow(nt,-2 + mDelta)*(2*mD*np + mC*nt) + 2*(-2 + mDelta)*(-1 + \
-mDelta)*pow(nt,-3 + mDelta)*(4*mD*nn*np + mC*pow(nt,2)) + ((mF - \
-mG)*taun[0][1][0])/MNUC + ((mF + mG)*taup[0][1][0])/MNUC + ((mF + \
-mG)*taun[1][0][0])/MNUC + ((mF - mG)*taup[1][0][0])/MNUC + ((1 + mG*(-nn + \
-np) + mF*nt)*taun[1][1][0])/MNUC + ((1 + mG*(nn - np) + \
-mF*nt)*taup[1][1][0])/MNUC)/2.;\"\>"},
-     {"\<\"ee[1][1][1] = ((mF - mG)*taun[0][1][1] + (mF + mG)*taup[0][1][1] + \
-(mF + mG)*taun[1][0][1] + (mF - mG)*taup[1][0][1] + (1 + mG*(-nn + np) + \
-mF*nt)*taun[1][1][1] + (1 + mG*(nn - np) + mF*nt)*taup[1][1][1])/(2.*MNUC);\"\
-\>"}
+     {"\<\"ee[0][0][0] = 4*mB*nn*np + mA*pow(nt,2) + 4*mD*nn*np*pow(nt,-1 + \
+mDelta) + mC*pow(nt,1 + mDelta) + (momsp[0][0]*taup[0][0][0])/(2.*MNUC) + \
+(Sqrt(2)*T*pow((MNUC*T)/momsn[0][0],1.5)*zfermi32n[0])/pow(Pi,2);\"\>"},
+     {"\<\"ee[0][0][1] = (pow((MNUC*T)/momsn[0][0],1.5)*(5*zfermi32n[0] + \
+2*T*zfermi32n[1]*etan[0][0][1]))/(Sqrt(2)*pow(Pi,2));\"\>"},
+     {"\<\"ee[0][1][0] = 4*mB*nn + 2*mA*nt - 4*mD*nn*np*pow(nt,-2 + mDelta) + \
+4*mD*mDelta*nn*np*pow(nt,-2 + mDelta) + 4*mD*nn*pow(nt,-1 + mDelta) + \
+mC*pow(nt,mDelta) + mC*mDelta*pow(nt,mDelta) - \
+(3*pow((MNUC*T)/momsn[0][0],2.5)*zfermi32n[0]*momsn[0][1])/(Sqrt(2)*MNUC*pow(\
+Pi,2)) + (taup[0][0][0]*momsp[0][1])/(2.*MNUC) + \
+(momsp[0][0]*taup[0][1])/(2.*MNUC) + \
+(Sqrt(2)*T*pow((MNUC*T)/momsn[0][0],1.5)*zfermi32n[1]*etan[0][1][0])/pow(Pi,2)\
+;\"\>"},
+     {"\<\"ee[0][1][1] = \
+(pow((MNUC*T)/momsn[0][0],1.5)*(-15*zfermi32n[0]*momsn[0][1] + \
+4*T*momsn[0][0]*zfermi32n[2]*etan[0][0][1]*etan[0][1][0] + \
+zfermi32n[1]*(-6*T*momsn[0][1]*etan[0][0][1] + 2*momsn[0][0]*(5*etan[0][1][0] \
++ 2*T*etan[0][1][1]))))/(2.*Sqrt(2)*pow(Pi,2)*momsn[0][0]);\"\>"},
+     {"\<\"ee[1][0][0] = 4*mB*np + 2*mA*nt - 4*mD*nn*np*pow(nt,-2 + mDelta) + \
+4*mD*mDelta*nn*np*pow(nt,-2 + mDelta) + 4*mD*np*pow(nt,-1 + mDelta) + \
+mC*pow(nt,mDelta) + mC*mDelta*pow(nt,mDelta) - \
+(3*pow((MNUC*T)/momsn[0][0],2.5)*zfermi32n[0]*momsn[1][0])/(Sqrt(2)*MNUC*pow(\
+Pi,2)) + (taup[0][0][0]*momsp[1][0])/(2.*MNUC) + \
+(momsp[0][0]*taup[1][0])/(2.*MNUC) + \
+(Sqrt(2)*T*pow((MNUC*T)/momsn[0][0],1.5)*zfermi32n[1]*etan[1][0][0])/pow(Pi,2)\
+;\"\>"},
+     {"\<\"ee[1][0][1] = \
+(pow((MNUC*T)/momsn[0][0],1.5)*(-15*zfermi32n[0]*momsn[1][0] + \
+4*T*momsn[0][0]*zfermi32n[2]*etan[0][0][1]*etan[1][0][0] + \
+zfermi32n[1]*(-6*T*momsn[1][0]*etan[0][0][1] + 2*momsn[0][0]*(5*etan[1][0][0] \
++ 2*T*etan[1][0][1]))))/(2.*Sqrt(2)*pow(Pi,2)*momsn[0][0]);\"\>"},
+     {"\<\"ee[1][1][0] = \
+(15*Sqrt(2)*MNUC*pow(nt,3)*T*pow((MNUC*T)/momsn[0][0],1.5)*momsn[0][0]*\
+zfermi32n[0]*momsn[0][1]*momsn[1][0] + \
+2*pow(Pi,2)*pow(momsn[0][0],3)*(4*mA*MNUC*pow(nt,3) + 8*mB*MNUC*pow(nt,3) + \
+16*mD*MNUC*nn*np*pow(nt,mDelta) - 24*mD*mDelta*MNUC*nn*np*pow(nt,mDelta) + \
+8*mD*pow(mDelta,2)*MNUC*nn*np*pow(nt,mDelta) - 8*mD*MNUC*nn*pow(nt,1 + \
+mDelta) + 8*mD*mDelta*MNUC*nn*pow(nt,1 + mDelta) - 8*mD*MNUC*np*pow(nt,1 + \
+mDelta) + 8*mD*mDelta*MNUC*np*pow(nt,1 + mDelta) + 8*mD*MNUC*pow(nt,2 + \
+mDelta) + 2*mC*mDelta*MNUC*pow(nt,2 + mDelta) + \
+2*mC*pow(mDelta,2)*MNUC*pow(nt,2 + mDelta) + pow(nt,3)*taup[0][1]*momsp[1][0] \
++ pow(nt,3)*momsp[0][1]*taup[1][0] + pow(nt,3)*taup[0][0][0]*momsp[1][1] + \
+pow(nt,3)*momsp[0][0]*taup[1][1]) - \
+6*Sqrt(2)*pow(nt,3)*pow((MNUC*T)/momsn[0][0],2.5)*pow(momsn[0][0],3)*(\
+zfermi32n[0]*momsn[1][1] + zfermi32n[1]*(momsn[1][0]*etan[0][1][0] + \
+momsn[0][1]*etan[1][0][0])) + \
+4*Sqrt(2)*pow(nt,3)*pow((MNUC*T)/momsn[0][0],2.5)*pow(momsn[0][0],4)*(\
+zfermi32n[2]*etan[0][1][0]*etan[1][0][0] + \
+zfermi32n[1]*etan[1][1][0]))/(4.*MNUC*pow(nt,3)*pow(Pi,2)*pow(momsn[0][0],3));\
+\"\>"},
+     {"\<\"ee[1][1][1] = \
+(pow((MNUC*T)/momsn[0][0],1.5)*(15*zfermi32n[0]*(5*momsn[0][1]*momsn[1][0] - \
+2*momsn[0][0]*momsn[1][1]) + \
+2*(2*momsn[0][0]*(2*T*momsn[0][0]*zfermi32n[3]*etan[0][0][1]*etan[0][1][0]*\
+etan[1][0][0] + zfermi32n[2]*(-3*T*momsn[1][0]*etan[0][0][1]*etan[0][1][0] - \
+3*T*momsn[0][1]*etan[0][0][1]*etan[1][0][0] + \
+momsn[0][0]*(etan[0][1][0]*(5*etan[1][0][0] + 2*T*etan[1][0][1]) + \
+2*T*(etan[0][1][1]*etan[1][0][0] + etan[0][0][1]*etan[1][1][0])))) + \
+zfermi32n[1]*(3*momsn[0][1]*(5*T*momsn[1][0]*etan[0][0][1] - \
+momsn[0][0]*(5*etan[1][0][0] + 2*T*etan[1][0][1])) + \
+momsn[0][0]*(-6*T*momsn[1][1]*etan[0][0][1] - 3*momsn[1][0]*(5*etan[0][1][0] \
++ 2*T*etan[0][1][1]) + 2*momsn[0][0]*(5*etan[1][1][0] + \
+2*T*etan[1][1][1]))))))/(4.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],2));\"\>"}
     },
     GridBoxAlignment->{
      "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
@@ -609,47 +827,156 @@ mF*nt)*taun[1][1][1] + (1 + mG*(nn - np) + mF*nt)*taup[1][1][1])/(2.*MNUC);\"\
   3.652820784815481*^9, {3.652820821828999*^9, 3.6528208556997557`*^9}, 
    3.6528229031730556`*^9, 3.652822985775559*^9, 3.652823018076873*^9, {
    3.6528230801693983`*^9, 3.6528231183840313`*^9}, 3.652823332873685*^9, 
-   3.652823422077121*^9}],
+   3.652823420914359*^9, 3.653072895666217*^9, 3.65307315554976*^9, 
+   3.6530733506440983`*^9}],
 
 Cell[BoxData[
  TagBox[
   TagBox[GridBox[{
-     {"\<\"pp[0][0][0] = (6*MNUC*(4*mB*nn*np*nt + mA*pow(nt,3) + \
-mDelta*pow(nt,mDelta)*(4*mD*nn*np + mC*pow(nt,2))) + nt*(2 - 5*mG*nn + \
-5*mG*np + 5*mF*nt)*taun[0][0][0] + nt*(2 + 5*mG*(nn - np) + \
-5*mF*nt)*taup[0][0][0])/(6.*MNUC*nt);\"\>"},
-     {"\<\"pp[0][0][1] = ((2 - 5*mG*nn + 5*mG*np + 5*mF*nt)*taun[0][0][1] + \
-(2 + 5*mG*(nn - np) + 5*mF*nt)*taup[0][0][1])/(6.*MNUC);\"\>"},
+     {"\<\"pp[0][0][0] = 4*mB*nn*np + mA*pow(nt,2) + mDelta*pow(nt,-1 + \
+mDelta)*(4*mD*nn*np + mC*pow(nt,2)) + \
+(Sqrt(2)*pow((MNUC*T)/momsn[0][0],2.5)*(-3 + \
+5*momsn[0][0])*zfermi32n[0])/(3.*MNUC*pow(Pi,2)) + \
+(Sqrt(2)*pow((MNUC*T)/momsp[0][0],2.5)*(-3 + \
+5*momsp[0][0])*zfermi32p[0])/(3.*MNUC*pow(Pi,2));\"\>"},
+     {"\<\"pp[0][0][1] = (MNUC*T*(Sqrt((MNUC*T)/momsn[0][0])*(-3 + \
+5*momsn[0][0])*pow(momsp[0][0],2)*(5*zfermi32n[0] + \
+2*T*zfermi32n[1]*etan[0][0][1]) - \
+3*pow(momsn[0][0],2)*Sqrt((MNUC*T)/momsp[0][0])*(5*zfermi32p[0] + \
+2*T*zfermi32p[1]*etap[0][0][1]) + \
+5*pow(momsn[0][0],2)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][0]*(5*zfermi32p[0] + \
+2*T*zfermi32p[1]*etap[0][0][1])))/(3.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],2)*\
+pow(momsp[0][0],2));\"\>"},
      {"\<\"pp[0][1][0] = (24*mB*nn + 12*mA*nt + 12*mDelta*pow(nt,-1 + \
 mDelta)*(2*mD*nn + mC*nt) + 6*(-1 + mDelta)*mDelta*pow(nt,-2 + \
-mDelta)*(4*mD*nn*np + mC*pow(nt,2)) + (5*(mF + mG)*taun[0][0][0])/MNUC + \
-(5*(mF - mG)*taup[0][0][0])/MNUC - ((-2 + 5*mG*(nn - np) - \
-5*mF*nt)*taun[0][1][0])/MNUC + ((2 + 5*mG*(nn - np) + \
-5*mF*nt)*taup[0][1][0])/MNUC)/6.;\"\>"},
-     {"\<\"pp[0][1][1] = (5*(mF + mG)*taun[0][0][1] + 5*(mF - \
-mG)*taup[0][0][1] - (-2 + 5*mG*(nn - np) - 5*mF*nt)*taun[0][1][1] + (2 + \
-5*mG*(nn - np) + 5*mF*nt)*taup[0][1][1])/(6.*MNUC);\"\>"},
+mDelta)*(4*mD*nn*np + mC*pow(nt,2)) + \
+(10*Sqrt(2)*pow((MNUC*T)/momsn[0][0],2.5)*zfermi32n[0]*momsn[0][1])/(MNUC*pow(\
+Pi,2)) - (5*Sqrt(2)*T*pow((MNUC*T)/momsn[0][0],1.5)*(-3 + \
+5*momsn[0][0])*zfermi32n[0]*momsn[0][1])/(pow(Pi,2)*pow(momsn[0][0],2)) + \
+(10*Sqrt(2)*pow((MNUC*T)/momsp[0][0],2.5)*zfermi32p[0]*momsp[0][1])/(MNUC*pow(\
+Pi,2)) - (5*Sqrt(2)*T*pow((MNUC*T)/momsp[0][0],1.5)*(-3 + \
+5*momsp[0][0])*zfermi32p[0]*momsp[0][1])/(pow(Pi,2)*pow(momsp[0][0],2)) + \
+(2*Sqrt(2)*pow((MNUC*T)/momsn[0][0],2.5)*(-3 + \
+5*momsn[0][0])*zfermi32n[1]*etan[0][1][0])/(MNUC*pow(Pi,2)) + \
+(2*Sqrt(2)*pow((MNUC*T)/momsp[0][0],2.5)*(-3 + \
+5*momsp[0][0])*zfermi32p[1]*etap[0][1][0])/(MNUC*pow(Pi,2)))/6.;\"\>"},
+     {"\<\"pp[0][1][1] = \
+(MNUC*T*(15*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][1]*(5*\
+zfermi32p[0] + 2*T*zfermi32p[1]*etap[0][0][1]) + \
+Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],3)*(-75*(-1 + \
+momsn[0][0])*zfermi32n[0]*momsn[0][1] + 2*(2*T*momsn[0][0]*(-3 + \
+5*momsn[0][0])*zfermi32n[2]*etan[0][0][1]*etan[0][1][0] + \
+zfermi32n[1]*(-15*T*(-1 + momsn[0][0])*momsn[0][1]*etan[0][0][1] + \
+momsn[0][0]*(-3 + 5*momsn[0][0])*(5*etan[0][1][0] + 2*T*etan[0][1][1])))) + \
+10*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*pow(momsp[0][0],2)*(2*T*\
+zfermi32p[2]*etap[0][0][1]*etap[0][1][0] + zfermi32p[1]*(5*etap[0][1][0] + \
+2*T*etap[0][1][1])) - \
+3*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][0]*(25*zfermi32p[0]*\
+momsp[0][1] + 2*(2*T*zfermi32p[2]*etap[0][0][1]*etap[0][1][0] + \
+zfermi32p[1]*(5*T*momsp[0][1]*etap[0][0][1] + 5*etap[0][1][0] + \
+2*T*etap[0][1][1])))))/(6.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*pow(momsp[0][\
+0],3));\"\>"},
      {"\<\"pp[1][0][0] = (24*mB*np + 12*mA*nt + 12*mDelta*pow(nt,-1 + \
 mDelta)*(2*mD*np + mC*nt) + 6*(-1 + mDelta)*mDelta*pow(nt,-2 + \
-mDelta)*(4*mD*nn*np + mC*pow(nt,2)) + (5*(mF - mG)*taun[0][0][0])/MNUC + \
-(5*(mF + mG)*taup[0][0][0])/MNUC - ((-2 + 5*mG*(nn - np) - \
-5*mF*nt)*taun[1][0][0])/MNUC + ((2 + 5*mG*(nn - np) + \
-5*mF*nt)*taup[1][0][0])/MNUC)/6.;\"\>"},
-     {"\<\"pp[1][0][1] = (5*(mF - mG)*taun[0][0][1] + 5*(mF + \
-mG)*taup[0][0][1] - (-2 + 5*mG*(nn - np) - 5*mF*nt)*taun[1][0][1] + (2 + \
-5*mG*(nn - np) + 5*mF*nt)*taup[1][0][1])/(6.*MNUC);\"\>"},
-     {"\<\"pp[1][1][0] = (12*mA + 24*mB + 12*(mC + 2*mD)*mDelta*pow(nt,-1 + \
-mDelta) + 12*(-1 + mDelta)*mDelta*pow(nt,-2 + mDelta)*(2*mD*nn + mC*nt) + \
-12*(-1 + mDelta)*mDelta*pow(nt,-2 + mDelta)*(2*mD*np + mC*nt) + 6*(-2 + \
-mDelta)*(-1 + mDelta)*mDelta*pow(nt,-3 + mDelta)*(4*mD*nn*np + mC*pow(nt,2)) \
-+ (5*(mF - mG)*taun[0][1][0])/MNUC + (5*(mF + mG)*taup[0][1][0])/MNUC + \
-(5*(mF + mG)*taun[1][0][0])/MNUC + (5*(mF - mG)*taup[1][0][0])/MNUC - ((-2 + \
-5*mG*(nn - np) - 5*mF*nt)*taun[1][1][0])/MNUC + ((2 + 5*mG*(nn - np) + \
-5*mF*nt)*taup[1][1][0])/MNUC)/6.;\"\>"},
-     {"\<\"pp[1][1][1] = (5*(mF - mG)*taun[0][1][1] + 5*(mF + \
-mG)*taup[0][1][1] + 5*(mF + mG)*taun[1][0][1] + 5*(mF - mG)*taup[1][0][1] - \
-(-2 + 5*mG*(nn - np) - 5*mF*nt)*taun[1][1][1] + (2 + 5*mG*(nn - np) + \
-5*mF*nt)*taup[1][1][1])/(6.*MNUC);\"\>"}
+mDelta)*(4*mD*nn*np + mC*pow(nt,2)) + \
+(10*Sqrt(2)*pow((MNUC*T)/momsn[0][0],2.5)*zfermi32n[0]*momsn[1][0])/(MNUC*pow(\
+Pi,2)) - (5*Sqrt(2)*T*pow((MNUC*T)/momsn[0][0],1.5)*(-3 + \
+5*momsn[0][0])*zfermi32n[0]*momsn[1][0])/(pow(Pi,2)*pow(momsn[0][0],2)) + \
+(10*Sqrt(2)*pow((MNUC*T)/momsp[0][0],2.5)*zfermi32p[0]*momsp[1][0])/(MNUC*pow(\
+Pi,2)) - (5*Sqrt(2)*T*pow((MNUC*T)/momsp[0][0],1.5)*(-3 + \
+5*momsp[0][0])*zfermi32p[0]*momsp[1][0])/(pow(Pi,2)*pow(momsp[0][0],2)) + \
+(2*Sqrt(2)*pow((MNUC*T)/momsn[0][0],2.5)*(-3 + \
+5*momsn[0][0])*zfermi32n[1]*etan[1][0][0])/(MNUC*pow(Pi,2)) + \
+(2*Sqrt(2)*pow((MNUC*T)/momsp[0][0],2.5)*(-3 + \
+5*momsp[0][0])*zfermi32p[1]*etap[1][0][0])/(MNUC*pow(Pi,2)))/6.;\"\>"},
+     {"\<\"pp[1][0][1] = \
+(MNUC*T*(15*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[1][0]*(5*\
+zfermi32p[0] + 2*T*zfermi32p[1]*etap[0][0][1]) + \
+Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],3)*(-75*(-1 + \
+momsn[0][0])*zfermi32n[0]*momsn[1][0] + 2*(2*T*momsn[0][0]*(-3 + \
+5*momsn[0][0])*zfermi32n[2]*etan[0][0][1]*etan[1][0][0] + \
+zfermi32n[1]*(-15*T*(-1 + momsn[0][0])*momsn[1][0]*etan[0][0][1] + \
+momsn[0][0]*(-3 + 5*momsn[0][0])*(5*etan[1][0][0] + 2*T*etan[1][0][1])))) + \
+10*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*pow(momsp[0][0],2)*(2*T*\
+zfermi32p[2]*etap[0][0][1]*etap[1][0][0] + zfermi32p[1]*(5*etap[1][0][0] + \
+2*T*etap[1][0][1])) - \
+3*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][0]*(25*zfermi32p[0]*\
+momsp[1][0] + 2*(2*T*zfermi32p[2]*etap[0][0][1]*etap[1][0][0] + \
+zfermi32p[1]*(5*T*momsp[1][0]*etap[0][0][1] + 5*etap[1][0][0] + \
+2*T*etap[1][0][1])))))/(6.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*pow(momsp[0][\
+0],3));\"\>"},
+     {"\<\"pp[1][1][0] = \
+(-105*Sqrt(2)*MNUC*pow(nt,3)*pow(T,2)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][\
+0],4)*zfermi32n[0]*momsn[0][1]*momsn[1][0] + \
+15*Sqrt(2)*pow(nt,3)*T*pow((MNUC*T)/momsn[0][0],1.5)*pow(momsn[0][0],2)*pow(\
+momsp[0][0],4)*(zfermi32n[0]*(5*momsn[0][1]*momsn[1][0] + 2*momsn[1][1]) + \
+2*zfermi32n[1]*(momsn[1][0]*etan[0][1][0] + momsn[0][1]*etan[1][0][0])) + \
+20*Sqrt(2)*pow(nt,3)*T*pow((MNUC*T)/momsn[0][0],1.5)*pow(momsn[0][0],4)*pow(\
+momsp[0][0],4)*(zfermi32n[2]*etan[0][1][0]*etan[1][0][0] + \
+zfermi32n[1]*etan[1][1][0]) - \
+6*Sqrt(2)*pow(nt,3)*T*pow((MNUC*T)/momsn[0][0],1.5)*pow(momsn[0][0],3)*pow(\
+momsp[0][0],4)*(5*zfermi32n[0]*momsn[1][1] + \
+2*zfermi32n[2]*etan[0][1][0]*etan[1][0][0] + \
+zfermi32n[1]*(5*momsn[1][0]*etan[0][1][0] + 5*momsn[0][1]*etan[1][0][0] + \
+2*etan[1][1][0])) + pow(momsn[0][0],4)*(12*(2*mA*pow(nt,3) + 4*mB*pow(nt,3) + \
+mDelta*pow(nt,mDelta)*(mC*mDelta*(1 + mDelta)*pow(nt,2) + 4*mD*((-1 + \
+mDelta)*nn*((-2 + mDelta)*np + nt) + nt*((-1 + mDelta)*np + \
+nt))))*pow(Pi,2)*pow(momsp[0][0],4) - \
+105*Sqrt(2)*MNUC*pow(nt,3)*pow(T,2)*Sqrt((MNUC*T)/momsp[0][0])*zfermi32p[0]*\
+momsp[0][1]*momsp[1][0] + \
+15*Sqrt(2)*pow(nt,3)*T*pow((MNUC*T)/momsp[0][0],1.5)*pow(momsp[0][0],2)*(\
+zfermi32p[0]*(5*momsp[0][1]*momsp[1][0] + 2*momsp[1][1]) + \
+2*zfermi32p[1]*(momsp[1][0]*etap[0][1][0] + momsp[0][1]*etap[1][0][0])) + \
+20*Sqrt(2)*pow(nt,3)*T*pow((MNUC*T)/momsp[0][0],1.5)*pow(momsp[0][0],4)*(\
+zfermi32p[2]*etap[0][1][0]*etap[1][0][0] + zfermi32p[1]*etap[1][1][0]) - \
+6*Sqrt(2)*pow(nt,3)*T*pow((MNUC*T)/momsp[0][0],1.5)*pow(momsp[0][0],3)*(5*\
+zfermi32p[0]*momsp[1][1] + 2*zfermi32p[2]*etap[0][1][0]*etap[1][0][0] + \
+zfermi32p[1]*(5*momsp[1][0]*etap[0][1][0] + 5*momsp[0][1]*etap[1][0][0] + \
+2*etap[1][1][0]))))/(12.*pow(nt,3)*pow(Pi,2)*pow(momsn[0][0],4)*pow(momsp[0][\
+0],4));\"\>"},
+     {"\<\"pp[1][1][1] = \
+(pow((MNUC*T)/momsn[0][0],1.5)*(-105*Sqrt((MNUC*T)/momsn[0][0])*pow(momsn[0][\
+0],5)*momsp[0][1]*momsp[1][0]*(5*zfermi32p[0] + \
+2*T*zfermi32p[1]*etap[0][0][1]) + \
+15*Sqrt((MNUC*T)/momsn[0][0])*pow(momsn[0][0],5)*momsp[0][0]*(5*zfermi32p[0]*(\
+5*momsp[0][1]*momsp[1][0] + 2*momsp[1][1]) + \
+2*(2*T*zfermi32p[2]*etap[0][0][1]*(momsp[1][0]*etap[0][1][0] + \
+momsp[0][1]*etap[1][0][0]) + zfermi32p[1]*(2*T*momsp[1][1]*etap[0][0][1] + \
+momsp[1][0]*(5*etap[0][1][0] + 2*T*etap[0][1][1]) + \
+momsp[0][1]*(5*T*momsp[1][0]*etap[0][0][1] + 5*etap[1][0][0] + \
+2*T*etap[1][0][1])))) + \
+Sqrt((MNUC*T)/momsp[0][0])*pow(momsp[0][0],5)*(75*zfermi32n[0]*((-7 + \
+5*momsn[0][0])*momsn[0][1]*momsn[1][0] - 2*(-1 + \
+momsn[0][0])*momsn[0][0]*momsn[1][1]) + 2*(2*momsn[0][0]*(2*T*momsn[0][0]*(-3 \
++ 5*momsn[0][0])*zfermi32n[3]*etan[0][0][1]*etan[0][1][0]*etan[1][0][0] + \
+zfermi32n[2]*(-15*T*(-1 + \
+momsn[0][0])*momsn[1][0]*etan[0][0][1]*etan[0][1][0] - 15*T*(-1 + \
+momsn[0][0])*momsn[0][1]*etan[0][0][1]*etan[1][0][0] + momsn[0][0]*(-3 + \
+5*momsn[0][0])*(etan[0][1][0]*(5*etan[1][0][0] + 2*T*etan[1][0][1]) + \
+2*T*(etan[0][1][1]*etan[1][0][0] + etan[0][0][1]*etan[1][1][0])))) + \
+zfermi32n[1]*(15*momsn[0][1]*(T*(-7 + \
+5*momsn[0][0])*momsn[1][0]*etan[0][0][1] - (-1 + \
+momsn[0][0])*momsn[0][0]*(5*etan[1][0][0] + 2*T*etan[1][0][1])) + \
+momsn[0][0]*(-30*T*(-1 + momsn[0][0])*momsn[1][1]*etan[0][0][1] - 15*(-1 + \
+momsn[0][0])*momsn[1][0]*(5*etan[0][1][0] + 2*T*etan[0][1][1]) + \
+2*momsn[0][0]*(-3 + 5*momsn[0][0])*(5*etan[1][1][0] + 2*T*etan[1][1][1]))))) \
++ 20*Sqrt((MNUC*T)/momsn[0][0])*pow(momsn[0][0],5)*pow(momsp[0][0],3)*(2*T*\
+zfermi32p[3]*etap[0][0][1]*etap[0][1][0]*etap[1][0][0] + \
+zfermi32p[2]*(etap[0][1][0]*(5*etap[1][0][0] + 2*T*etap[1][0][1]) + \
+2*T*(etap[0][1][1]*etap[1][0][0] + etap[0][0][1]*etap[1][1][0])) + \
+zfermi32p[1]*(5*etap[1][1][0] + 2*T*etap[1][1][1])) - \
+6*Sqrt((MNUC*T)/momsn[0][0])*pow(momsn[0][0],5)*pow(momsp[0][0],2)*(25*\
+zfermi32p[0]*momsp[1][1] + \
+2*(2*T*zfermi32p[3]*etap[0][0][1]*etap[0][1][0]*etap[1][0][0] + \
+zfermi32p[2]*(5*T*momsp[1][0]*etap[0][0][1]*etap[0][1][0] + \
+5*T*momsp[0][1]*etap[0][0][1]*etap[1][0][0] + 5*etap[0][1][0]*etap[1][0][0] + \
+2*T*etap[0][1][1]*etap[1][0][0] + 2*T*etap[0][1][0]*etap[1][0][1] + \
+2*T*etap[0][0][1]*etap[1][1][0])) + \
+zfermi32p[1]*(10*T*momsp[1][1]*etap[0][0][1] + 5*momsp[1][0]*(5*etap[0][1][0] \
++ 2*T*etap[0][1][1]) + 25*momsp[0][1]*etap[1][0][0] + \
+10*T*momsp[0][1]*etap[1][0][1] + 10*etap[1][1][0] + \
+4*T*etap[1][1][1]))))/(12.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/\
+momsp[0][0])*pow(momsp[0][0],5));\"\>"}
     },
     GridBoxAlignment->{
      "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
@@ -668,7 +995,176 @@ mG)*taup[0][1][1] + 5*(mF + mG)*taun[1][0][1] + 5*(mF - mG)*taup[1][0][1] - \
   3.652820784815481*^9, {3.652820821828999*^9, 3.6528208556997557`*^9}, 
    3.6528229031730556`*^9, 3.652822985775559*^9, 3.652823018076873*^9, {
    3.6528230801693983`*^9, 3.6528231183840313`*^9}, 3.652823332873685*^9, 
-   3.6528234226981773`*^9}]
+   3.652823420914359*^9, 3.653072895666217*^9, 3.65307315554976*^9, 
+   3.653073356412655*^9}],
+
+Cell[BoxData[
+ TagBox[
+  TagBox[GridBox[{
+     {"\<\"ss[0][0][0] = 4*mB*nn*np + mA*pow(nt,2) + mDelta*pow(nt,-1 + \
+mDelta)*(4*mD*nn*np + mC*pow(nt,2)) + \
+(Sqrt(2)*pow((MNUC*T)/momsn[0][0],2.5)*(-3 + \
+5*momsn[0][0])*zfermi32n[0])/(3.*MNUC*pow(Pi,2)) + \
+(Sqrt(2)*pow((MNUC*T)/momsp[0][0],2.5)*(-3 + \
+5*momsp[0][0])*zfermi32p[0])/(3.*MNUC*pow(Pi,2));\"\>"},
+     {"\<\"ss[0][0][1] = (MNUC*T*(Sqrt((MNUC*T)/momsn[0][0])*(-3 + \
+5*momsn[0][0])*pow(momsp[0][0],2)*(5*zfermi32n[0] + \
+2*T*zfermi32n[1]*etan[0][0][1]) - \
+3*pow(momsn[0][0],2)*Sqrt((MNUC*T)/momsp[0][0])*(5*zfermi32p[0] + \
+2*T*zfermi32p[1]*etap[0][0][1]) + \
+5*pow(momsn[0][0],2)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][0]*(5*zfermi32p[0] + \
+2*T*zfermi32p[1]*etap[0][0][1])))/(3.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],2)*\
+pow(momsp[0][0],2));\"\>"},
+     {"\<\"ss[0][1][0] = (24*mB*nn + 12*mA*nt + 12*mDelta*pow(nt,-1 + \
+mDelta)*(2*mD*nn + mC*nt) + 6*(-1 + mDelta)*mDelta*pow(nt,-2 + \
+mDelta)*(4*mD*nn*np + mC*pow(nt,2)) + \
+(10*Sqrt(2)*pow((MNUC*T)/momsn[0][0],2.5)*zfermi32n[0]*momsn[0][1])/(MNUC*pow(\
+Pi,2)) - (5*Sqrt(2)*T*pow((MNUC*T)/momsn[0][0],1.5)*(-3 + \
+5*momsn[0][0])*zfermi32n[0]*momsn[0][1])/(pow(Pi,2)*pow(momsn[0][0],2)) + \
+(10*Sqrt(2)*pow((MNUC*T)/momsp[0][0],2.5)*zfermi32p[0]*momsp[0][1])/(MNUC*pow(\
+Pi,2)) - (5*Sqrt(2)*T*pow((MNUC*T)/momsp[0][0],1.5)*(-3 + \
+5*momsp[0][0])*zfermi32p[0]*momsp[0][1])/(pow(Pi,2)*pow(momsp[0][0],2)) + \
+(2*Sqrt(2)*pow((MNUC*T)/momsn[0][0],2.5)*(-3 + \
+5*momsn[0][0])*zfermi32n[1]*etan[0][1][0])/(MNUC*pow(Pi,2)) + \
+(2*Sqrt(2)*pow((MNUC*T)/momsp[0][0],2.5)*(-3 + \
+5*momsp[0][0])*zfermi32p[1]*etap[0][1][0])/(MNUC*pow(Pi,2)))/6.;\"\>"},
+     {"\<\"ss[0][1][1] = \
+(MNUC*T*(15*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][1]*(5*\
+zfermi32p[0] + 2*T*zfermi32p[1]*etap[0][0][1]) + \
+Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],3)*(-75*(-1 + \
+momsn[0][0])*zfermi32n[0]*momsn[0][1] + 2*(2*T*momsn[0][0]*(-3 + \
+5*momsn[0][0])*zfermi32n[2]*etan[0][0][1]*etan[0][1][0] + \
+zfermi32n[1]*(-15*T*(-1 + momsn[0][0])*momsn[0][1]*etan[0][0][1] + \
+momsn[0][0]*(-3 + 5*momsn[0][0])*(5*etan[0][1][0] + 2*T*etan[0][1][1])))) + \
+10*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*pow(momsp[0][0],2)*(2*T*\
+zfermi32p[2]*etap[0][0][1]*etap[0][1][0] + zfermi32p[1]*(5*etap[0][1][0] + \
+2*T*etap[0][1][1])) - \
+3*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][0]*(25*zfermi32p[0]*\
+momsp[0][1] + 2*(2*T*zfermi32p[2]*etap[0][0][1]*etap[0][1][0] + \
+zfermi32p[1]*(5*T*momsp[0][1]*etap[0][0][1] + 5*etap[0][1][0] + \
+2*T*etap[0][1][1])))))/(6.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*pow(momsp[0][\
+0],3));\"\>"},
+     {"\<\"ss[1][0][0] = (24*mB*np + 12*mA*nt + 12*mDelta*pow(nt,-1 + \
+mDelta)*(2*mD*np + mC*nt) + 6*(-1 + mDelta)*mDelta*pow(nt,-2 + \
+mDelta)*(4*mD*nn*np + mC*pow(nt,2)) + \
+(10*Sqrt(2)*pow((MNUC*T)/momsn[0][0],2.5)*zfermi32n[0]*momsn[1][0])/(MNUC*pow(\
+Pi,2)) - (5*Sqrt(2)*T*pow((MNUC*T)/momsn[0][0],1.5)*(-3 + \
+5*momsn[0][0])*zfermi32n[0]*momsn[1][0])/(pow(Pi,2)*pow(momsn[0][0],2)) + \
+(10*Sqrt(2)*pow((MNUC*T)/momsp[0][0],2.5)*zfermi32p[0]*momsp[1][0])/(MNUC*pow(\
+Pi,2)) - (5*Sqrt(2)*T*pow((MNUC*T)/momsp[0][0],1.5)*(-3 + \
+5*momsp[0][0])*zfermi32p[0]*momsp[1][0])/(pow(Pi,2)*pow(momsp[0][0],2)) + \
+(2*Sqrt(2)*pow((MNUC*T)/momsn[0][0],2.5)*(-3 + \
+5*momsn[0][0])*zfermi32n[1]*etan[1][0][0])/(MNUC*pow(Pi,2)) + \
+(2*Sqrt(2)*pow((MNUC*T)/momsp[0][0],2.5)*(-3 + \
+5*momsp[0][0])*zfermi32p[1]*etap[1][0][0])/(MNUC*pow(Pi,2)))/6.;\"\>"},
+     {"\<\"ss[1][0][1] = \
+(MNUC*T*(15*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[1][0]*(5*\
+zfermi32p[0] + 2*T*zfermi32p[1]*etap[0][0][1]) + \
+Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][0],3)*(-75*(-1 + \
+momsn[0][0])*zfermi32n[0]*momsn[1][0] + 2*(2*T*momsn[0][0]*(-3 + \
+5*momsn[0][0])*zfermi32n[2]*etan[0][0][1]*etan[1][0][0] + \
+zfermi32n[1]*(-15*T*(-1 + momsn[0][0])*momsn[1][0]*etan[0][0][1] + \
+momsn[0][0]*(-3 + 5*momsn[0][0])*(5*etan[1][0][0] + 2*T*etan[1][0][1])))) + \
+10*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*pow(momsp[0][0],2)*(2*T*\
+zfermi32p[2]*etap[0][0][1]*etap[1][0][0] + zfermi32p[1]*(5*etap[1][0][0] + \
+2*T*etap[1][0][1])) - \
+3*pow(momsn[0][0],3)*Sqrt((MNUC*T)/momsp[0][0])*momsp[0][0]*(25*zfermi32p[0]*\
+momsp[1][0] + 2*(2*T*zfermi32p[2]*etap[0][0][1]*etap[1][0][0] + \
+zfermi32p[1]*(5*T*momsp[1][0]*etap[0][0][1] + 5*etap[1][0][0] + \
+2*T*etap[1][0][1])))))/(6.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*pow(momsp[0][\
+0],3));\"\>"},
+     {"\<\"ss[1][1][0] = \
+(-105*Sqrt(2)*MNUC*pow(nt,3)*pow(T,2)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsp[0][\
+0],4)*zfermi32n[0]*momsn[0][1]*momsn[1][0] + \
+15*Sqrt(2)*pow(nt,3)*T*pow((MNUC*T)/momsn[0][0],1.5)*pow(momsn[0][0],2)*pow(\
+momsp[0][0],4)*(zfermi32n[0]*(5*momsn[0][1]*momsn[1][0] + 2*momsn[1][1]) + \
+2*zfermi32n[1]*(momsn[1][0]*etan[0][1][0] + momsn[0][1]*etan[1][0][0])) + \
+20*Sqrt(2)*pow(nt,3)*T*pow((MNUC*T)/momsn[0][0],1.5)*pow(momsn[0][0],4)*pow(\
+momsp[0][0],4)*(zfermi32n[2]*etan[0][1][0]*etan[1][0][0] + \
+zfermi32n[1]*etan[1][1][0]) - \
+6*Sqrt(2)*pow(nt,3)*T*pow((MNUC*T)/momsn[0][0],1.5)*pow(momsn[0][0],3)*pow(\
+momsp[0][0],4)*(5*zfermi32n[0]*momsn[1][1] + \
+2*zfermi32n[2]*etan[0][1][0]*etan[1][0][0] + \
+zfermi32n[1]*(5*momsn[1][0]*etan[0][1][0] + 5*momsn[0][1]*etan[1][0][0] + \
+2*etan[1][1][0])) + pow(momsn[0][0],4)*(12*(2*mA*pow(nt,3) + 4*mB*pow(nt,3) + \
+mDelta*pow(nt,mDelta)*(mC*mDelta*(1 + mDelta)*pow(nt,2) + 4*mD*((-1 + \
+mDelta)*nn*((-2 + mDelta)*np + nt) + nt*((-1 + mDelta)*np + \
+nt))))*pow(Pi,2)*pow(momsp[0][0],4) - \
+105*Sqrt(2)*MNUC*pow(nt,3)*pow(T,2)*Sqrt((MNUC*T)/momsp[0][0])*zfermi32p[0]*\
+momsp[0][1]*momsp[1][0] + \
+15*Sqrt(2)*pow(nt,3)*T*pow((MNUC*T)/momsp[0][0],1.5)*pow(momsp[0][0],2)*(\
+zfermi32p[0]*(5*momsp[0][1]*momsp[1][0] + 2*momsp[1][1]) + \
+2*zfermi32p[1]*(momsp[1][0]*etap[0][1][0] + momsp[0][1]*etap[1][0][0])) + \
+20*Sqrt(2)*pow(nt,3)*T*pow((MNUC*T)/momsp[0][0],1.5)*pow(momsp[0][0],4)*(\
+zfermi32p[2]*etap[0][1][0]*etap[1][0][0] + zfermi32p[1]*etap[1][1][0]) - \
+6*Sqrt(2)*pow(nt,3)*T*pow((MNUC*T)/momsp[0][0],1.5)*pow(momsp[0][0],3)*(5*\
+zfermi32p[0]*momsp[1][1] + 2*zfermi32p[2]*etap[0][1][0]*etap[1][0][0] + \
+zfermi32p[1]*(5*momsp[1][0]*etap[0][1][0] + 5*momsp[0][1]*etap[1][0][0] + \
+2*etap[1][1][0]))))/(12.*pow(nt,3)*pow(Pi,2)*pow(momsn[0][0],4)*pow(momsp[0][\
+0],4));\"\>"},
+     {"\<\"ss[1][1][1] = \
+(pow((MNUC*T)/momsn[0][0],1.5)*(-105*Sqrt((MNUC*T)/momsn[0][0])*pow(momsn[0][\
+0],5)*momsp[0][1]*momsp[1][0]*(5*zfermi32p[0] + \
+2*T*zfermi32p[1]*etap[0][0][1]) + \
+15*Sqrt((MNUC*T)/momsn[0][0])*pow(momsn[0][0],5)*momsp[0][0]*(5*zfermi32p[0]*(\
+5*momsp[0][1]*momsp[1][0] + 2*momsp[1][1]) + \
+2*(2*T*zfermi32p[2]*etap[0][0][1]*(momsp[1][0]*etap[0][1][0] + \
+momsp[0][1]*etap[1][0][0]) + zfermi32p[1]*(2*T*momsp[1][1]*etap[0][0][1] + \
+momsp[1][0]*(5*etap[0][1][0] + 2*T*etap[0][1][1]) + \
+momsp[0][1]*(5*T*momsp[1][0]*etap[0][0][1] + 5*etap[1][0][0] + \
+2*T*etap[1][0][1])))) + \
+Sqrt((MNUC*T)/momsp[0][0])*pow(momsp[0][0],5)*(75*zfermi32n[0]*((-7 + \
+5*momsn[0][0])*momsn[0][1]*momsn[1][0] - 2*(-1 + \
+momsn[0][0])*momsn[0][0]*momsn[1][1]) + 2*(2*momsn[0][0]*(2*T*momsn[0][0]*(-3 \
++ 5*momsn[0][0])*zfermi32n[3]*etan[0][0][1]*etan[0][1][0]*etan[1][0][0] + \
+zfermi32n[2]*(-15*T*(-1 + \
+momsn[0][0])*momsn[1][0]*etan[0][0][1]*etan[0][1][0] - 15*T*(-1 + \
+momsn[0][0])*momsn[0][1]*etan[0][0][1]*etan[1][0][0] + momsn[0][0]*(-3 + \
+5*momsn[0][0])*(etan[0][1][0]*(5*etan[1][0][0] + 2*T*etan[1][0][1]) + \
+2*T*(etan[0][1][1]*etan[1][0][0] + etan[0][0][1]*etan[1][1][0])))) + \
+zfermi32n[1]*(15*momsn[0][1]*(T*(-7 + \
+5*momsn[0][0])*momsn[1][0]*etan[0][0][1] - (-1 + \
+momsn[0][0])*momsn[0][0]*(5*etan[1][0][0] + 2*T*etan[1][0][1])) + \
+momsn[0][0]*(-30*T*(-1 + momsn[0][0])*momsn[1][1]*etan[0][0][1] - 15*(-1 + \
+momsn[0][0])*momsn[1][0]*(5*etan[0][1][0] + 2*T*etan[0][1][1]) + \
+2*momsn[0][0]*(-3 + 5*momsn[0][0])*(5*etan[1][1][0] + 2*T*etan[1][1][1]))))) \
++ 20*Sqrt((MNUC*T)/momsn[0][0])*pow(momsn[0][0],5)*pow(momsp[0][0],3)*(2*T*\
+zfermi32p[3]*etap[0][0][1]*etap[0][1][0]*etap[1][0][0] + \
+zfermi32p[2]*(etap[0][1][0]*(5*etap[1][0][0] + 2*T*etap[1][0][1]) + \
+2*T*(etap[0][1][1]*etap[1][0][0] + etap[0][0][1]*etap[1][1][0])) + \
+zfermi32p[1]*(5*etap[1][1][0] + 2*T*etap[1][1][1])) - \
+6*Sqrt((MNUC*T)/momsn[0][0])*pow(momsn[0][0],5)*pow(momsp[0][0],2)*(25*\
+zfermi32p[0]*momsp[1][1] + \
+2*(2*T*zfermi32p[3]*etap[0][0][1]*etap[0][1][0]*etap[1][0][0] + \
+zfermi32p[2]*(5*T*momsp[1][0]*etap[0][0][1]*etap[0][1][0] + \
+5*T*momsp[0][1]*etap[0][0][1]*etap[1][0][0] + 5*etap[0][1][0]*etap[1][0][0] + \
+2*T*etap[0][1][1]*etap[1][0][0] + 2*T*etap[0][1][0]*etap[1][0][1] + \
+2*T*etap[0][0][1]*etap[1][1][0])) + \
+zfermi32p[1]*(10*T*momsp[1][1]*etap[0][0][1] + 5*momsp[1][0]*(5*etap[0][1][0] \
++ 2*T*etap[0][1][1]) + 25*momsp[0][1]*etap[1][0][0] + \
+10*T*momsp[0][1]*etap[1][0][1] + 10*etap[1][1][0] + \
+4*T*etap[1][1][1]))))/(12.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3)*Sqrt((MNUC*T)/\
+momsp[0][0])*pow(momsp[0][0],5));\"\>"}
+    },
+    GridBoxAlignment->{
+     "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+      "RowsIndexed" -> {}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.5599999999999999]}, 
+        Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}, "RowsIndexed" -> {}}],
+   Column],
+  Function[BoxForm`e$, 
+   TableForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{
+  3.652820784815481*^9, {3.652820821828999*^9, 3.6528208556997557`*^9}, 
+   3.6528229031730556`*^9, 3.652822985775559*^9, 3.652823018076873*^9, {
+   3.6528230801693983`*^9, 3.6528231183840313`*^9}, 3.652823332873685*^9, 
+   3.652823420914359*^9, 3.653072895666217*^9, 3.65307315554976*^9, 
+   3.653073359002921*^9}]
 }, Open  ]]
 }, Open  ]],
 
@@ -696,7 +1192,7 @@ Cell[BoxData[
          RowBox[{"2", "*", "MNUC", "*", 
           RowBox[{"T", "/", 
            RowBox[{"momsp", "[", 
-            RowBox[{"nn", ",", "np", ",", "T"}], "]"}]}]}], ")"}], "^", 
+            RowBox[{"nn", ",", "np"}], "]"}]}]}], ")"}], "^", 
         RowBox[{"(", 
          RowBox[{"5", "/", "2"}], ")"}]}], "/", 
        RowBox[{"(", 
@@ -717,7 +1213,7 @@ Cell[BoxData[
          RowBox[{"2", "*", "MNUC", "*", 
           RowBox[{"T", "/", 
            RowBox[{"momsn", "[", 
-            RowBox[{"nn", ",", "np", ",", "T"}], "]"}]}]}], ")"}], "^", 
+            RowBox[{"nn", ",", "np"}], "]"}]}]}], ")"}], "^", 
         RowBox[{"(", 
          RowBox[{"5", "/", "2"}], ")"}]}], "/", 
        RowBox[{"(", 
@@ -746,61 +1242,53 @@ Cell[BoxData[
    3.652820971068787*^9, 3.652820984999159*^9}, {3.6528210354994907`*^9, 
    3.652821037554208*^9}, {3.652822664835105*^9, 3.652822665383782*^9}, {
    3.652823200189271*^9, 3.652823275320037*^9}, {3.652823397906384*^9, 
-   3.652823400537552*^9}}],
+   3.652823400537552*^9}, {3.653073265410987*^9, 3.653073266875317*^9}}],
 
 Cell[BoxData[
  TagBox[
   TagBox[GridBox[{
-     {"\<\"taup[0][0][0] = (2*Sqrt(2)*pow((MNUC*T)/(1 + mG*nn - mG*np + \
-mF*nt),2.5)*zfermi32p[0])/pow(Pi,2);\"\>"},
-     {"\<\"taup[0][0][1] = (Sqrt(2)*pow(MNUC,2)*T*Sqrt((MNUC*T)/(1 + mG*nn - \
-mG*np + mF*nt))*(5*zfermi32p[0] + 2*T*zfermi32p[1]*etap[0][0][1]))/(pow(1 + \
-mG*(nn - np) + mF*nt,2)*pow(Pi,2));\"\>"},
-     {"\<\"taup[0][1][0] = (Sqrt(2)*pow(MNUC,2)*pow(T,2)*Sqrt((MNUC*T)/(1 + \
-mG*nn - mG*np + mF*nt))*(-5*(mF - mG)*zfermi32p[0] + 2*(1 + mG*(nn - np) + \
-mF*nt)*zfermi32p[1]*etap[0][1][0]))/(pow(1 + mG*(nn - np) + \
-mF*nt,3)*pow(Pi,2));\"\>"},
-     {"\<\"taup[0][1][1] = (pow(MNUC,2)*T*Sqrt((MNUC*T)/(2 + 2*mG*nn - \
-2*mG*np + 2*mF*nt))*(-25*(mF - mG)*zfermi32p[0] + 2*(2*(1 + mG*(nn - np) + \
-mF*nt)*T*zfermi32p[2]*etap[0][0][1]*etap[0][1][0] + zfermi32p[1]*(5*(-mF + \
-mG)*T*etap[0][0][1] + (1 + mG*(nn - np) + mF*nt)*(5*etap[0][1][0] + \
-2*T*etap[0][1][1])))))/(pow(1 + mG*(nn - np) + mF*nt,3)*pow(Pi,2));\"\>"},
-     {"\<\"taup[1][0][0] = (Sqrt(2)*pow(MNUC,2)*pow(T,2)*Sqrt((MNUC*T)/(1 + \
-mG*nn - mG*np + mF*nt))*(-5*(mF + mG)*zfermi32p[0] + 2*(1 + mG*(nn - np) + \
-mF*nt)*zfermi32p[1]*etap[1][0][0]))/(pow(1 + mG*(nn - np) + \
-mF*nt,3)*pow(Pi,2));\"\>"},
-     {"\<\"taup[1][0][1] = (pow(MNUC,2)*T*Sqrt((MNUC*T)/(2 + 2*mG*nn - \
-2*mG*np + 2*mF*nt))*(-25*(mF + mG)*zfermi32p[0] + 2*(2*(1 + mG*(nn - np) + \
-mF*nt)*T*zfermi32p[2]*etap[0][0][1]*etap[1][0][0] + zfermi32p[1]*(-5*(mF + \
-mG)*T*etap[0][0][1] + (1 + mG*(nn - np) + mF*nt)*(5*etap[1][0][0] + \
-2*T*etap[1][0][1])))))/(pow(1 + mG*(nn - np) + mF*nt,3)*pow(Pi,2));\"\>"},
-     {"\<\"taup[1][1][0] = (pow(MNUC,2)*pow(T,2)*Sqrt((MNUC*T)/(2 + 2*mG*nn - \
-2*mG*np + 2*mF*nt))*(35*(mF - mG)*(mF + mG)*zfermi32p[0] - 10*(mF + mG)*(1 + \
-mG*(nn - np) + mF*nt)*zfermi32p[1]*etap[0][1][0] - 10*(mF - mG)*(1 + mG*(nn - \
-np) + mF*nt)*zfermi32p[1]*etap[1][0][0] + 4*pow(1 + mG*(nn - np) + \
-mF*nt,2)*zfermi32p[2]*etap[0][1][0]*etap[1][0][0] + 4*pow(1 + mG*(nn - np) + \
-mF*nt,2)*zfermi32p[1]*etap[1][1][0]))/(pow(1 + mG*(nn - np) + \
-mF*nt,4)*pow(Pi,2));\"\>"},
-     {"\<\"taup[1][1][1] = (pow(MNUC,3)*pow(T,2)*((175*(mF - mG)*(mF + \
-mG)*zfermi32p[0])/pow(1 + mG*(nn - np) + mF*nt,5) + (70*(mF - mG)*(mF + \
-mG)*T*zfermi32p[1]*etap[0][0][1])/pow(1 + mG*(nn - np) + mF*nt,5) - (50*(mF + \
-mG)*zfermi32p[1]*etap[0][1][0])/pow(1 + mG*(nn - np) + mF*nt,4) - (20*(mF + \
-mG)*T*zfermi32p[2]*etap[0][0][1]*etap[0][1][0])/pow(1 + mG*(nn - np) + \
-mF*nt,4) - (20*(mF + mG)*T*zfermi32p[1]*etap[0][1][1])/pow(1 + mG*(nn - np) + \
-mF*nt,4) - (50*(mF - mG)*zfermi32p[1]*etap[1][0][0])/pow(1 + mG*(nn - np) + \
-mF*nt,4) - (20*(mF - mG)*T*zfermi32p[2]*etap[0][0][1]*etap[1][0][0])/pow(1 + \
-mG*(nn - np) + mF*nt,4) + (20*zfermi32p[2]*etap[0][1][0]*etap[1][0][0])/pow(1 \
-+ mG*(nn - np) + mF*nt,3) + \
-(8*T*zfermi32p[3]*etap[0][0][1]*etap[0][1][0]*etap[1][0][0])/pow(1 + mG*nn - \
-mG*np + mF*nt,3) + (8*T*zfermi32p[2]*etap[0][1][1]*etap[1][0][0])/pow(1 + \
-mG*nn - mG*np + mF*nt,3) - (20*(mF - mG)*T*zfermi32p[1]*etap[1][0][1])/pow(1 \
-+ mG*(nn - np) + mF*nt,4) + \
-(8*T*zfermi32p[2]*etap[0][1][0]*etap[1][0][1])/pow(1 + mG*nn - mG*np + \
-mF*nt,3) + (20*zfermi32p[1]*etap[1][1][0])/pow(1 + mG*(nn - np) + mF*nt,3) + \
-(8*T*zfermi32p[2]*etap[0][0][1]*etap[1][1][0])/pow(1 + mG*nn - mG*np + \
-mF*nt,3) + (8*T*zfermi32p[1]*etap[1][1][1])/pow(1 + mG*nn - mG*np + \
-mF*nt,3)))/(2.*Sqrt(2)*pow(Pi,2)*Sqrt((MNUC*T)/(1 + mG*nn - mG*np + mF*nt)));\
-\"\>"}
+     {"\<\"taup[0][0][0] = \
+(2*Sqrt(2)*pow((MNUC*T)/momsp[0][0],2.5)*zfermi32p[0])/pow(Pi,2);\"\>"},
+     {"\<\"taup[0][0][1] = \
+(Sqrt(2)*pow((MNUC*T)/momsp[0][0],2.5)*(5*zfermi32p[0] + \
+2*T*zfermi32p[1]*etap[0][0][1]))/(pow(Pi,2)*T);\"\>"},
+     {"\<\"taup[0][1][0] = \
+(Sqrt(2)*pow((MNUC*T)/momsp[0][0],2.5)*(-5*zfermi32p[0]*momsp[0][1] + \
+2*momsp[0][0]*zfermi32p[1]*etap[0][1][0]))/(pow(Pi,2)*momsp[0][0]);\"\>"},
+     {"\<\"taup[0][1][1] = \
+(MNUC*pow((MNUC*T)/momsp[0][0],1.5)*(-25*zfermi32p[0]*momsp[0][1] + \
+2*(2*T*momsp[0][0]*zfermi32p[2]*etap[0][0][1]*etap[0][1][0] + \
+zfermi32p[1]*(-5*T*momsp[0][1]*etap[0][0][1] + momsp[0][0]*(5*etap[0][1][0] + \
+2*T*etap[0][1][1])))))/(Sqrt(2)*pow(Pi,2)*pow(momsp[0][0],2));\"\>"},
+     {"\<\"taup[1][0][0] = \
+(Sqrt(2)*pow((MNUC*T)/momsp[0][0],2.5)*(-5*zfermi32p[0]*momsp[1][0] + \
+2*momsp[0][0]*zfermi32p[1]*etap[1][0][0]))/(pow(Pi,2)*momsp[0][0]);\"\>"},
+     {"\<\"taup[1][0][1] = \
+(MNUC*pow((MNUC*T)/momsp[0][0],1.5)*(-25*zfermi32p[0]*momsp[1][0] + \
+2*(2*T*momsp[0][0]*zfermi32p[2]*etap[0][0][1]*etap[1][0][0] + \
+zfermi32p[1]*(-5*T*momsp[1][0]*etap[0][0][1] + momsp[0][0]*(5*etap[1][0][0] + \
+2*T*etap[1][0][1])))))/(Sqrt(2)*pow(Pi,2)*pow(momsp[0][0],2));\"\>"},
+     {"\<\"taup[1][1][0] = \
+(pow((MNUC*T)/momsp[0][0],2.5)*(5*zfermi32p[0]*(7*momsp[0][1]*momsp[1][0] - \
+2*momsp[0][0]*momsp[1][1]) + \
+2*momsp[0][0]*(2*momsp[0][0]*zfermi32p[2]*etap[0][1][0]*etap[1][0][0] + \
+zfermi32p[1]*(-5*momsp[1][0]*etap[0][1][0] - 5*momsp[0][1]*etap[1][0][0] + \
+2*momsp[0][0]*etap[1][1][0]))))/(Sqrt(2)*pow(Pi,2)*pow(momsp[0][0],2));\"\>"},\
+
+     {"\<\"taup[1][1][1] = \
+(MNUC*pow((MNUC*T)/momsp[0][0],1.5)*(25*zfermi32p[0]*(7*momsp[0][1]*momsp[1][\
+0] - 2*momsp[0][0]*momsp[1][1]) + \
+4*momsp[0][0]*(2*T*momsp[0][0]*zfermi32p[3]*etap[0][0][1]*etap[0][1][0]*etap[\
+1][0][0] + zfermi32p[2]*(-5*T*momsp[1][0]*etap[0][0][1]*etap[0][1][0] - \
+5*T*momsp[0][1]*etap[0][0][1]*etap[1][0][0] + \
+momsp[0][0]*(etap[0][1][0]*(5*etap[1][0][0] + 2*T*etap[1][0][1]) + \
+2*T*(etap[0][1][1]*etap[1][0][0] + etap[0][0][1]*etap[1][1][0])))) + \
+zfermi32p[1]*(10*momsp[0][1]*(7*T*momsp[1][0]*etap[0][0][1] - \
+momsp[0][0]*(5*etap[1][0][0] + 2*T*etap[1][0][1])) + \
+2*momsp[0][0]*(-10*T*momsp[1][1]*etap[0][0][1] - \
+5*momsp[1][0]*(5*etap[0][1][0] + 2*T*etap[0][1][1]) + \
+2*momsp[0][0]*(5*etap[1][1][0] + \
+2*T*etap[1][1][1])))))/(2.*Sqrt(2)*pow(Pi,2)*pow(momsp[0][0],3));\"\>"}
     },
     GridBoxAlignment->{
      "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
@@ -815,60 +1303,56 @@ mF*nt,3)))/(2.*Sqrt(2)*pow(Pi,2)*Sqrt((MNUC*T)/(1 + mG*nn - mG*np + mF*nt)));\
    Column],
   Function[BoxForm`e$, 
    TableForm[BoxForm`e$]]]], "Output",
- CellChangeTimes->{3.652823294141642*^9, 3.6528233425239973`*^9, 
-  3.652823429027094*^9, 3.652823486132992*^9}],
+ CellChangeTimes->{
+  3.652823294141642*^9, 3.6528233425239973`*^9, 3.652823429027094*^9, 
+   3.652823486132992*^9, 3.653072950424704*^9, {3.6530732509838533`*^9, 
+   3.653073268189508*^9}, 3.653073365281149*^9}],
 
 Cell[BoxData[
  TagBox[
   TagBox[GridBox[{
-     {"\<\"taun[0][0][0] = (2*Sqrt(2)*pow((MNUC*T)/(1 + mG*(-nn + np) + \
-mF*nt),2.5)*zfermi32n[0])/pow(Pi,2);\"\>"},
-     {"\<\"taun[0][0][1] = (Sqrt(2)*pow((MNUC*T)/(1 + mG*(-nn + np) + \
-mF*nt),2.5)*(5*zfermi32n[0] + 2*T*zfermi32n[1]*etan[0][0][1]))/(pow(Pi,2)*T);\
-\"\>"},
-     {"\<\"taun[0][1][0] = -((Sqrt(2)*pow((MNUC*T)/(1 + mG*(-nn + np) + \
-mF*nt),3.5)*(5*(mF + mG)*zfermi32n[0] - 2*(1 + mG*(-nn + np) + \
-mF*nt)*zfermi32n[1]*etan[0][1][0]))/(MNUC*pow(Pi,2)*T));\"\>"},
-     {"\<\"taun[0][1][1] = -((pow(MNUC,2)*T*Sqrt((MNUC*T)/(2 - 2*mG*nn + \
-2*mG*np + 2*mF*nt))*(25*(mF + mG)*zfermi32n[0] - 2*(2*(1 + mG*(-nn + np) + \
-mF*nt)*T*zfermi32n[2]*etan[0][0][1]*etan[0][1][0] + zfermi32n[1]*(-5*(mF + \
-mG)*T*etan[0][0][1] - (-1 + mG*(nn - np) - mF*nt)*(5*etan[0][1][0] + \
-2*T*etan[0][1][1])))))/(pow(1 + mG*(-nn + np) + mF*nt,3)*pow(Pi,2)));\"\>"},
-     {"\<\"taun[1][0][0] = -((Sqrt(2)*pow((MNUC*T)/(1 + mG*(-nn + np) + \
-mF*nt),3.5)*(5*(mF - mG)*zfermi32n[0] - 2*(1 + mG*(-nn + np) + \
-mF*nt)*zfermi32n[1]*etan[1][0][0]))/(MNUC*pow(Pi,2)*T));\"\>"},
-     {"\<\"taun[1][0][1] = -((pow(MNUC,2)*T*Sqrt((MNUC*T)/(2 - 2*mG*nn + \
-2*mG*np + 2*mF*nt))*(25*(mF - mG)*zfermi32n[0] - 2*(2*(1 + mG*(-nn + np) + \
-mF*nt)*T*zfermi32n[2]*etan[0][0][1]*etan[1][0][0] + zfermi32n[1]*(5*(-mF + \
-mG)*T*etan[0][0][1] - (-1 + mG*(nn - np) - mF*nt)*(5*etan[1][0][0] + \
-2*T*etan[1][0][1])))))/(pow(1 + mG*(-nn + np) + mF*nt,3)*pow(Pi,2)));\"\>"},
-     {"\<\"taun[1][1][0] = (pow(MNUC,2)*pow(T,2)*Sqrt((MNUC*T)/(2 - 2*mG*nn + \
-2*mG*np + 2*mF*nt))*(35*(mF - mG)*(mF + mG)*zfermi32n[0] - 10*(mF - mG)*(1 + \
-mG*(-nn + np) + mF*nt)*zfermi32n[1]*etan[0][1][0] - 10*(mF + mG)*(1 + mG*(-nn \
-+ np) + mF*nt)*zfermi32n[1]*etan[1][0][0] + 4*pow(1 + mG*(-nn + np) + \
-mF*nt,2)*zfermi32n[2]*etan[0][1][0]*etan[1][0][0] + 4*pow(1 + mG*(-nn + np) + \
-mF*nt,2)*zfermi32n[1]*etan[1][1][0]))/(pow(1 + mG*(-nn + np) + \
-mF*nt,4)*pow(Pi,2));\"\>"},
-     {"\<\"taun[1][1][1] = (pow(MNUC,3)*pow(T,2)*((175*(mF - mG)*(mF + \
-mG)*zfermi32n[0])/pow(1 + mG*(-nn + np) + mF*nt,5) + (70*(mF - mG)*(mF + \
-mG)*T*zfermi32n[1]*etan[0][0][1])/pow(1 + mG*(-nn + np) + mF*nt,5) - (50*(mF \
-- mG)*zfermi32n[1]*etan[0][1][0])/pow(1 + mG*(-nn + np) + mF*nt,4) - (20*(mF \
-- mG)*T*zfermi32n[2]*etan[0][0][1]*etan[0][1][0])/pow(1 + mG*(-nn + np) + \
-mF*nt,4) - (20*(mF - mG)*T*zfermi32n[1]*etan[0][1][1])/pow(1 + mG*(-nn + np) \
-+ mF*nt,4) - (50*(mF + mG)*zfermi32n[1]*etan[1][0][0])/pow(1 + mG*(-nn + np) \
-+ mF*nt,4) - (20*(mF + mG)*T*zfermi32n[2]*etan[0][0][1]*etan[1][0][0])/pow(1 \
-+ mG*(-nn + np) + mF*nt,4) + \
-(20*zfermi32n[2]*etan[0][1][0]*etan[1][0][0])/pow(1 + mG*(-nn + np) + \
-mF*nt,3) + (8*T*zfermi32n[3]*etan[0][0][1]*etan[0][1][0]*etan[1][0][0])/pow(1 \
-- mG*nn + mG*np + mF*nt,3) + \
-(8*T*zfermi32n[2]*etan[0][1][1]*etan[1][0][0])/pow(1 - mG*nn + mG*np + \
-mF*nt,3) - (20*(mF + mG)*T*zfermi32n[1]*etan[1][0][1])/pow(1 + mG*(-nn + np) \
-+ mF*nt,4) + (8*T*zfermi32n[2]*etan[0][1][0]*etan[1][0][1])/pow(1 - mG*nn + \
-mG*np + mF*nt,3) + (20*zfermi32n[1]*etan[1][1][0])/pow(1 + mG*(-nn + np) + \
-mF*nt,3) + (8*T*zfermi32n[2]*etan[0][0][1]*etan[1][1][0])/pow(1 - mG*nn + \
-mG*np + mF*nt,3) + (8*T*zfermi32n[1]*etan[1][1][1])/pow(1 - mG*nn + mG*np + \
-mF*nt,3)))/(2.*Sqrt(2)*pow(Pi,2)*Sqrt((MNUC*T)/(1 - mG*nn + mG*np + mF*nt)));\
-\"\>"}
+     {"\<\"taun[0][0][0] = \
+(2*Sqrt(2)*pow((MNUC*T)/momsn[0][0],2.5)*zfermi32n[0])/pow(Pi,2);\"\>"},
+     {"\<\"taun[0][0][1] = \
+(Sqrt(2)*pow((MNUC*T)/momsn[0][0],2.5)*(5*zfermi32n[0] + \
+2*T*zfermi32n[1]*etan[0][0][1]))/(pow(Pi,2)*T);\"\>"},
+     {"\<\"taun[0][1][0] = \
+(Sqrt(2)*pow((MNUC*T)/momsn[0][0],2.5)*(-5*zfermi32n[0]*momsn[0][1] + \
+2*momsn[0][0]*zfermi32n[1]*etan[0][1][0]))/(pow(Pi,2)*momsn[0][0]);\"\>"},
+     {"\<\"taun[0][1][1] = \
+(MNUC*pow((MNUC*T)/momsn[0][0],1.5)*(-25*zfermi32n[0]*momsn[0][1] + \
+2*(2*T*momsn[0][0]*zfermi32n[2]*etan[0][0][1]*etan[0][1][0] + \
+zfermi32n[1]*(-5*T*momsn[0][1]*etan[0][0][1] + momsn[0][0]*(5*etan[0][1][0] + \
+2*T*etan[0][1][1])))))/(Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],2));\"\>"},
+     {"\<\"taun[1][0][0] = \
+(Sqrt(2)*pow((MNUC*T)/momsn[0][0],2.5)*(-5*zfermi32n[0]*momsn[1][0] + \
+2*momsn[0][0]*zfermi32n[1]*etan[1][0][0]))/(pow(Pi,2)*momsn[0][0]);\"\>"},
+     {"\<\"taun[1][0][1] = \
+(MNUC*pow((MNUC*T)/momsn[0][0],1.5)*(-25*zfermi32n[0]*momsn[1][0] + \
+2*(2*T*momsn[0][0]*zfermi32n[2]*etan[0][0][1]*etan[1][0][0] + \
+zfermi32n[1]*(-5*T*momsn[1][0]*etan[0][0][1] + momsn[0][0]*(5*etan[1][0][0] + \
+2*T*etan[1][0][1])))))/(Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],2));\"\>"},
+     {"\<\"taun[1][1][0] = \
+(pow((MNUC*T)/momsn[0][0],2.5)*(5*zfermi32n[0]*(7*momsn[0][1]*momsn[1][0] - \
+2*momsn[0][0]*momsn[1][1]) + \
+2*momsn[0][0]*(2*momsn[0][0]*zfermi32n[2]*etan[0][1][0]*etan[1][0][0] + \
+zfermi32n[1]*(-5*momsn[1][0]*etan[0][1][0] - 5*momsn[0][1]*etan[1][0][0] + \
+2*momsn[0][0]*etan[1][1][0]))))/(Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],2));\"\>"},\
+
+     {"\<\"taun[1][1][1] = \
+(MNUC*pow((MNUC*T)/momsn[0][0],1.5)*(25*zfermi32n[0]*(7*momsn[0][1]*momsn[1][\
+0] - 2*momsn[0][0]*momsn[1][1]) + \
+4*momsn[0][0]*(2*T*momsn[0][0]*zfermi32n[3]*etan[0][0][1]*etan[0][1][0]*etan[\
+1][0][0] + zfermi32n[2]*(-5*T*momsn[1][0]*etan[0][0][1]*etan[0][1][0] - \
+5*T*momsn[0][1]*etan[0][0][1]*etan[1][0][0] + \
+momsn[0][0]*(etan[0][1][0]*(5*etan[1][0][0] + 2*T*etan[1][0][1]) + \
+2*T*(etan[0][1][1]*etan[1][0][0] + etan[0][0][1]*etan[1][1][0])))) + \
+zfermi32n[1]*(10*momsn[0][1]*(7*T*momsn[1][0]*etan[0][0][1] - \
+momsn[0][0]*(5*etan[1][0][0] + 2*T*etan[1][0][1])) + \
+2*momsn[0][0]*(-10*T*momsn[1][1]*etan[0][0][1] - \
+5*momsn[1][0]*(5*etan[0][1][0] + 2*T*etan[0][1][1]) + \
+2*momsn[0][0]*(5*etan[1][1][0] + \
+2*T*etan[1][1][1])))))/(2.*Sqrt(2)*pow(Pi,2)*pow(momsn[0][0],3));\"\>"}
     },
     GridBoxAlignment->{
      "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
@@ -883,8 +1367,10 @@ mF*nt,3)))/(2.*Sqrt(2)*pow(Pi,2)*Sqrt((MNUC*T)/(1 - mG*nn + mG*np + mF*nt)));\
    Column],
   Function[BoxForm`e$, 
    TableForm[BoxForm`e$]]]], "Output",
- CellChangeTimes->{3.652823294141642*^9, 3.6528233425239973`*^9, 
-  3.652823429027094*^9, 3.652823486446117*^9}]
+ CellChangeTimes->{
+  3.652823294141642*^9, 3.6528233425239973`*^9, 3.652823429027094*^9, 
+   3.652823486132992*^9, 3.653072950424704*^9, {3.6530732509838533`*^9, 
+   3.653073268189508*^9}, 3.653073365434629*^9}]
 }, Open  ]],
 
 Cell[CellGroupData[{
@@ -901,7 +1387,7 @@ Cell[BoxData[{
       RowBox[{"2", "*", "MNUC", "*", 
        RowBox[{"T", "/", 
         RowBox[{"momsp", "[", 
-         RowBox[{"nn", ",", "np", ",", "T"}], "]"}]}]}], ")"}], "^", 
+         RowBox[{"nn", ",", "np"}], "]"}]}]}], ")"}], "^", 
      RowBox[{"-", 
       RowBox[{"(", 
        RowBox[{"3", "/", "2"}], ")"}]}]}]}]}], ";"}], "\[IndentingNewLine]", 
@@ -916,7 +1402,7 @@ Cell[BoxData[{
       RowBox[{"2", "*", "MNUC", "*", 
        RowBox[{"T", "/", 
         RowBox[{"momsn", "[", 
-         RowBox[{"nn", ",", "np", ",", "T"}], "]"}]}]}], ")"}], "^", 
+         RowBox[{"nn", ",", "np"}], "]"}]}]}], ")"}], "^", 
      RowBox[{"-", 
       RowBox[{"(", 
        RowBox[{"3", "/", "2"}], ")"}]}]}]}]}], ";"}], "\[IndentingNewLine]", 
@@ -942,58 +1428,48 @@ Cell[BoxData[{
   RowBox[{"etan", ",", "\"\<etan\>\""}], "]"}]}], "Input",
  CellChangeTimes->{{3.652823152568961*^9, 3.652823155081111*^9}, {
   3.652823185275095*^9, 3.652823187602347*^9}, {3.652823224089114*^9, 
-  3.6528232690076*^9}, {3.652823389914844*^9, 3.652823391217546*^9}}],
+  3.6528232690076*^9}, {3.652823389914844*^9, 3.652823391217546*^9}, {
+  3.6530734795463123`*^9, 3.6530734813322163`*^9}}],
 
 Cell[BoxData[
  TagBox[
   TagBox[GridBox[{
      {"\<\"etap[0][0][0] = ifermi12p[0];\"\>"},
-     {"\<\"etap[0][0][1] = (-3*MNUC*np*pow(Pi,2)*ifermi12p[1])/(2.*Sqrt(2)*(1 \
-+ mG*(nn - np) + mF*nt)*pow((MNUC*T)/(1 + mG*nn - mG*np + \
-mF*nt),2.5));\"\>"},
-     {"\<\"etap[0][1][0] = ((2 + 2*mG*nn + 3*mF*np - 5*mG*np + \
-2*mF*nt)*pow(Pi,2)*ifermi12p[1])/(2.*Sqrt(2)*MNUC*T*Sqrt((MNUC*T)/(1 + mG*nn \
-- mG*np + mF*nt)));\"\>"},
-     {"\<\"etap[0][1][1] = (3*pow(Pi,2)*(-((pow(MNUC,2)*(2 + 2*mG*nn + \
-3*mF*np - 5*mG*np + 2*mF*nt)*pow(T,2)*ifermi12p[1])/Sqrt((MNUC*T)/(2 + \
-2*mG*nn - 2*mG*np + 2*mF*nt))) + np*(-2 - 2*mG*nn - 3*mF*np + 5*mG*np - \
-2*mF*nt)*pow(1 + mG*(nn - np) + \
-mF*nt,2)*pow(Pi,2)*ifermi12p[2]))/(8.*pow(MNUC,3)*pow(T,4));\"\>"},
-     {"\<\"etap[1][0][0] = (3*(mF + \
-mG)*np*pow(Pi,2)*ifermi12p[1])/(2.*Sqrt(2)*MNUC*T*Sqrt((MNUC*T)/(1 + mG*nn - \
-mG*np + mF*nt)));\"\>"},
-     {"\<\"etap[1][0][1] = (3*(mF + \
-mG)*np*pow(Pi,2)*((-5*Sqrt(2)*pow(MNUC,5)*T*ifermi12p[1])/pow((MNUC*T)/(1 + \
-mG*nn - mG*np + mF*nt),3.5) + (2*Sqrt(2)*pow(MNUC,4)*(1 + mG*(nn - np) + \
-mF*nt)*ifermi12p[1])/pow((MNUC*T)/(1 + mG*nn - mG*np + mF*nt),2.5) - \
-(3*np*pow(1 + mG*nn - mG*np + \
-mF*nt,5)*pow(Pi,2)*ifermi12p[2])/pow(T,4)))/(8.*pow(MNUC,3)*pow(1 + mG*(nn - \
-np) + mF*nt,3));\"\>"},
-     {"\<\"etap[1][1][0] = (3*(mF + mG)*pow(MNUC,2)*pow(Pi,2)*pow(T,2)*((mF - \
-mG)*np*ifermi12p[1] + 2*(1 + mG*(nn - np) + mF*nt)*ifermi12p[1] + (np*(-2 - \
-2*mG*nn - 3*mF*np + 5*mG*np - 2*mF*nt)*(-1 + mG*(-nn + np) - \
-mF*nt)*pow(Pi,2)*ifermi12p[2])/(Sqrt(2)*MNUC*T*Sqrt((MNUC*T)/(1 + mG*nn - \
-mG*np + mF*nt)))))/(4.*Sqrt(2)*pow(1 + mG*(nn - np) + \
-mF*nt,4)*pow((MNUC*T)/(1 + mG*nn - mG*np + mF*nt),3.5));\"\>"},
-     {"\<\"etap[1][1][1] = (3*(mF + mG)*pow(Pi,2)*((-35*Sqrt(2)*(mF - \
-mG)*pow(MNUC,6)*np*pow(T,2)*ifermi12p[1])/pow((MNUC*T)/(1 + mG*nn - mG*np + \
-mF*nt),4.5) + (40*Sqrt(2)*(mF - mG)*pow(MNUC,5)*np*(1 + mG*(nn - np) + \
-mF*nt)*T*ifermi12p[1])/pow((MNUC*T)/(1 + mG*nn - mG*np + mF*nt),3.5) - \
-(10*Sqrt(2)*pow(MNUC,5)*pow(1 + mG*(nn - np) + \
-mF*nt,2)*T*ifermi12p[1])/pow((MNUC*T)/(1 + mG*nn - mG*np + mF*nt),3.5) - \
-(8*Sqrt(2)*(mF - mG)*pow(MNUC,4)*np*pow(1 + mG*(nn - np) + \
-mF*nt,2)*ifermi12p[1])/pow((MNUC*T)/(1 + mG*nn - mG*np + mF*nt),2.5) + \
-(4*Sqrt(2)*pow(MNUC,4)*pow(1 + mG*(nn - np) + \
-mF*nt,3)*ifermi12p[1])/pow((MNUC*T)/(1 + mG*nn - mG*np + mF*nt),2.5) - (3*(mF \
-- mG)*pow(np,2)*pow(1 + mG*(nn - np) + \
-mF*nt,6)*pow(Pi,2)*ifermi12p[2])/pow(T,4) + (6*np*(-2 - 2*mG*nn - 3*mF*np + \
-5*mG*np - 2*mF*nt)*pow(1 + mG*(nn - np) + \
-mF*nt,6)*pow(Pi,2)*ifermi12p[2])/pow(T,4) - (6*np*pow(1 + mG*(nn - np) + \
-mF*nt,7)*pow(Pi,2)*ifermi12p[2])/pow(T,4) + (3*pow(np,2)*(-2 - 2*mG*nn - \
-3*mF*np + 5*mG*np - 2*mF*nt)*pow(1 + mG*(nn - np) + \
-mF*nt,7)*pow(Pi,4)*ifermi12p[3])/(Sqrt(2)*MNUC*pow(T,5)*Sqrt((MNUC*T)/(1 + \
-mG*nn - mG*np + mF*nt)))))/(16.*pow(MNUC,3)*pow(1 + mG*(nn - np) + mF*nt,5));\
-\"\>"}
+     {"\<\"etap[0][0][1] = \
+(-3*np*pow(Pi,2)*ifermi12p[1])/(2.*Sqrt(2)*T*pow((MNUC*T)/momsp[0][0],1.5));\"\
+\>"},
+     {"\<\"etap[0][1][0] = (pow(Pi,2)*ifermi12p[1]*(2*momsp[0][0] + \
+3*np*momsp[0][1]))/(2.*Sqrt(2)*pow((MNUC*T)/momsp[0][0],1.5)*momsp[0][0]);\"\>\
+"},
+     {"\<\"etap[0][1][1] = \
+(-3*pow(Pi,2)*momsp[0][0]*(2*MNUC*T*Sqrt((MNUC*T)/momsp[0][0])*ifermi12p[1] + \
+Sqrt(2)*np*pow(Pi,2)*momsp[0][0]*ifermi12p[2])*(2*momsp[0][0] + \
+3*np*momsp[0][1]))/(8.*Sqrt(2)*pow(MNUC,3)*pow(T,4));\"\>"},
+     {"\<\"etap[1][0][0] = \
+(3*np*pow(Pi,2)*ifermi12p[1]*momsp[1][0])/(2.*Sqrt(2)*pow((MNUC*T)/momsp[0][0]\
+,1.5)*momsp[0][0]);\"\>"},
+     {"\<\"etap[1][0][1] = \
+(-9*np*pow(Pi,2)*(Sqrt(2)*pow(MNUC,2)*pow(T,2)*ifermi12p[1] + \
+np*pow(Pi,2)*Sqrt((MNUC*T)/momsp[0][0])*pow(momsp[0][0],2)*ifermi12p[2])*\
+momsp[1][0])/(8.*pow(MNUC,3)*pow(T,4)*Sqrt((MNUC*T)/momsp[0][0]));\"\>"},
+     {"\<\"etap[1][1][0] = \
+(3*pow(Pi,2)*(2*np*pow(Pi,2)*pow(momsp[0][0],2)*ifermi12p[2]*momsp[1][0] + \
+Sqrt(2)*MNUC*np*T*Sqrt((MNUC*T)/momsp[0][0])*ifermi12p[1]*momsp[0][1]*momsp[1]\
+[0] + momsp[0][0]*(3*pow(np,2)*pow(Pi,2)*ifermi12p[2]*momsp[0][1]*momsp[1][0] \
++ 2*Sqrt(2)*MNUC*T*Sqrt((MNUC*T)/momsp[0][0])*ifermi12p[1]*(momsp[1][0] + \
+np*momsp[1][1]))))/(8.*pow(MNUC,3)*pow(T,3));\"\>"},
+     {"\<\"etap[1][1][1] = \
+(-9*pow(Pi,2)*Sqrt((MNUC*T)/momsp[0][0])*(2*Sqrt(2)*pow(np,2)*pow(Pi,4)*pow(\
+momsp[0][0],4)*ifermi12p[3]*momsp[1][0] + \
+2*Sqrt(2)*pow(MNUC,3)*np*pow(T,3)*ifermi12p[1]*momsp[0][1]*momsp[1][0] + \
+14*pow(np,2)*pow(Pi,2)*pow((MNUC*T)/momsp[0][0],1.5)*pow(momsp[0][0],3)*\
+ifermi12p[2]*momsp[0][1]*momsp[1][0] + \
+4*Sqrt(2)*pow(MNUC,3)*pow(T,3)*momsp[0][0]*ifermi12p[1]*(momsp[1][0] + \
+np*momsp[1][1]) + \
+np*pow(Pi,2)*pow(momsp[0][0],3)*(3*Sqrt(2)*pow(np,2)*pow(Pi,2)*ifermi12p[3]*\
+momsp[0][1]*momsp[1][0] + \
+4*MNUC*T*Sqrt((MNUC*T)/momsp[0][0])*ifermi12p[2]*(3*momsp[1][0] + \
+np*momsp[1][1]))))/(32.*pow(MNUC,5)*pow(T,6));\"\>"}
     },
     GridBoxAlignment->{
      "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
@@ -1009,44 +1485,48 @@ mG*nn - mG*np + mF*nt)))))/(16.*pow(MNUC,3)*pow(1 + mG*(nn - np) + mF*nt,5));\
   Function[BoxForm`e$, 
    TableForm[BoxForm`e$]]]], "Output",
  CellChangeTimes->{{3.65282317080484*^9, 3.652823199318317*^9}, 
-   3.652823236281258*^9, 3.6528233671840887`*^9, 3.6528235105468493`*^9}],
+   3.652823236281258*^9, 3.6528233671840887`*^9, 3.6528235105468493`*^9, 
+   3.65307297449863*^9, 3.653073393774036*^9, 3.653073485085668*^9}],
 
 Cell[BoxData[
  TagBox[
   TagBox[GridBox[{
      {"\<\"etan[0][0][0] = ifermi12n[0];\"\>"},
      {"\<\"etan[0][0][1] = \
-(-3*nn*pow(Pi,2)*ifermi12n[1])/(2.*Sqrt(2)*T*pow((MNUC*T)/(1 + mG*(-nn + np) \
-+ mF*nt),1.5));\"\>"},
-     {"\<\"etan[0][1][0] = (3*(mF + \
-mG)*nn*pow(Pi,2)*ifermi12n[1])/(2.*Sqrt(2)*MNUC*T*Sqrt((MNUC*T)/(1 + mG*(-nn \
-+ np) + mF*nt)));\"\>"},
-     {"\<\"etan[0][1][1] = (3*(mF + \
-mG)*nn*pow(Pi,2)*((-3*Sqrt(2)*pow(MNUC,5)*T*ifermi12n[1])/pow((MNUC*T)/(1 + \
-mG*(-nn + np) + mF*nt),3.5) - (3*nn*pow(1 + mG*(-nn + np) + \
-mF*nt,5)*pow(Pi,2)*ifermi12n[2])/pow(T,4)))/(8.*pow(MNUC,3)*pow(1 + mG*(-nn + \
-np) + mF*nt,3));\"\>"},
-     {"\<\"etan[1][0][0] = ((2 + 3*mF*nn - 5*mG*nn + 2*mG*np + \
-2*mF*nt)*pow(Pi,2)*ifermi12n[1])/(2.*Sqrt(2)*MNUC*T*Sqrt((MNUC*T)/(1 + \
-mG*(-nn + np) + mF*nt)));\"\>"},
-     {"\<\"etan[1][0][1] = (3*(2 + 3*mF*nn - 5*mG*nn + 2*mG*np + \
-2*mF*nt)*pow(Pi,2)*(-((pow(MNUC,2)*pow(T,2)*ifermi12n[1])/Sqrt((MNUC*T)/(2 - \
-2*mG*nn + 2*mG*np + 2*mF*nt))) - nn*pow(1 + mG*(-nn + np) + \
-mF*nt,2)*pow(Pi,2)*ifermi12n[2]))/(8.*pow(MNUC,3)*pow(T,4));\"\>"},
-     {"\<\"etan[1][1][0] = (3*(mF + mG)*pow(Pi,2)*(-((pow(MNUC,2)*(2 - \
-3*mG*nn + 2*mG*np + mF*(nn + 2*nt))*pow(T,2)*ifermi12n[1])/((-1 + mG*(nn - \
-np) - mF*nt)*Sqrt((MNUC*T)/(2 - 2*mG*nn + 2*mG*np + 2*mF*nt)))) + nn*(1 + \
-mG*(-nn + np) + mF*nt)*(2 + 3*mF*nn - 5*mG*nn + 2*mG*np + \
-2*mF*nt)*pow(Pi,2)*ifermi12n[2]))/(8.*pow(MNUC,3)*pow(T,3));\"\>"},
-     {"\<\"etan[1][1][1] = (9*(mF + mG)*pow(Pi,2)*((2*pow(MNUC,2)*(2 - \
-3*mG*nn + 2*mG*np + mF*(nn + 2*nt))*pow(T,2)*ifermi12n[1])/((-1 + mG*(nn - \
-np) - mF*nt)*Sqrt((MNUC*T)/(2 - 2*mG*nn + 2*mG*np + 2*mF*nt))) - 4*nn*(1 + \
-mG*(-nn + np) + mF*nt)*(2 + 3*mF*nn - 5*mG*nn + 2*mG*np + \
-2*mF*nt)*pow(Pi,2)*ifermi12n[2] - 2*nn*(1 + mG*(-nn + np) + mF*nt)*(2 - \
-3*mG*nn + 2*mG*np + mF*(nn + 2*nt))*pow(Pi,2)*ifermi12n[2] - \
-(Sqrt(2)*MNUC*pow(nn,2)*(2 + 3*mF*nn - 5*mG*nn + 2*mG*np + \
-2*mF*nt)*pow(Pi,4)*T*ifermi12n[3])/pow((MNUC*T)/(1 + mG*(-nn + np) + \
-mF*nt),2.5)))/(32.*pow(MNUC,3)*pow(T,4));\"\>"}
+(-3*nn*pow(Pi,2)*ifermi12n[1])/(2.*Sqrt(2)*T*pow((MNUC*T)/momsn[0][0],1.5));\"\
+\>"},
+     {"\<\"etan[0][1][0] = \
+(3*nn*pow(Pi,2)*ifermi12n[1]*momsn[0][1])/(2.*Sqrt(2)*pow((MNUC*T)/momsn[0][0]\
+,1.5)*momsn[0][0]);\"\>"},
+     {"\<\"etan[0][1][1] = \
+(-9*nn*pow(Pi,2)*(Sqrt(2)*pow(MNUC,2)*pow(T,2)*ifermi12n[1] + \
+nn*pow(Pi,2)*Sqrt((MNUC*T)/momsn[0][0])*pow(momsn[0][0],2)*ifermi12n[2])*\
+momsn[0][1])/(8.*pow(MNUC,3)*pow(T,4)*Sqrt((MNUC*T)/momsn[0][0]));\"\>"},
+     {"\<\"etan[1][0][0] = (pow(Pi,2)*ifermi12n[1]*(2*momsn[0][0] + \
+3*nn*momsn[1][0]))/(2.*Sqrt(2)*pow((MNUC*T)/momsn[0][0],1.5)*momsn[0][0]);\"\>\
+"},
+     {"\<\"etan[1][0][1] = \
+(-3*pow(Pi,2)*momsn[0][0]*(2*MNUC*T*Sqrt((MNUC*T)/momsn[0][0])*ifermi12n[1] + \
+Sqrt(2)*nn*pow(Pi,2)*momsn[0][0]*ifermi12n[2])*(2*momsn[0][0] + \
+3*nn*momsn[1][0]))/(8.*Sqrt(2)*pow(MNUC,3)*pow(T,4));\"\>"},
+     {"\<\"etan[1][1][0] = \
+(3*pow(Pi,2)*(2*nn*pow(Pi,2)*pow(momsn[0][0],2)*ifermi12n[2]*momsn[0][1] + \
+Sqrt(2)*MNUC*nn*T*Sqrt((MNUC*T)/momsn[0][0])*ifermi12n[1]*momsn[0][1]*momsn[1]\
+[0] + momsn[0][0]*(3*pow(nn,2)*pow(Pi,2)*ifermi12n[2]*momsn[0][1]*momsn[1][0] \
++ 2*Sqrt(2)*MNUC*T*Sqrt((MNUC*T)/momsn[0][0])*ifermi12n[1]*(momsn[0][1] + \
+nn*momsn[1][1]))))/(8.*pow(MNUC,3)*pow(T,3));\"\>"},
+     {"\<\"etan[1][1][1] = \
+(-9*pow(Pi,2)*Sqrt((MNUC*T)/momsn[0][0])*(2*Sqrt(2)*pow(nn,2)*pow(Pi,4)*pow(\
+momsn[0][0],4)*ifermi12n[3]*momsn[0][1] + \
+2*Sqrt(2)*pow(MNUC,3)*nn*pow(T,3)*ifermi12n[1]*momsn[0][1]*momsn[1][0] + \
+14*pow(nn,2)*pow(Pi,2)*pow((MNUC*T)/momsn[0][0],1.5)*pow(momsn[0][0],3)*\
+ifermi12n[2]*momsn[0][1]*momsn[1][0] + \
+4*Sqrt(2)*pow(MNUC,3)*pow(T,3)*momsn[0][0]*ifermi12n[1]*(momsn[0][1] + \
+nn*momsn[1][1]) + \
+nn*pow(Pi,2)*pow(momsn[0][0],3)*(3*Sqrt(2)*pow(nn,2)*pow(Pi,2)*ifermi12n[3]*\
+momsn[0][1]*momsn[1][0] + \
+4*MNUC*T*Sqrt((MNUC*T)/momsn[0][0])*ifermi12n[2]*(3*momsn[0][1] + \
+nn*momsn[1][1]))))/(32.*pow(MNUC,5)*pow(T,6));\"\>"}
     },
     GridBoxAlignment->{
      "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
@@ -1062,13 +1542,101 @@ mF*nt),2.5)))/(32.*pow(MNUC,3)*pow(T,4));\"\>"}
   Function[BoxForm`e$, 
    TableForm[BoxForm`e$]]]], "Output",
  CellChangeTimes->{{3.65282317080484*^9, 3.652823199318317*^9}, 
-   3.652823236281258*^9, 3.6528233671840887`*^9, 3.652823514673759*^9}]
+   3.652823236281258*^9, 3.6528233671840887`*^9, 3.6528235105468493`*^9, 
+   3.65307297449863*^9, 3.653073393774036*^9, 3.65307348553272*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"momsp", "[", 
+    RowBox[{"nn_", ",", "np_", ",", "T_"}], "]"}], ":=", 
+   RowBox[{"1", "+", 
+    RowBox[{"mF", "*", 
+     RowBox[{"(", 
+      RowBox[{"nn", "+", "np"}], ")"}]}], "+", 
+    RowBox[{"mG", "*", 
+     RowBox[{"(", 
+      RowBox[{"nn", "-", "np"}], ")"}]}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"momsn", "[", 
+    RowBox[{"nn_", ",", "np_", ",", "T_"}], "]"}], ":=", 
+   RowBox[{"1", "+", 
+    RowBox[{"mF", "*", 
+     RowBox[{"(", 
+      RowBox[{"nn", "+", "np"}], ")"}]}], "-", 
+    RowBox[{"mG", "*", 
+     RowBox[{"(", 
+      RowBox[{"nn", "-", "np"}], ")"}]}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{"MakeTable", "[", 
+  RowBox[{"momsp", ",", "\"\<momsp\>\""}], "]"}], "\[IndentingNewLine]", 
+ RowBox[{"MakeTable", "[", 
+  RowBox[{"momsn", ",", "\"\<momsn\>\""}], "]"}]}], "Input",
+ CellChangeTimes->{{3.653073112257594*^9, 3.653073135727498*^9}, {
+  3.6530739257352962`*^9, 3.653073928615005*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  TagBox[GridBox[{
+     {"\<\"momsp[0][0][0] = 1 + mG*(nn - np) + mF*nt;\"\>"},
+     {"\<\"momsp[0][0][1] = 0;\"\>"},
+     {"\<\"momsp[0][1][0] = mF - mG;\"\>"},
+     {"\<\"momsp[0][1][1] = 0;\"\>"},
+     {"\<\"momsp[1][0][0] = mF + mG;\"\>"},
+     {"\<\"momsp[1][0][1] = 0;\"\>"},
+     {"\<\"momsp[1][1][0] = 0;\"\>"},
+     {"\<\"momsp[1][1][1] = 0;\"\>"}
+    },
+    GridBoxAlignment->{
+     "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+      "RowsIndexed" -> {}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.5599999999999999]}, 
+        Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}, "RowsIndexed" -> {}}],
+   Column],
+  Function[BoxForm`e$, 
+   TableForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{{3.6530738946112556`*^9, 3.653073929746275*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  TagBox[GridBox[{
+     {"\<\"momsn[0][0][0] = 1 + mG*(-nn + np) + mF*nt;\"\>"},
+     {"\<\"momsn[0][0][1] = 0;\"\>"},
+     {"\<\"momsn[0][1][0] = mF + mG;\"\>"},
+     {"\<\"momsn[0][1][1] = 0;\"\>"},
+     {"\<\"momsn[1][0][0] = mF - mG;\"\>"},
+     {"\<\"momsn[1][0][1] = 0;\"\>"},
+     {"\<\"momsn[1][1][0] = 0;\"\>"},
+     {"\<\"momsn[1][1][1] = 0;\"\>"}
+    },
+    GridBoxAlignment->{
+     "Columns" -> {{Left}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+      "RowsIndexed" -> {}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.5599999999999999]}, 
+        Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}, "RowsIndexed" -> {}}],
+   Column],
+  Function[BoxForm`e$, 
+   TableForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{{3.6530738946112556`*^9, 3.653073929754387*^9}}]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
 },
-WindowSize->{636, 751},
-WindowMargins->{{Automatic, 0}, {Automatic, -1}},
+WindowSize->{1280, 751},
+WindowMargins->{{0, Automatic}, {Automatic, -1}},
 FrontEndVersion->"10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (December 4, \
 2014)",
 StyleDefinitions->"Default.nb"
@@ -1085,35 +1653,41 @@ CellTagsIndex->{}
 (*NotebookFileOutline
 Notebook[{
 Cell[CellGroupData[{
-Cell[580, 22, 177, 4, 99, "Section"],
+Cell[580, 22, 177, 4, 64, "Section"],
 Cell[CellGroupData[{
 Cell[782, 30, 228, 3, 44, "Subsection"],
 Cell[1013, 35, 145, 2, 28, "Input"],
-Cell[1161, 39, 6603, 156, 642, "Input"]
-}, Closed]],
+Cell[1161, 39, 7536, 181, 336, "Input"]
+}, Open  ]],
 Cell[CellGroupData[{
-Cell[7801, 200, 309, 4, 36, "Subsection"],
-Cell[8113, 206, 6546, 207, 369, "Input"],
-Cell[14662, 415, 335, 6, 68, "Text"],
+Cell[8734, 225, 309, 4, 44, "Subsection"],
+Cell[9046, 231, 7354, 216, 182, "Input"],
+Cell[16403, 449, 335, 6, 30, "Text"],
 Cell[CellGroupData[{
-Cell[15022, 425, 2277, 35, 114, "Input"],
-Cell[17302, 462, 2245, 45, 168, "Output"],
-Cell[19550, 509, 2245, 45, 168, "Output"],
-Cell[21798, 556, 2974, 55, 168, "Output"],
-Cell[24775, 613, 3158, 57, 168, "Output"]
+Cell[16763, 459, 2423, 38, 131, "Input"],
+Cell[19189, 499, 7095, 121, 176, "Output"],
+Cell[26287, 622, 7106, 121, 176, "Output"],
+Cell[33396, 745, 4709, 85, 176, "Output"],
+Cell[38108, 832, 9742, 166, 176, "Output"],
+Cell[47853, 1000, 9742, 166, 176, "Output"]
 }, Open  ]]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[27982, 676, 329, 4, 44, "Subsection"],
+Cell[57644, 1172, 329, 4, 44, "Subsection"],
 Cell[CellGroupData[{
-Cell[28336, 684, 2760, 64, 165, "Input"],
-Cell[31099, 750, 4049, 68, 168, "Output"],
-Cell[35151, 820, 3949, 66, 168, "Output"]
+Cell[57998, 1180, 2786, 64, 97, "Input"],
+Cell[60787, 1246, 3159, 62, 176, "Output"],
+Cell[63949, 1310, 3159, 62, 176, "Output"]
 }, Open  ]],
 Cell[CellGroupData[{
-Cell[39137, 891, 1899, 53, 148, "Input"],
-Cell[41039, 946, 3544, 65, 168, "Output"],
-Cell[44586, 1013, 2680, 51, 202, "Output"]
+Cell[67145, 1377, 1932, 54, 114, "Input"],
+Cell[69080, 1433, 2730, 55, 176, "Output"],
+Cell[71813, 1490, 2729, 55, 176, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[74579, 1550, 998, 28, 80, "Input"],
+Cell[75580, 1580, 941, 25, 168, "Output"],
+Cell[76524, 1607, 942, 25, 202, "Output"]
 }, Open  ]]
 }, Open  ]]
 }, Open  ]]
