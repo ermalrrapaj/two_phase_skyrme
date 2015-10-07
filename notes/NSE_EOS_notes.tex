@@ -342,7 +342,12 @@ voids.  Derivatives of this are also required
 \todo{Write up what you are doing} 
 \subsection{Gibbs Phase Equilibrium Solver}
 \subsection{NSE Solver}
-The NSE solver and equation of state are found in the file \texttt{src/EquationsOfState/EOSNSE.hpp} 
+The NSE solver and equation of state are found in the file \texttt{src/EquationsOfState/EOSNSE.hpp}.  As was shown above, standard NSE, excluded volume NSE, and our model free energy share a very similar form.  Therefore, a generic NSE solver with excluded volume corrections has been implemented.  It takes a vector of nuclear species that all inherit from the class \texttt{NucleusBase}.  For a given exterior state, these nuclei can return their binding energy, their internal partition function \todo{implement the partition function for generality}, and their volume.  This implies that the NSE solver should be agnostic about what type of nuclei are being passed to it.  Often, it is hard to find a solution to the NSE equations when the composition is dominated by nuclei.  To increase the range over which the solver converges, we use a trick where we turn on the binding energies and volumes of the nuclei as if they were a perturbation.  The number densities then are given by 
+\begin{equation*}
+n_{i} = A_i^{3/2} G_i(T) n_Q \exp\left(\left[Z_i (\mu_p - m_p) + N_i (\mu_n - m_n) 
+- \lambda_B B_i - \lambda_v v_i P_o \right]/T\right).
+\end{equation*}
+A solution can easily be found when the $\lambda$s are zero, and then they can be slowly increased to find a solution to our actual system of equations.   There also seem to be problems when the neutrons and protons are assumed to be an interacting gas.  This results in the chemical potentials decreasing with increasing density and prevents a solution from being found.  Currently, it is unclear to me why this is the case. \todo{Understand why this is the case.}
 
 \begin{figure}[t]
 \centering
