@@ -215,12 +215,12 @@ The constraint equations for our model free energy bear a strong resemblance
 to the excluded volume NSE equations (by construction).  This can be seen by recasting 
 equation \ref{eq:dFdN} to 
 \begin{equation*}
-n_i = A_i^{3/2} n_Q \exp(Z_i \mu_{p,o} + N_i \mu_{n,o} - \tilde B_i - v_i P_o),
+n_i = A_i^{3/2} n_Q \exp(Z_i (\mu_{p,o} - m_p) + N_i (\mu_{n,o} - m_n) + \tilde B_i - v_i P_o),
 \end{equation*}
 where 
 \begin{equation*}
 \tilde B_i(v_i, n_{p,o}, n_{n,o}, T) = 
--v_i f_{B,i} - F_{FS,i} - E_{0,i}.
+ Z_i m_p + N_i m_n - v_i f_{B,i} - F_{FS,i} - E_{0,i}.
 \end{equation*}
 We can also see that equation \ref{eq:dFdv} is independent of $\mathcal{N}_i$ 
 when $n_i$ is non-zero.  This allows us to express the nuclear volume as a 
