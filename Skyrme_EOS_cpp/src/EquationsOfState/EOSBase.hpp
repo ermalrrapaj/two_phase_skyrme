@@ -16,12 +16,24 @@
 #include "EquationsOfState/EOSData.hpp" 
 #include "Util/OneDimensionalRoot.hpp"
 
+///
+/// EOS error class 
+/// 
+class EOSException : public std::runtime_error {
+public: 
+  EOSException(std::string message) : 
+    std::runtime_error(message) {}
+protected: 
+};
+
+///
 /// Abstract base class for equations of state -
 /// Provides a number of virtual functions for finding the state of the material
 /// given the temperature and various combinations of the chemical potentials
 /// and densities of neutrons and protons.
 /// Additionally, any inheriting class is forced to include a method for 
 /// creating copies via a unique pointer to simplify polymorphism.
+///
 class EOSBase {
 public:
   /// Get the state of the material from the temperature and the neutron and 
