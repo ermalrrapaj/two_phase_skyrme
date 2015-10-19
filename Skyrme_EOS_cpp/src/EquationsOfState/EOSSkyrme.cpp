@@ -34,30 +34,59 @@ EOSSkyrme::EOSSkyrme() :
     mD(0.0), 
     mF(0.0), 
     mG(0.0),
-    mDelta(2.002) {}
+    mDelta(2.002),
+    mNmin(1.e-220) {}
 
 std::vector<EOSData> EOSSkyrme::FromMuAndT(const EOSData& eosIn) const {
   
-  MultiDimensionalRoot rootFinder(1.e-10);
+  MultiDimensionalRoot rootFinder(1.e-10, 150);
+  OneDimensionalRoot rootFinder1D(1.e-12, 150);
   auto root_func = [&eosIn, this] (std::vector<double> logN) -> 
       std::vector<double> { 
     EOSData out = BaseEOSCall<false>(eosIn.T(), exp(logN[0]), exp(logN[1]));
-    return {(out.Mun() - eosIn.Mun())/(eosIn.Mun() + 1.e-7), 
-            (out.Mup() - eosIn.Mup())/(eosIn.Mup() + 1.e-7)};
+    return {(out.Mun() - eosIn.Mun())/(eosIn.Mun() + 1.e-25), 
+            (out.Mup() - eosIn.Mup())/(eosIn.Mup() + 1.e-25)};
   };
    
   std::vector<EOSData> eosOut; 
    
-  // Look for a low density solution first   
+  // Carefully look for a low density solution first   
   try {
-    std::vector<double> logN = rootFinder(root_func, {1.e-8, 1.e-8}, 2); 
-    EOSData low = BaseEOSCall<true>(eosIn.T(), exp(logN[0]), exp(logN[1]));
-    eosOut.push_back(low);
+    // At low density neutrons and protons shouldn't really care about each other
+    double lnng = rootFinder1D( [&eosIn, this](double logNn) {
+      return BaseEOSCall<false>(eosIn.T(), exp(logNn), mNmin).
+          Mun()/(eosIn.Mun() + 1.e-25) - 1.0; }, log(mNmin),  log(1.e-3)); 
+    double lnpg = rootFinder1D( [&eosIn, this](double logNp) {
+      return BaseEOSCall<false>(eosIn.T(), mNmin, exp(logNp)).
+          Mup()/(eosIn.Mup() + 1.e-25) - 1.0;}, log(mNmin),  log(1.e-3)); 
+    
+    if (lnng <= log(1.01*mNmin) && lnpg <= log(1.01*mNmin)) {
+      throw EOSException("All densities are too low"); 
+    }
+    else if (lnng <= log(1.01*mNmin)) {
+      //std::cerr << "Neutron density too low, returning with good proton density.\n";
+      eosOut.push_back(BaseEOSCall<true>(eosIn.T(), mNmin, exp(lnpg)));
+    }
+    else if (lnpg <= log(1.01*mNmin)) { 
+      //std::cerr << "Proton density too low, returning with good neutron density.\n";
+      eosOut.push_back(BaseEOSCall<true>(eosIn.T(), lnng, exp(mNmin)));
+    } else {
+      std::vector<double> logN = rootFinder(root_func, {lnng, lnpg}, 2); 
+      eosOut.push_back(BaseEOSCall<true>(eosIn.T(), exp(logN[0]), exp(logN[1])));
+    }
+    
+    //std::cout << exp(lnng) << " " << exp(lnpg) << " "; 
+    //std::cout << eosIn.Mun() << " " << eosIn.Mup() << " " 
+    //    << BaseEOSCall<false>(eosIn.T(), mNmin, mNmin).Mun() << " " 
+    //    << BaseEOSCall<false>(eosIn.T(), mNmin, mNmin).Mup() << " " 
+    //    << BaseEOSCall<false>(eosIn.T(), exp(lnng), mNmin).Mun() << " " 
+    //    << BaseEOSCall<false>(eosIn.T(), mNmin, exp(lnpg)).Mup() << std::endl;
+     
   } catch(...) {}
   
   // Look for a high density solution second
   try {
-    std::vector<double> logN = rootFinder(root_func, {1.e1, 1.e1}, 2); 
+    std::vector<double> logN = rootFinder(root_func, {log(1.e1), log(1.e1)}, 2); 
     EOSData hi = BaseEOSCall<true>(eosIn.T(), exp(logN[0]), exp(logN[1]));
     eosOut.push_back(hi);
   } catch(...) {}
@@ -72,7 +101,7 @@ EOSData EOSSkyrme::FromNpMunAndT(const EOSData& eosIn) const {
   }; 
   
   OneDimensionalRoot rootFinder(1.e-12);
-  double nn_lo = log(1.e-120);
+  double nn_lo = log(mNmin);
   double nn_hi = log(0.95/(fabs(mF + mG) + 1.e-5));
   double logNn = rootFinder(root_func, nn_lo, nn_hi);
   
@@ -87,7 +116,7 @@ EOSData EOSSkyrme::FromNnMupAndT(const EOSData& eosIn) const {
   }; 
   
   OneDimensionalRoot rootFinder(1.e-12);
-  double nn_lo = log(1.e-120);
+  double nn_lo = log(mNmin);
   double nn_hi = log(0.95/(fabs(mF + mG) + 1.e-5));
   double logNp = rootFinder(root_func, nn_lo, nn_hi);
   
@@ -150,12 +179,17 @@ EOSSkyrme EOSSkyrme::FromSaturation(const std::array<const double, 7>& param){
 } 
 
 template <bool first_deriv> 
-EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn, 
-    const double np) const {
-    
+EOSData EOSSkyrme::BaseEOSCall(const double T, const double nnin, 
+    const double npin) const {
+
+  //const double np = std::max(npin, mNmin); 
+  //const double nn = std::max(nnin, mNmin); 
+  const double np = npin; 
+  const double nn = nnin; 
+   
   EOSData eosOut = EOSData::InputFromTNnNp(T, nn, np);
   const double nt = nn + np; 
-  const double xp = np/(nt+1.e-40);
+  const double xp = np/(nt + 1.e-5*mNmin);
  
   /* ******************************************************************* */
   
@@ -208,102 +242,102 @@ EOSData EOSSkyrme::BaseEOSCall(const double T, const double nn,
   
   /* **************** 1st order derivatives ***************************** */
   if (first_deriv) {
-  double Gp = invetap * if12p[1]; 
-  double Gn = invetan * if12n[1]; 
-  
-  double detandnn = Gn*(1.0/nn + 1.5*(mF-mG)/momsn); 
-  double detandnp = 1.5*Gn*(mF+mG)/momsn; 
-  double detandT = -1.5*Gn/T;
-  
-  double detapdnp = Gp*(1.0/np + 1.5*(mF-mG)/momsp);
-  double detapdnn = 1.5*Gp*(mF+mG)/momsp;
-  double detapdT = -1.5*Gp/T;
-   
-  double dtaundnn = taun * (zf32n[1]/zf32n[0]*detandnn - 2.5*(mF - mG)/momsn);
-  double dtaundnp = taun * (zf32n[1]/zf32n[0]*detandnp - 2.5*(mF + mG)/momsn);
-  double dtaundT  = taun * (zf32n[1]/zf32n[0]*detandT  + 2.5/T);
+    double Gp = invetap * if12p[1]; 
+    double Gn = invetan * if12n[1]; 
+    
+    double detandnn = Gn*(1.0/nn + 1.5*(mF-mG)/momsn); 
+    double detandnp = 1.5*Gn*(mF+mG)/momsn; 
+    double detandT = -1.5*Gn/T;
+    
+    double detapdnp = Gp*(1.0/np + 1.5*(mF-mG)/momsp);
+    double detapdnn = 1.5*Gp*(mF+mG)/momsp;
+    double detapdT = -1.5*Gp/T;
+     
+    double dtaundnn = taun * (zf32n[1]/zf32n[0]*detandnn - 2.5*(mF - mG)/momsn);
+    double dtaundnp = taun * (zf32n[1]/zf32n[0]*detandnp - 2.5*(mF + mG)/momsn);
+    double dtaundT  = taun * (zf32n[1]/zf32n[0]*detandT  + 2.5/T);
 
-  double dtaupdnn = taup * (zf32p[1]/zf32p[0]*detapdnn - 2.5*(mF + mG)/momsp);
-  double dtaupdnp = taup * (zf32p[1]/zf32p[0]*detapdnp - 2.5*(mF - mG)/momsp);
-  double dtaupdT  = taup * (zf32p[1]/zf32p[0]*detapdT  + 2.5/T);
+    double dtaupdnn = taup * (zf32p[1]/zf32p[0]*detapdnn - 2.5*(mF + mG)/momsp);
+    double dtaupdnp = taup * (zf32p[1]/zf32p[0]*detapdnp - 2.5*(mF - mG)/momsp);
+    double dtaupdT  = taup * (zf32p[1]/zf32p[0]*detapdT  + 2.5/T);
 
- double dUndnn = 0.5*(mF-mG)/MNUC * dtaundnn + 0.5*(mF+mG)/MNUC * dtaupdnn
-    + 2.0*mA  + mC*mDelta*(1.0+mDelta)*pow(nt,mDelta-1.0) 
-    + 4.0*mD*pow(nt,mDelta-3.0)*(mDelta-1.0)*np*(2.0*np+mDelta*nn);
-  double dUndnp = 0.5*(mF-mG)/MNUC * dtaundnp + 0.5*(mF+mG)/MNUC * dtaupdnp
-    + 2.0*mA + 4.0*mB + mC*mDelta*(1.0+mDelta)*pow(nt,mDelta-1.0) 
-    + 4.0*mD*pow(nt,mDelta-3.0)*( mDelta*(pow(nn,2.0)+pow(np,2.0)) 
-    + nn*np*(2.0+mDelta*(mDelta-1.0)) );
-  double dUndT = 0.5*(mF-mG)/MNUC * dtaundT + 0.5*(mF+mG)/MNUC * dtaupdT;
-  
-  double dUpdnp = 0.5*(mF-mG)/MNUC * dtaupdnp + 0.5*(mF+mG)/MNUC * dtaundnp
-    + 2.0*mA + mC*mDelta*(1.0+mDelta)*pow(nt,mDelta-1.0) 
-    + 4.0*mD*pow(nt,mDelta-3.0)*(mDelta-1.0)*nn*(2.0*nn+mDelta*np);
-  double dUpdnn = 0.5*(mF-mG)/MNUC * dtaupdnn + 0.5*(mF+mG)/MNUC * dtaundnn
-    + 2.0*mA + 4.0*mB + mC*mDelta*(1.0+mDelta)*pow(nt,mDelta-1.0) 
-    + 4.0*mD*pow(nt,mDelta-3.0)*( mDelta*(pow(nn,2.0)+pow(np,2.0)) 
-    + nn*np*(2.0+mDelta*(mDelta-1.0)) );
-  double dUpdT = 0.5*(mF-mG)/MNUC * dtaupdT + 0.5*(mF+mG)/MNUC * dtaundT;
+    double dUndnn = 0.5*(mF-mG)/MNUC * dtaundnn + 0.5*(mF+mG)/MNUC * dtaupdnn
+      + 2.0*mA  + mC*mDelta*(1.0+mDelta)*pow(nt,mDelta-1.0) 
+      + 4.0*mD*pow(nt,mDelta-3.0)*(mDelta-1.0)*np*(2.0*np+mDelta*nn);
+    double dUndnp = 0.5*(mF-mG)/MNUC * dtaundnp + 0.5*(mF+mG)/MNUC * dtaupdnp
+      + 2.0*mA + 4.0*mB + mC*mDelta*(1.0+mDelta)*pow(nt,mDelta-1.0) 
+      + 4.0*mD*pow(nt,mDelta-3.0)*( mDelta*(pow(nn,2.0)+pow(np,2.0)) 
+      + nn*np*(2.0+mDelta*(mDelta-1.0)) );
+    double dUndT = 0.5*(mF-mG)/MNUC * dtaundT + 0.5*(mF+mG)/MNUC * dtaupdT;
+    
+    double dUpdnp = 0.5*(mF-mG)/MNUC * dtaupdnp + 0.5*(mF+mG)/MNUC * dtaundnp
+      + 2.0*mA + mC*mDelta*(1.0+mDelta)*pow(nt,mDelta-1.0) 
+      + 4.0*mD*pow(nt,mDelta-3.0)*(mDelta-1.0)*nn*(2.0*nn+mDelta*np);
+    double dUpdnn = 0.5*(mF-mG)/MNUC * dtaupdnn + 0.5*(mF+mG)/MNUC * dtaundnn
+      + 2.0*mA + 4.0*mB + mC*mDelta*(1.0+mDelta)*pow(nt,mDelta-1.0) 
+      + 4.0*mD*pow(nt,mDelta-3.0)*( mDelta*(pow(nn,2.0)+pow(np,2.0)) 
+      + nn*np*(2.0+mDelta*(mDelta-1.0)) );
+    double dUpdT = 0.5*(mF-mG)/MNUC * dtaupdT + 0.5*(mF+mG)/MNUC * dtaundT;
 
-  double dmundnn = T*detandnn + dUndnn;
-  double dmundnp = T*detandnp + dUndnp;
-  double dmundT = etan + T*detandT + dUndT;
-  eosOut.SetDNp("Mun", dmundnp);  
-  eosOut.SetDT( "Mun", dmundT);  
-  eosOut.SetDNn("Mun", dmundnn);
-  
-  double dmupdnp = T*detapdnp + dUpdnp;
-  double dmupdnn = T*detapdnn + dUpdnn;
-  double dmupdT = etap + T*detapdT + dUpdT;
-  eosOut.SetDNp("Mup", dmupdnp);  
-  eosOut.SetDT( "Mup", dmupdT);  
-  eosOut.SetDNn("Mup", dmupdnn);
-  
-  double dpdnn = nn*dmundnn + np*dmupdnn;
-  double dpdnp = nn*dmundnp + np*dmupdnp;
-  double dpdT = ss + nn*dmundT + np*dmupdT;
-  eosOut.SetDNp("P", dpdnp);  
-  eosOut.SetDT( "P", dpdT);  
-  eosOut.SetDNn("P", dpdnn);
-  
-  //double dmndnn = -pow(momsn,-2.0)*(mF-mG)*MNUC;
-  //double dmndnp = -pow(momsn,-2.0)*(mF+mG)*MNUC;
-  //double dmpdnp = -pow(momsp,-2.0)*(mF-mG)*MNUC;
-  //double dmpdnn = -pow(momsp,-2.0)*(mF+mG)*MNUC;
-  //double dmndT = 0.0;
-  //double dmpdT = 0.0;
-  //
-  //double dssdnn = 5.0/(6.0*MNUC*T)*( momsn*(dtaundnn-taun*dmndnn* momsn/MNUC) 
-  //    + momsp*(dtaupdnn-taup*dmpdnn* momsp/MNUC) )
-  //    - (etan + nn*detandnn + np*detapdnn); 
-  //double dssdnp = 5.0/(6.0*MNUC*T)*( momsn*(dtaundnp-taun*dmndnp* momsn/MNUC) 
-  //    + momsp*(dtaupdnp-taup*dmpdnp* momsp/MNUC) )
-  //    - (etap + nn*detandnp + np*detapdnp);
-  
-  double dssdnn = -dmundT; 
-  double dssdnp = -dmupdT;
-  double dssdT = 5.0/(6.0*MNUC*T)*((dtaupdT - taup/T)*momsp 
-      + (dtaundT - taun/T)*momsn) 
-      - np*detapdT - nn*detandT; 
-  double dsdnn = dssdnn/nt-ss/pow(nt,2.0);
-  double dsdnp = dssdnp/nt-ss/pow(nt,2.0);
-  double dsdT  =  dssdT/nt;
-   
-  eosOut.SetDNp("S", dsdnp);  
-  eosOut.SetDT( "S", dsdT);  
-  eosOut.SetDNn("S", dsdnn);
-  
-  double deednn = T*dssdnn + mun;
-  double deednp = T*dssdnp + mup;
-  double deedT  = T*dssdT;
-  
-  double dednn = deednn/nt-ee/pow(nt,2.0);
-  double dednp = deednp/nt-ee/pow(nt,2.0);
-  double dedT  =  deedT/nt;
+    double dmundnn = T*detandnn + dUndnn;
+    double dmundnp = T*detandnp + dUndnp;
+    double dmundT = etan + T*detandT + dUndT;
+    eosOut.SetDNp("Mun", dmundnp);  
+    eosOut.SetDT( "Mun", dmundT);  
+    eosOut.SetDNn("Mun", dmundnn);
+    
+    double dmupdnp = T*detapdnp + dUpdnp;
+    double dmupdnn = T*detapdnn + dUpdnn;
+    double dmupdT = etap + T*detapdT + dUpdT;
+    eosOut.SetDNp("Mup", dmupdnp);  
+    eosOut.SetDT( "Mup", dmupdT);  
+    eosOut.SetDNn("Mup", dmupdnn);
+    
+    double dpdnn = nn*dmundnn + np*dmupdnn;
+    double dpdnp = nn*dmundnp + np*dmupdnp;
+    double dpdT = ss + nn*dmundT + np*dmupdT;
+    eosOut.SetDNp("P", dpdnp);  
+    eosOut.SetDT( "P", dpdT);  
+    eosOut.SetDNn("P", dpdnn);
+    
+    //double dmndnn = -pow(momsn,-2.0)*(mF-mG)*MNUC;
+    //double dmndnp = -pow(momsn,-2.0)*(mF+mG)*MNUC;
+    //double dmpdnp = -pow(momsp,-2.0)*(mF-mG)*MNUC;
+    //double dmpdnn = -pow(momsp,-2.0)*(mF+mG)*MNUC;
+    //double dmndT = 0.0;
+    //double dmpdT = 0.0;
+    //
+    //double dssdnn = 5.0/(6.0*MNUC*T)*( momsn*(dtaundnn-taun*dmndnn* momsn/MNUC) 
+    //    + momsp*(dtaupdnn-taup*dmpdnn* momsp/MNUC) )
+    //    - (etan + nn*detandnn + np*detapdnn); 
+    //double dssdnp = 5.0/(6.0*MNUC*T)*( momsn*(dtaundnp-taun*dmndnp* momsn/MNUC) 
+    //    + momsp*(dtaupdnp-taup*dmpdnp* momsp/MNUC) )
+    //    - (etap + nn*detandnp + np*detapdnp);
+    
+    double dssdnn = -dmundT; 
+    double dssdnp = -dmupdT;
+    double dssdT = 5.0/(6.0*MNUC*T)*((dtaupdT - taup/T)*momsp 
+        + (dtaundT - taun/T)*momsn) 
+        - np*detapdT - nn*detandT; 
+    double dsdnn = dssdnn/nt-ss/pow(nt,2.0);
+    double dsdnp = dssdnp/nt-ss/pow(nt,2.0);
+    double dsdT  =  dssdT/nt;
+     
+    eosOut.SetDNp("S", dsdnp);  
+    eosOut.SetDT( "S", dsdT);  
+    eosOut.SetDNn("S", dsdnn);
+    
+    double deednn = T*dssdnn + mun;
+    double deednp = T*dssdnp + mup;
+    double deedT  = T*dssdT;
+    
+    double dednn = deednn/nt-ee/pow(nt,2.0);
+    double dednp = deednp/nt-ee/pow(nt,2.0);
+    double dedT  =  deedT/nt;
  
-  eosOut.SetDNp("E", dednp);  
-  eosOut.SetDT( "E", dedT);  
-  eosOut.SetDNn("E", dednn);
+    eosOut.SetDNp("E", dednp);  
+    eosOut.SetDT( "E", dedT);  
+    eosOut.SetDNn("E", dednn);
   }  
  /* **************************************************************** */  
  
