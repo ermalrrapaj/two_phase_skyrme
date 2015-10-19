@@ -23,8 +23,9 @@
 ///
 class EOSSingleNucleus : public GibbsPhaseConstruct {
 public:
-  EOSSingleNucleus(const EOSBase& eos, bool createPhaseBound = true) : 
-      GibbsPhaseConstruct(eos, createPhaseBound), 
+  EOSSingleNucleus(const EOSBase& eos, bool createPhaseBound = true, 
+      double TMeVMin = 0.1, double TMeVMax = 2.e2) : 
+      GibbsPhaseConstruct(eos, createPhaseBound, TMeVMin, TMeVMax), 
       mA0(60.0),
       mSigma0(1.15/Constants::HBCFmMeV),
       mSs0(45.8/Constants::HBCFmMeV), 
@@ -46,7 +47,7 @@ protected:
   double mSigma0;
   double mSs0;
   double mKs0; 
-
+  std::vector<double> mLastSet;
 };
 
 #endif // EOS_EOSSINGLENUCLEUS_HPP_

@@ -201,35 +201,77 @@ std::vector<EOSData> EOSSingleNucleus::EquilibriumConditions(
     return f;
   };
   
-  PScale = std::max(eosHi.P(), 1.e-6); 
+  PScale = std::max(fabs(eosHi.P()), 1.e-6); 
   MunScale = fabs(eosHi.Mun()); 
   MupScale = fabs(eosHi.Mup()); 
-  MultiDimensionalRoot rootFinder = MultiDimensionalRoot(1.e-10, 200);
+  MultiDimensionalRoot rootFinder = MultiDimensionalRoot(1.e-10, 250);
   
-  std::vector<double> pars = {log(eosLo.Nn()), log(eosLo.Np()),
-      log(eosHi.Nn() - eosLo.Nn()), log(eosHi.Np() - eosLo.Np()), 
-      (eosIn.Np()-eosLo.Np())/(eosHi.Np() - eosLo.Np())};
-       
-  // Try to slowly increase the effect of the finite size terms
-  for (double llam = llam0; llam <0.1; llam += 0.1) {
-    lamV = std::min(pow(10.0, llam), 1.0); 
-    lamS = std::min(pow(10.0, llam), 1.0); 
-    try {
-      pars = rootFinder(equil_f, pars, 5);
-    } catch (std::exception& e) {
-      //std::cerr << "Didn't converge. " << std::to_string(lamV) << " " 
-      //    << std::to_string(lamV-1.0) << " " << std::to_string(eosIn.Nb()) << std::endl;
-      return {mpEos->FromNAndT(
-          EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np()))}; 
+  std::vector<double> pars;
+  bool lastSuccess = false;  
+  if (mLastSet.size()==5) {
+    try { 
+      lamV = 1.0; 
+      lamS = 1.0; 
+      pars = rootFinder(equil_f, mLastSet, 5);
+      lastSuccess = true;
+    } catch (...) {
+      lastSuccess = false;
     }
-  } 
+  }      
+  
+  if (!lastSuccess) { 
+    if (eosIn.T() < GibbsPhaseConstruct::mTMin) T = GibbsPhaseConstruct::mTMin;
+    pars = {log(eosLo.Nn()), log(eosLo.Np()),
+        log(eosHi.Nn() - eosLo.Nn()), log(eosHi.Np() - eosLo.Np()), 
+        (eosIn.Np()-eosLo.Np())/(eosHi.Np() - eosLo.Np())};
     
+    // Try to slowly increase the effect of the finite size terms
+    double dllam = 0.1;
+    for (double llam = llam0; llam <0.01; llam += dllam) {
+      lamV = std::min(pow(10.0, llam), 1.0); 
+      lamS = std::min(pow(10.0, llam), 1.0); 
+      try {
+        pars = rootFinder(equil_f, pars, 5);
+      } catch (std::exception& e) {
+        //std::cerr << "Didn't converge. " << std::to_string(lamV) << " " 
+        //    << std::to_string(lamV-1.0) << " " << std::to_string(eosIn.Nb())  
+        //    << " " << pars[4] << std::endl;
+        //llam -= dllam; 
+        //dllam = 0.7*dllam;
+        //if (dllam < 0.01) 
+          return {mpEos->FromNAndT(
+              EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np()))}; 
+      }
+      if (T>eosIn.T()) { 
+        for (T = GibbsPhaseConstruct::mTMin; T >= eosIn.T(); T *= 0.9) {
+          try {
+            pars = rootFinder(equil_f, pars, 5);
+          } catch (std::exception& e) {
+            std::cerr << "Unable to work down to desired temperature" << std::endl;
+            return {mpEos->FromNAndT(
+              EOSData::InputFromTNnNp(eosIn.T(), eosIn.Nn(), eosIn.Np()))}; 
+          }
+        }
+        T = eosIn.T();
+        try {
+          pars = rootFinder(equil_f, pars, 5);
+        } catch(...) {
+          std::cerr << "Unable to work down to desired temperature" << std::endl;
+          return {mpEos->FromNAndT(
+            EOSData::InputFromTNnNp(eosIn.T(), eosIn.Nn(), eosIn.Np()))}; 
+        }
+      }
+    } 
+  }
+   
   EOSData eL = mpEos->FromNAndT(
       EOSData::InputFromTNnNp(T, exp(pars[0]), exp(pars[1])));
   EOSData eH = mpEos->FromNAndT(
       EOSData::InputFromTNnNp(T, exp(pars[0]) + exp(pars[2]), 
       exp(pars[1]) + exp(pars[3])));
-   
+  
+  mLastSet = pars; 
+  
   return {eL, eH};
 }
 
