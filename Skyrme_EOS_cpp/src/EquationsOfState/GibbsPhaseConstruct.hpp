@@ -31,7 +31,8 @@
 class GibbsPhaseConstruct : public EOSBase {
 public:
   /// Initialize with an EoS that has a non-convex region
-  GibbsPhaseConstruct(const EOSBase& eos, bool findPhaseBound=true);  
+  GibbsPhaseConstruct(const EOSBase& eos, bool findPhaseBound=true, 
+      double TMeVMin = 0.1, double TMeVMax = 2.e2);  
   
   virtual EOSData FromNAndT(const EOSData& eosIn);
   
@@ -39,7 +40,7 @@ public:
   double GetCriticalT() const {return mTCrit;}
   
   double GetMinimumT() const {return mTMin;}
-  double GetMaximumT() const {return 200.0/Constants::HBCFmMeV;}
+  double GetMaximumT() const {return mTMax;}
    
   /// This function is not implemented and will throw an error if called 
   std::vector<EOSData> FromMuAndT(const EOSData& eosIn) const {
@@ -67,14 +68,22 @@ public:
   std::vector<std::pair<EOSData, EOSData>> FindFixedTPhaseBoundary(double T,
       double NLoG=1.e-20, double NHiG=0.08, double deltaMu=0.03) const;
   
+  /// Find a phase boundary in the np, nn plane for a fixed temperature using 
+  /// a phase boundary for a different temperature as a starting point
+  std::vector<std::pair<EOSData, EOSData>> FindFixedTPhaseBoundary(double T, 
+      std::vector<std::pair<EOSData, EOSData>> oldPhase) const;
+
   /// Allows for easy serialization of the class so the phase boundary can 
   /// easily be read from file.  
   friend class boost::serialization::access; 
   template<class Archive> 
   void serialize(Archive & ar, const unsigned int /* File Version */) {
-    ar & mTMin & mTMult & mTCrit & mVerbose & mPhaseBounds;
+    ar & mTMin & mTMax & mTMult & mTCrit & mVerbose & mPhaseBounds;
   }
-    
+
+  /// Calculate boundary of self bound points for specific temperature 
+  std::vector<EOSData> SelfBoundPoints(double T) const;
+
 protected:
   /// Solve the three Gibbs equilibrium equations and the constraint equations 
   /// for the neutron and proton density and return the mixed phase state
@@ -93,6 +102,9 @@ protected:
   /// Calculate the entire phase boundary and store in mPhaseBounds 
   void FindPhaseBoundary();
   
+  /// Find a self bound liquid density 
+  EOSData FindSelfBoundPoint(double T, double Ye) const; 
+   
   /// Copy of the input bulk EOS 
   std::unique_ptr<EOSBase> mpEos; 
   
@@ -101,6 +113,7 @@ protected:
   std::vector<std::vector<std::pair<EOSData, EOSData>>> mPhaseBounds;
   
   double mTMin;  ///< Minimum temperature calculated for the EoS 
+  double mTMax;  ///< Minimum temperature calculated for the EoS 
   double mTMult; ///< How close together are the phase boundaries
   double mTCrit; ///< The critical temperature 
   bool mVerbose; ///< How verbose should I be?

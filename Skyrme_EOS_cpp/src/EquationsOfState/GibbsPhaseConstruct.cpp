@@ -16,20 +16,24 @@
 #include "Util/MultiDimensionalRoot.hpp"
 #include "Util/OneDimensionalRoot.hpp"
 
-GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos, bool findPhaseBound) : 
+GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos, 
+    bool findPhaseBound, double TMeVMin, double TMeVMax) : 
     mTMult(1.25),
     mpEos(eos.MakeUniquePtr()), 
     mVerbose(false),
-    mTMin(0.1/Constants::HBCFmMeV) {
+    mTMin(TMeVMin/Constants::HBCFmMeV),
+    mTMax(TMeVMax/Constants::HBCFmMeV) {
   if (findPhaseBound) FindPhaseBoundary();
 }
 
 void GibbsPhaseConstruct::FindPhaseBoundary() {
   
   // Do a first pass for finding phase boundaries  
-  double TFail = 0.0;
+  double TFail = -1.0;
   double TMax = 50.0/Constants::HBCFmMeV;
-  for (double lT = log10(mTMin); lT < log10(TMax); lT +=  log10(mTMult)) {
+  
+  for (double lT = log10(mTMin); lT < log10(TMax) && lT < log10(mTMax); 
+      lT +=  log10(mTMult)) {
     std::cerr << pow(10.0, lT)*Constants::HBCFmMeV << " ";
     auto phaseBound = FindFixedTPhaseBoundary(pow(10.0, lT));
     std::cerr << phaseBound.size() << std::endl;
@@ -41,28 +45,31 @@ void GibbsPhaseConstruct::FindPhaseBoundary() {
       break;
     }
   }
-
+  
   // Now bisect to get close to the critical temperature
-  double Tlo = mTCrit;
-  double Thi = TFail;
-  double Tmid = 0.0;
-  for (int i=0; i<8; i++) {
-    Tmid = 0.5*(Tlo + Thi); 
-    std::cerr << Tmid*Constants::HBCFmMeV << " ";
-    auto phaseBound = FindFixedTPhaseBoundary(Tmid);
-    std::cerr << phaseBound.size() << std::endl;
-    if (phaseBound.size()>10) { 
-      mPhaseBounds.push_back(phaseBound);
-      Tlo = Tmid; 
-    } else { 
-      Thi = Tmid;
+  if (TFail > 0.0) {
+    double Tlo = mTCrit;
+    double Thi = TFail;
+    double Tmid = 0.0;
+    for (int i=0; i<8; i++) {
+      Tmid = 0.5*(Tlo + Thi); 
+      std::cerr << Tmid*Constants::HBCFmMeV << " ";
+      auto phaseBound = FindFixedTPhaseBoundary(Tmid);
+      std::cerr << phaseBound.size() << std::endl;
+      if (phaseBound.size()>10) { 
+        mPhaseBounds.push_back(phaseBound);
+        Tlo = Tmid; 
+      } else { 
+        Thi = Tmid;
+      }
     }
+    mTCrit = Tmid;
+    std::cerr << "Tcritical : " << mTCrit*Constants::HBCFmMeV 
+        << std::endl;
+  } else {
+    mTCrit = mTMax;
   }
-  mTCrit = Tmid;
    
-  std::cerr << "Tcritical : " << mTCrit*Constants::HBCFmMeV 
-      << std::endl;
-
   // Sort the phase boundaries in terms of temperature 
   std::sort (mPhaseBounds.begin(), mPhaseBounds.end(), 
       [](std::vector<std::pair<EOSData, EOSData>> a, 
@@ -280,6 +287,26 @@ GibbsPhaseConstruct::FindPhaseRange(double T, bool doMun,
 
 } 
 
+// Find a phase boundary for one temperature using boundary from another
+// temperature
+std::vector<std::pair<EOSData, EOSData>> 
+GibbsPhaseConstruct::FindFixedTPhaseBoundary(double T, 
+    std::vector<std::pair<EOSData, EOSData>> oldPhase) const {
+  if (oldPhase.size() < 1) throw std::length_error("oldPhase contains no points.");
+  double Told = oldPhase[0].first.T();
+  std::vector<std::pair<EOSData, EOSData>> newPhase;
+  for (auto& old : oldPhase) {
+    std::pair<EOSData, EOSData> cur = old; 
+    double Tc = T;
+    try {
+      cur = FindPhasePoint(Tc, cur.first.Mun()*Tc/Told, cur.first.Np(), 
+          old.second.Np());
+      newPhase.push_back(cur); 
+    } catch(...) {}
+  }
+  return newPhase; 
+}
+
 std::vector<std::pair<EOSData, EOSData>>
 GibbsPhaseConstruct::FindFixedTPhaseBoundary(double T, double NLoG, 
     double NHiG, double deltaMu) const {
@@ -417,6 +444,58 @@ EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn,
   out.SetPhases({eLo, eHi});
   return out;
 } 
+
+std::vector<EOSData> GibbsPhaseConstruct::SelfBoundPoints(double T) const {
+  std::vector<EOSData> selfBound;
+  // Calculate self bound points over a large range of Yes 
+  for (double Ye = 1.e-10; Ye <= 0.5+1.e-10; Ye += 0.01) {
+    try {
+      selfBound.push_back(FindSelfBoundPoint(T, Ye)); 
+    } catch(...) {} 
+
+    try {
+      selfBound.push_back(FindSelfBoundPoint(T, 1.0-Ye)); 
+    } catch(...) {} 
+  }
+
+  // Sort by Ye and return
+  std::sort (selfBound.begin(), selfBound.end(), 
+      [](EOSData a, EOSData b) { return (a.Ye() < b.Ye()); });
+  return selfBound;
+} 
+
+EOSData GibbsPhaseConstruct::FindSelfBoundPoint(double T, double Ye) const {
+  // Get set of bracketing densities (How do we know the minimum is in there) 
+  // Maybe try brute force search 
+  double nbMin = 1.e5; 
+  double nbMax = 0.2;
+  double pMin = 1.e10;
+  double pMax = mpEos->FromNAndT(EOSData::InputFromTNbYe(T, nbMax, Ye)).P();
+  for (double lnb = -4.0; lnb< log10(nbMax); lnb += 0.1) { 
+    double pc = 
+        (mpEos->FromNAndT(EOSData::InputFromTNbYe(T, pow(10.0, lnb), Ye))).P();
+    if (pc < pMin) {
+      nbMin = pow(10.0, lnb);
+      pMin = pc; 
+    }
+  }
+
+  // Check that our two limits have different signs on the pressure 
+  if (pMax*pMin>0.0) throw EOSException("No zero pressure.");  
+  
+  // Search for the zero, throw an error if it is not found
+  auto PZero = [&T, &Ye, this](double nb) {
+    return mpEos->FromNAndT(EOSData::InputFromTNbYe(T, nb, Ye)).P();
+  };
+  
+  OneDimensionalRoot rootFinder(1.e-10, 150); 
+  try {
+    double nbZero = rootFinder(PZero, nbMin, nbMax);
+    return mpEos->FromNAndT(EOSData::InputFromTNbYe(T, nbZero, Ye));
+  } catch (...) { 
+    throw EOSException("Zero pressure solver failed.");
+  }
+}
  
 std::pair<EOSData, EOSData> GibbsPhaseConstruct::FindPhasePoint(double T, 
     double mu, double NLoG, double NHiG, bool doMun) const {
