@@ -296,14 +296,47 @@ GibbsPhaseConstruct::FindFixedTPhaseBoundary(double T,
   double Told = oldPhase[0].first.T();
   std::vector<std::pair<EOSData, EOSData>> newPhase;
   for (auto& old : oldPhase) {
-    std::pair<EOSData, EOSData> cur = old; 
+    std::pair<EOSData, EOSData> cur; 
     double Tc = T;
-    try {
-      cur = FindPhasePoint(Tc, cur.first.Mun()*Tc/Told, cur.first.Np(), 
-          old.second.Np());
-      newPhase.push_back(cur); 
-    } catch(...) {}
+    for (bool doMun : {true, false} ) {
+      cur = old;   
+      try {
+        for (double Tc = old.first.T(); Tc > T; Tc *= 0.9) {
+          cur = FindPhasePoint(Tc, cur.first.Mun(), cur.first.Np(), 
+              cur.second.Np(), doMun);
+        }
+        cur = FindPhasePoint(T, cur.first.Mun(), cur.first.Np(), 
+            cur.second.Np(), doMun);
+        newPhase.push_back(cur); 
+      } catch(...) {}
+      
+      cur = old; 
+      try {
+        for (double Tc = old.first.T(); Tc > T; Tc *= 0.9) {
+          cur = FindPhasePoint(Tc, cur.first.Mup(), cur.first.Nn(), 
+              cur.second.Nn(), doMun);
+        }
+        cur = FindPhasePoint(T, cur.first.Mup(), cur.first.Nn(), 
+            cur.second.Nn(), doMun);
+        newPhase.push_back(cur); 
+      } catch(...) {}
+    }
   }
+  
+  std::sort (newPhase.begin(), newPhase.end(), 
+      [](std::pair<EOSData, EOSData> a, std::pair<EOSData, EOSData> b) { 
+      return (fabs(0.5-(a.second).Ye()) > fabs(0.5-(b.second).Ye()));});
+  
+  double YeMax = newPhase.back().second.Ye(); 
+  YeMax = std::min(YeMax, 1.0-YeMax);
+  std::cout << YeMax << std::endl; 
+  auto selfBound = SelfBoundPoints(T, YeMax, 1.0 - YeMax);
+  newPhase.insert(newPhase.end(), selfBound.begin(), selfBound.end());
+   
+  std::sort (newPhase.begin(), newPhase.end(), 
+      [](std::pair<EOSData, EOSData> a, std::pair<EOSData, EOSData> b) { 
+      return ((a.second).Mun() < (b.second).Mun());});
+  
   return newPhase; 
 }
 
@@ -445,23 +478,31 @@ EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn,
   return out;
 } 
 
-std::vector<EOSData> GibbsPhaseConstruct::SelfBoundPoints(double T) const {
+std::vector<std::pair<EOSData, EOSData>> 
+GibbsPhaseConstruct::SelfBoundPoints(double T, 
+    double yeMin, double yeMax) const {
   std::vector<EOSData> selfBound;
   // Calculate self bound points over a large range of Yes 
-  for (double Ye = 1.e-10; Ye <= 0.5+1.e-10; Ye += 0.01) {
+  for (double Ye = yeMin; Ye <= yeMax; Ye += 0.01) {
     try {
       selfBound.push_back(FindSelfBoundPoint(T, Ye)); 
     } catch(...) {} 
-
-    try {
-      selfBound.push_back(FindSelfBoundPoint(T, 1.0-Ye)); 
-    } catch(...) {} 
   }
 
-  // Sort by Ye and return
+  // Sort by Ye
   std::sort (selfBound.begin(), selfBound.end(), 
       [](EOSData a, EOSData b) { return (a.Ye() < b.Ye()); });
-  return selfBound;
+  std::vector<std::pair<EOSData, EOSData>> selfBoundPair;
+  for (auto& pt : selfBound) {
+    //auto low = mpEos->FromMuAndT(
+    //  EOSData::InputFromTMunMup(pt.T(), pt.Mun(), pt.Mup()));
+    auto lowTemp = EOSData::Output(pt.T(), 1.e-250, 1.e-250, 
+        pt.Mun(), pt.Mup(), 0.0);
+    selfBoundPair.push_back(std::pair<EOSData, EOSData>(lowTemp, pt)); 
+  }
+
+  // Find matching points, ignoring pressure  
+  return selfBoundPair;
 } 
 
 EOSData GibbsPhaseConstruct::FindSelfBoundPoint(double T, double Ye) const {
@@ -538,7 +579,7 @@ std::pair<EOSData, EOSData> GibbsPhaseConstruct::FindPhasePoint(double T,
           / muScale}; 
     }
   };
-
+  
   // First get close with linear equations  
   MultiDimensionalRoot rootFinder(1.e-5*NHiG, 100);
   initial = true;
@@ -547,8 +588,8 @@ std::pair<EOSData, EOSData> GibbsPhaseConstruct::FindPhasePoint(double T,
 
   // Now get to high precision with non-linear scaled version of equations
   initial = false;
-  EOSData eosLo = (mpEos.get()->*eosCall)(eosDat(T, exp(logN[0]), mu)); 
-  EOSData eosHi = (mpEos.get()->*eosCall)(eosDat(T, exp(logN[0])+exp(logN[1]), mu));
+  auto eosLo = (mpEos.get()->*eosCall)(eosDat(T, exp(logN[0]), mu)); 
+  auto eosHi = (mpEos.get()->*eosCall)(eosDat(T, exp(logN[0])+exp(logN[1]), mu));
   muScale = std::max(fabs(eosLo.Mun()), fabs(eosHi.Mup()));
   PScale = 1.e3*fabs(eosHi.P());
   rootFinder = MultiDimensionalRoot(1.e-13, 200);

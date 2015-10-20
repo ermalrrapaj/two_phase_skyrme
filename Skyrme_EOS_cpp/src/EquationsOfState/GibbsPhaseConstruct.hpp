@@ -82,7 +82,8 @@ public:
   }
 
   /// Calculate boundary of self bound points for specific temperature 
-  std::vector<EOSData> SelfBoundPoints(double T) const;
+  std::vector<std::pair<EOSData, EOSData>> SelfBoundPoints(double T, 
+      double yeMin=0.0, double yeMax=1.0) const;
 
 protected:
   /// Solve the three Gibbs equilibrium equations and the constraint equations 
