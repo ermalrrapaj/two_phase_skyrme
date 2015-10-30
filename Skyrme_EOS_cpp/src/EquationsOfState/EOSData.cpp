@@ -24,7 +24,8 @@ EOSData::EOSData() :
     mMue(EOSDatum("Electron chemical potential")), 
     mP  (EOSDatum("Pressure")), 
     mE  (EOSDatum("Energy per baryon")),
-    mS  (EOSDatum("Entropy per baryon")) { 
+    mS  (EOSDatum("Entropy per baryon")),
+    mPhases(std::vector<EOSData>()) { 
   mVars["T"] = &mT;
   mVars["Np"] = &mNp;
   mVars["Nn"] = &mNn;

@@ -22,24 +22,23 @@
 #include <boost/serialization/utility.hpp> 
 #include <boost/serialization/list.hpp> 
 #include <boost/serialization/vector.hpp> 
+#include <boost/serialization/map.hpp> 
 #include <boost/serialization/assume_abstract.hpp> 
 
 #define STDNAN std::numeric_limits<double>::quiet_NaN()
 #define UNINIT std::pair<bool, double>(false,0.0) 
 class EOSDatum {
 public:  
-  EOSDatum() : name(" "), val(std::pair<bool, double>(false, 0.0)), 
+  EOSDatum() : name(" "), val(UNINIT), 
       dNp(UNINIT), dNn(UNINIT), dT(UNINIT), dNpdT(UNINIT), 
       dNndT(UNINIT), dNndNp(UNINIT) {} 
-  EOSDatum(std::string name) : name(name), val(std::pair<bool, double>(false, 0.0)),
-      dNp(UNINIT), dNn(UNINIT), dT(UNINIT), dNpdT(UNINIT), 
-      dNndT(UNINIT), dNndNp(UNINIT) {} 
-  EOSDatum(double val) : name("Un-named"), val(std::pair<bool, double>(true, val)), 
-      dNp(UNINIT), dNn(UNINIT), dT(UNINIT), dNpdT(UNINIT), 
-      dNndT(UNINIT), dNndNp(UNINIT) {} 
-  EOSDatum(double val, std::string name) : name(name), val(std::pair<bool, double>(true, val)),
-      dNp(UNINIT), dNn(UNINIT), dT(UNINIT), dNpdT(UNINIT), 
-      dNndT(UNINIT), dNndNp(UNINIT) {} 
+  
+  EOSDatum(std::string name) : EOSDatum() {name = name;}
+  
+  EOSDatum(double valin, std::string namein="Un-named") : EOSDatum() {
+    name = namein; 
+    val = std::pair<bool, double>(true, valin); 
+  } 
   
   double Get() const {
     if (val.first) return val.second;
@@ -146,8 +145,7 @@ public:
   friend class boost::serialization::access; 
   template<class Archive> 
   void serialize(Archive & ar, const unsigned int /* File Version */) {
-    ar & mT & mNp & mNn & mP & mMun & mMup & mMue & mE & mS
-    & mPhases;
+    ar & mT & mNp & mNn & mP & mMun & mMup & mMue & mE & mS & mPhases;
   }
    
   /// Get a vector of the subphases of this point
@@ -203,6 +201,7 @@ protected:
   EOSDatum mP, mMun, mMup, mMue, mE, mS;
   std::vector<EOSData> mPhases;
   std::map<std::string, EOSDatum*> mVars;
+
 };
 #endif // EOS_EOSDATA_HPP_
 
