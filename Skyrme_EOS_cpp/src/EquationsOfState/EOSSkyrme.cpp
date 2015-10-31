@@ -35,7 +35,7 @@ EOSSkyrme::EOSSkyrme() :
     mF(0.0), 
     mG(0.0),
     mDelta(2.002),
-    mNmin(1.e-220) {}
+    mNmin(std::numeric_limits<double>::min()) {}
 
 std::vector<EOSData> EOSSkyrme::FromMuAndT(const EOSData& eosIn) const {
   
@@ -44,6 +44,9 @@ std::vector<EOSData> EOSSkyrme::FromMuAndT(const EOSData& eosIn) const {
   auto root_func = [&eosIn, this] (std::vector<double> logN) -> 
       std::vector<double> { 
     EOSData out = BaseEOSCall<false>(eosIn.T(), exp(logN[0]), exp(logN[1]));
+    std::cout << exp(logN[0]) << " " << exp(logN[1]) << " ";
+    std::cout << eosIn.Mun() << " " << eosIn.Mup()<< " ";
+    std::cout << out.Mun() << " " << out.Mup()<< std::endl;
     return {(out.Mun() - eosIn.Mun())/(eosIn.Mun() + 1.e-25), 
             (out.Mup() - eosIn.Mup())/(eosIn.Mup() + 1.e-25)};
   };
@@ -53,24 +56,37 @@ std::vector<EOSData> EOSSkyrme::FromMuAndT(const EOSData& eosIn) const {
   // Carefully look for a low density solution first   
   try {
     // At low density neutrons and protons shouldn't really care about each other
-    double lnng = rootFinder1D( [&eosIn, this](double logNn) {
-      return BaseEOSCall<false>(eosIn.T(), exp(logNn), mNmin).
-          Mun()/(eosIn.Mun() + 1.e-25) - 1.0; }, log(mNmin),  log(1.e-3)); 
-    double lnpg = rootFinder1D( [&eosIn, this](double logNp) {
-      return BaseEOSCall<false>(eosIn.T(), mNmin, exp(logNp)).
-          Mup()/(eosIn.Mup() + 1.e-25) - 1.0;}, log(mNmin),  log(1.e-3)); 
-    
-    if (lnng <= log(1.01*mNmin) && lnpg <= log(1.01*mNmin)) {
-      throw EOSException("All densities are too low"); 
+    double lnng = mNmin;
+    try {
+      lnng = rootFinder1D( [&eosIn, this](double logNn) {
+        return BaseEOSCall<false>(eosIn.T(), exp(logNn), mNmin).
+            Mun()/(eosIn.Mun() + 1.e-300) - 1.0; }, log(mNmin),  log(1.e-2)); 
+    } catch(...) {} 
+
+    double lnpg = mNmin;
+    try { 
+      lnpg = rootFinder1D( [&eosIn, this](double logNp) {
+        return BaseEOSCall<false>(eosIn.T(), mNmin, exp(logNp)).
+            Mup()/(eosIn.Mup() + 1.e-300) - 1.0;}, log(mNmin),  log(1.e-2)); 
+    } catch(...) {} 
+
+    double fac = 1.1; 
+    if (lnng <= log(mNmin * fac) && lnpg <= log(mNmin * fac)) {
+      eosOut.push_back(BaseEOSCall<true>(eosIn.T(), mNmin, mNmin));
+      //throw EOSException("All densities are too low"); 
     }
-    else if (lnng <= log(1.01*mNmin)) {
-      //std::cerr << "Neutron density too low, returning with good proton density.\n";
+    else if (lnng <= log(mNmin * fac)) {
+      //std::cerr << "Neutron density too low, returning with good proton density. ";
+      //std::cerr << mNmin << " " << exp(lnpg) <<std::endl; 
       eosOut.push_back(BaseEOSCall<true>(eosIn.T(), mNmin, exp(lnpg)));
     }
-    else if (lnpg <= log(1.01*mNmin)) { 
-      //std::cerr << "Proton density too low, returning with good neutron density.\n";
-      eosOut.push_back(BaseEOSCall<true>(eosIn.T(), lnng, exp(mNmin)));
+    else if (lnpg <= log(mNmin * fac)) { 
+      //std::cerr << "Proton density too low, returning with good neutron density. ";
+      //std::cerr << exp(lnng) << " " << mNmin <<std::endl; 
+      eosOut.push_back(BaseEOSCall<true>(eosIn.T(), exp(lnng), mNmin));
     } else {
+      //std::cerr << "Both densities good. ";
+      //std::cerr << exp(lnng) << " " << exp(lnpg) <<std::endl; 
       std::vector<double> logN = rootFinder(root_func, {lnng, lnpg}, 2); 
       eosOut.push_back(BaseEOSCall<true>(eosIn.T(), exp(logN[0]), exp(logN[1])));
     }
@@ -83,13 +99,13 @@ std::vector<EOSData> EOSSkyrme::FromMuAndT(const EOSData& eosIn) const {
     //    << BaseEOSCall<false>(eosIn.T(), mNmin, exp(lnpg)).Mup() << std::endl;
      
   } catch(...) {}
-  
+  //std::cout << std::endl; 
   // Look for a high density solution second
-  try {
-    std::vector<double> logN = rootFinder(root_func, {log(1.e1), log(1.e1)}, 2); 
-    EOSData hi = BaseEOSCall<true>(eosIn.T(), exp(logN[0]), exp(logN[1]));
-    eosOut.push_back(hi);
-  } catch(...) {}
+  //try {
+  //  std::vector<double> logN = rootFinder(root_func, {log(1.e1), log(1.e1)}, 2); 
+  //  EOSData hi = BaseEOSCall<true>(eosIn.T(), exp(logN[0]), exp(logN[1]));
+  //  eosOut.push_back(hi);
+  //} catch(...) {}
   return eosOut;
 }
 

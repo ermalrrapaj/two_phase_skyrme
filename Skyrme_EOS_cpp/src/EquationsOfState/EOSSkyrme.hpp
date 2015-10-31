@@ -20,7 +20,8 @@ public:
   EOSSkyrme();
   EOSSkyrme(double A,  double B,  double C,  double D,  double F,
             double G,  double delta) : mA(A), mB(B), mC(C), mD(D),
-            mF(F), mG(G), mDelta(delta), mNmin(1.e-220) {};
+            mF(F), mG(G), mDelta(delta), 
+            mNmin(std::numeric_limits<double>::min()) {};
   static EOSSkyrme FreeGas();
   static EOSSkyrme FromErmalSkyrme(const std::array<const double, 7>& param);
   static EOSSkyrme FromSaturation(const std::array<const double, 7>& param);
