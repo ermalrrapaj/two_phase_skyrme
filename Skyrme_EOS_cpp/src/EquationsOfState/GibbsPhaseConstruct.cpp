@@ -22,7 +22,8 @@ GibbsPhaseConstruct::GibbsPhaseConstruct(const EOSBase& eos,
     mpEos(eos.MakeUniquePtr()), 
     mVerbose(false),
     mTMin(TMeVMin/Constants::HBCFmMeV),
-    mTMax(TMeVMax/Constants::HBCFmMeV) {
+    mTMax(TMeVMax/Constants::HBCFmMeV),
+    mPhaseBounds(std::vector<std::vector<std::pair<EOSData, EOSData>>>()) {
   if (findPhaseBound) FindPhaseBoundary();
 }
 
@@ -31,9 +32,10 @@ void GibbsPhaseConstruct::FindPhaseBoundary() {
   // Do a first pass for finding phase boundaries  
   double TFail = -1.0;
   double TMax = 50.0/Constants::HBCFmMeV;
-  
-  for (double lT = log10(mTMin); lT < log10(TMax) && lT < log10(mTMax); 
-      lT +=  log10(mTMult)) {
+  if (mTMax < 0.1/Constants::HBCFmMeV) 
+    throw std::range_error("Minimum temperature must be > 0.1 MeV"); 
+  for (double lT = log10(std::max(mTMin,0.1/Constants::HBCFmMeV)); 
+      lT <= log10(TMax) && lT <= log10(mTMax); lT +=  log10(mTMult)) {
     std::cerr << pow(10.0, lT)*Constants::HBCFmMeV << " ";
     auto phaseBound = FindFixedTPhaseBoundary(pow(10.0, lT));
     std::cerr << phaseBound.size() << std::endl;
@@ -44,6 +46,17 @@ void GibbsPhaseConstruct::FindPhaseBoundary() {
       TFail = pow(10.0, lT);
       break;
     }
+  }
+
+  // Find low temperature phase boundaries
+  if (mTMin < 0.1) {
+    for (double lT = log10(0.1/Constants::HBCFmMeV/mTMult); lT >= log10(mTMin); 
+        lT -= log10(mTMult)){
+      std::cerr << pow(10.0, lT)*Constants::HBCFmMeV << " ";
+      auto phaseBound = FindFixedTPhaseBoundary(pow(10.0,lT), mPhaseBounds[0]); 
+      std::cerr << phaseBound.size() << std::endl;
+      mPhaseBounds.push_back(phaseBound);
+    } 
   }
   
   // Now bisect to get close to the critical temperature
@@ -83,9 +96,11 @@ EOSData GibbsPhaseConstruct::FromNAndT(const EOSData& eosIn) {
   double np = eosIn.Np();
 
   // Check that we are within the temperature bounds. 
-  if (T < mTMin) 
+  if (T < mTMin) {
+    std::cerr << T << " " << mTMin << std::endl;
     throw std::logic_error("Trying to call the EoS below the minimum allowed T.");
-   
+  }
+     
   if (T > mTCrit) {
     if (mVerbose) std::cout << "# We are above the critical temperature \n";
     return mpEos->FromNAndT(eosIn); 
@@ -391,18 +406,16 @@ EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn,
         exp(xx[3])+exp(xx[1])));
     if (linear) {
       return { (eHi.P() - eLo.P()),
+           ((1.0 - xx[4])*eLo.Np() + xx[4]*eHi.Np())/eosIn.Np() - 1.0,
+           ((1.0 - xx[4])*eLo.Nn() + xx[4]*eHi.Nn())/eosIn.Nn() - 1.0,
            (eHi.Mun() - eLo.Mun()),
-           (eHi.Mup() - eLo.Mup()),
-           ((1.0 - xx[4])*eLo.Np() + xx[4]*eHi.Np())/eosIn.Np() - 1.0,
-           ((1.0 - xx[4])*eLo.Nn() + xx[4]*eHi.Nn())/eosIn.Nn() - 1.0};
+           (eHi.Mup() - eLo.Mup())};
     } else {
-      
-      std::vector<double> f = { (eHi.P() - eLo.P()) / (PScale),
-           (eHi.Mun() - eLo.Mun()) / (MunScale),
-           (eHi.Mup() - eLo.Mup()) / (MupScale),
+      return { (eHi.P() - eLo.P()) / (PScale),
            ((1.0 - xx[4])*eLo.Np() + xx[4]*eHi.Np())/eosIn.Np() - 1.0,
-           ((1.0 - xx[4])*eLo.Nn() + xx[4]*eHi.Nn())/eosIn.Nn() - 1.0};
-      return f;
+           ((1.0 - xx[4])*eLo.Nn() + xx[4]*eHi.Nn())/eosIn.Nn() - 1.0,
+           (eHi.Mun() - eLo.Mun()) / (MunScale),
+           (eHi.Mup() - eLo.Mup()) / (MupScale)};
     }
   };
   
@@ -415,6 +428,7 @@ EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn,
   } catch (MultiDRootException& e) {
     pars = e.GetX();
   } catch (...) {
+    std::cerr << "Gibbs linear solve failed." << std::endl;
     return mpEos->FromNAndT(
         EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np())); 
   }
@@ -444,18 +458,18 @@ EOSData GibbsPhaseConstruct::GetState(const EOSData& eosIn,
   MupScale = fabs(eHi.Mun());
   try {
     pars = rootFinder(root_f, pars, 5);
+    eLo = mpEos->FromNAndT(
+        EOSData::InputFromTNnNp(T, exp(pars[0]), exp(pars[1]))); 
+    eHi = mpEos->FromNAndT(
+        EOSData::InputFromTNnNp(T, exp(pars[2]) + exp(pars[0]), 
+        exp(pars[3])+exp(pars[1])));
+
   } catch (std::exception& e) {
     std::cerr << e.what(); 
     std::cerr << " in second try." << std::endl;
-    return mpEos->FromNAndT(
-        EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np())); 
+    //return mpEos->FromNAndT(
+    //    EOSData::InputFromTNnNp(T, eosIn.Nn(), eosIn.Np())); 
   }
-
-  eLo = mpEos->FromNAndT(
-      EOSData::InputFromTNnNp(T, exp(pars[0]), exp(pars[1]))); 
-  eHi = mpEos->FromNAndT(
-      EOSData::InputFromTNnNp(T, exp(pars[2]) + exp(pars[0]), 
-      exp(pars[3])+exp(pars[1])));
 
   if ((exp(pars[2]) < 1.e-1*exp(pars[0]) ) 
       && (exp(pars[3]) < 1.e-1*exp(pars[1]))) {
@@ -494,11 +508,14 @@ GibbsPhaseConstruct::SelfBoundPoints(double T,
       [](EOSData a, EOSData b) { return (a.Ye() < b.Ye()); });
   std::vector<std::pair<EOSData, EOSData>> selfBoundPair;
   for (auto& pt : selfBound) {
-    //auto low = mpEos->FromMuAndT(
-    //  EOSData::InputFromTMunMup(pt.T(), pt.Mun(), pt.Mup()));
-    auto lowTemp = EOSData::Output(pt.T(), 1.e-250, 1.e-250, 
-        pt.Mun(), pt.Mup(), 0.0);
-    selfBoundPair.push_back(std::pair<EOSData, EOSData>(lowTemp, pt)); 
+    auto low = mpEos->FromMuAndT(
+      EOSData::InputFromTMunMup(pt.T(), pt.Mun(), pt.Mup()));
+    //auto lowTemp = EOSData::Output(pt.T(), 1.e-250, 1.e-250, 
+    //    pt.Mun(), pt.Mup(), 0.0);
+    if (low.size()>0) {
+      if (low[0].Nb()<1.e-1) 
+        selfBoundPair.push_back(std::pair<EOSData, EOSData>(low[0], pt)); 
+    }
   }
 
   // Find matching points, ignoring pressure  
