@@ -20,24 +20,62 @@ int main() {
   EOSSkyrme eos = EOSSkyrme::FromErmalSkyrme(ErmalSkyrmeParameters::Ska35S2009);
   GibbsPhaseConstruct gibbs(eos, false);
   
+  // Calculat self bound liquid densities
+  std::ofstream selfBoundFile; 
+  selfBoundFile.open("self_bound.out");
+  selfBoundFile << "# [1] Nb " << std::endl;
+  selfBoundFile << "# [2] T (MeV) " << std::endl;
+  selfBoundFile << "# [3] Ye " << std::endl;
+  selfBoundFile << "# [4] P " << std::endl;
+  selfBoundFile << "# [5] Mun " << std::endl;
+  selfBoundFile << "# [6] Mup " << std::endl;
+  selfBoundFile << "# [7] Nn (low density) " << std::endl;
+  selfBoundFile << "# [8] Np (low density) " << std::endl;
+  selfBoundFile << "# [9] P (low density) " << std::endl;
+  
   std::ofstream outFile; 
   outFile.open("gibbs_boundary.out");
+  outFile << "#[1] Nn_1 (fm^-3)" << std::endl; 
+  outFile << "#[2] Nn_2 (fm^-3)" << std::endl; 
+  outFile << "#[3] Np_1 (fm^-3)" << std::endl; 
+  outFile << "#[4] Np_2 (fm^-3)" << std::endl; 
+  outFile << "#[5] P (MeV fm^-3)" << std::endl; 
+  outFile << "#[6] Mun (MeV fm^-3)" << std::endl; 
+  outFile << "#[7] Mup (MeV fm^-3)" << std::endl; 
+  outFile << "#[8] T (MeV)" << std::endl; 
+  
+  double TStart = 0.1/HBC; 
+  double TEnd = 0.01/HBC;
+  auto phaseBoundFull = gibbs.FindFixedTPhaseBoundary(TStart);
+  std::cout << phaseBoundFull.size() << std::endl;
    
-  for (double T = 3.0/HBC; T <= 22.0/HBC; T += 1.0/HBC) {
-    auto phaseBound = gibbs.FindFixedTPhaseBoundary(T); 
+  for (double lT = log10(TStart); lT>=log10(TEnd); lT -= 1.0) {
+    double T = pow(10.0, lT);
+    std::cout << T * HBC << " "; 
     
-    std::cout << T * HBC << " " << phaseBound.size() << std::endl; 
+    //auto selfBound = gibbs.SelfBoundPoints(T);  
+    //for (auto &ptpair : selfBound) {
+    //  auto pt = ptpair.second;
+    //  selfBoundFile << pt.Nb() << " " << pt.T()*HBC << " " << pt.Ye() << " "  
+    //      << pt.P() << " " << pt.Mun() << " " << pt.Mup() << " "; 
+    //  auto eosPts = 
+    //      eos.FromMuAndT(EOSData::InputFromTMunMup(pt.T(), pt.Mun(), pt.Mup()));
+    //  if (eosPts.size()>0) {
+    //    selfBoundFile << eosPts[0].Np() << " " << eosPts[0].Nn() << " " 
+    //        << eosPts[0].P(); 
+    //  }
+    //  selfBoundFile << std::endl;
+    //} 
+    //selfBoundFile << std::endl; 
+   
+    // Calculate phase boundaries
+    auto phaseBound = phaseBoundFull; 
+    if (T < TStart)  
+      phaseBound = gibbs.FindFixedTPhaseBoundary(T, phaseBoundFull); 
+    
+    std::cout << phaseBound.size() << std::endl; 
     if (phaseBound.size() > 0) {
       // Write out the phase boundary
-      outFile << "#[1] Nn_1 (fm^-3)" << std::endl; 
-      outFile << "#[2] Nn_2 (fm^-3)" << std::endl; 
-      outFile << "#[3] Np_1 (fm^-3)" << std::endl; 
-      outFile << "#[4] Np_2 (fm^-3)" << std::endl; 
-      outFile << "#[5] P (MeV fm^-3)" << std::endl; 
-      outFile << "#[6] Mun (MeV fm^-3)" << std::endl; 
-      outFile << "#[7] Mup (MeV fm^-3)" << std::endl; 
-      outFile << "#[8] T (MeV)" << std::endl; 
-      
       for (auto &a : phaseBound) {
         outFile << (a.first).Nn() << " "; 
         outFile << (a.second).Nn() << " "; 
@@ -48,11 +86,11 @@ int main() {
         outFile << (a.first).Mup()*HBC << " ";
         outFile << (a.first).T()*HBC << std::endl;
       }
-      
       outFile << std::endl; 
     } 
   }  
    
+  selfBoundFile.close();
   outFile.close(); 
   return 0;
 }
