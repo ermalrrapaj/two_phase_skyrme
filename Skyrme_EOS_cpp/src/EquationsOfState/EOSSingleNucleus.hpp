@@ -37,11 +37,11 @@ protected:
   std::vector<EOSData> EquilibriumConditions(const EOSData& eosIn, 
       const EOSData& eosLo, const EOSData& eosHi, double llam0 = -5.0); 
 
+  EOSData GetStateFromPhases(double u, const EOSData& low, const EOSData& high);
+  double GetMuh(double u, double nn, double T); 
   std::array<double, 2> DSurf(double u);
   std::array<double, 2> Sigma(double xp);
   std::array<double, 3> HFunc(double T, double xp);
-  
-  double GetMuh(double u, double nn, double T); 
    
   double mA0;
   double mSigma0;
