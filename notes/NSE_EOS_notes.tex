@@ -121,18 +121,18 @@ model free energy used in LS.
 To find the thermodynamic state of the system, we must minimize our free energy
 with respect to the free parameters in our model subject to the constraints of
 total neutron number, proton number, and volume conservation.  These constraints
-are written as \begin{eqnarray*}
+are written as \begin{eqnarray}
 \sum \mathcal{N}_i Z_i + Z_o = Z \\
 \sum \mathcal{N}_i N_i + N_o = N \\
 \sum \mathcal{N}_i v_i + V_o = V, 
-\end{eqnarray*}
+\end{eqnarray}
 where $Z_o = n_{p,o} V_o$ and $N_o = n_{n,o} V_o$.  Choosing $\mathcal{N}_i$ and
-$v_i$ as our independent variables gives the relations \begin{eqnarray*} 
+$v_i$ as our independent variables gives the relations \begin{eqnarray} 
 Z_i + \frac{\partial Z_o}{\partial \mathcal{N}_i} = 0, \,\, \,\,
 N_i + \frac{\partial N_o}{\partial \mathcal{N}_i} = 0 \\
 v_i + \frac{\partial V_o}{\partial \mathcal{N}_i} = 0, \,\, \,\,
 \mathcal{N}_i + \frac{\partial V_o}{\partial v_i} = 0
-\end{eqnarray*}
+\end{eqnarray}
 and results in the system of equations 
 \begin{eqnarray}
 \label{eq:dFdN}
@@ -152,76 +152,76 @@ $P_{FS,i} = -\partial (F_{S,i}) / \partial v_i$.
 \subsection{Connection to NSE} 
 For a reaction $i \leftrightarrow j + k$, it is easy to show that the principle
 of detailed balance implies that 
-\begin{equation*}
+\begin{equation}
 \mu_i = \mu_j + \mu_k 
-\end{equation*} 
+\end{equation} 
 holds when the forward rate balances the backward rate.  When all strong
 interactions are in equilibrium with their inverses, invoking detailed balance
 for all of the reactions implies that 
-\begin{equation*}
+\begin{equation}
 \mu_i = N_i \mu_n + Z_i \mu_p. 
-\end{equation*} 
+\end{equation} 
 where $N_i$ is the number of neutrons and $Z_i$ is the number of protons in a
 nucleus of species $i$.
 This of course implies that if the neutron and proton number densities are
 known, the number densities of all other species in the medium are known.
 Assuming that the heavy nuclei obey Boltzmann statistics (i.e. $\mu_i = m_i + T
 \ln \left[n_i/(G_i n_Q)\right]$ gives 
-\begin{equation*}
+\begin{equation}
 n_i = A_i^{3/2} G_i(T) n_Q \exp\left(\left[Z_i \mu_p + N_i \mu_n
 - m_i \right]/T\right), 
-\end{equation*} 
+\end{equation} 
 where $G_i$ is the temperature dependent internal partition function of species
 $i$.  When neutrons and protons also obey Boltzmann statistics, the number
 density can be expressed as 
-\begin{equation*} 
+\begin{equation} 
 n_i = \frac{A_i^{3/2} G_i(T)}{2^{A_i}n_Q^{A_i-1}}  n_n^{N_i} n_p^{Z_i}
 \exp(BE_i/T), 
-\end{equation*} 
+\end{equation} 
 where $BE_i$ is the binding energy of species $i$.  
 
 Rather than being given the free proton and neutron densities, we often
 only know the total neutron and proton densities.  In that case the equations of
 neutron and proton number conservation must be solved as functions of the free
 proton and neutron number densities
-\begin{eqnarray*}
+\begin{eqnarray}
 &&\sum_i N_i n_i(n_{n,o}, n_{p,o}) = n_n, \\
 &&\sum_i Z_i n_i(n_{n,o}, n_{p,o}) = n_p.
-\end{eqnarray*}  
+\end{eqnarray}  
 
 The equations of NSE can also be derived by writing minimizing the free energy of a 
 multi-component gas subject to the constraints of neutron and proton number
 conservation.  The free energy is just 
-\begin{equation*}
+\begin{equation}
 F_{NSE} = \sum_i^{\textrm{nuclei, n, p}} V f_i(\mathcal{N}_i/V, T), 
-\end{equation*} 
+\end{equation} 
 where $V$ is the total volume of the system and $\mathcal{N}_i$ is the total number of particles of species $i$.  The NSE equations result if this free energy is minimized.  
 A slightly more complicated for nuclei in a medium takes into account that the nuclei
 take up volume.  The nuclei can exist in the whole volume, but neutrons and protons 
 can only exist in the volume not taken up by nuclei.  The free energy for this system
 can be written as 
-\begin{equation*}
+\begin{equation}
 F_{EV} = \sum_i^{\textrm{nuclei}} V f_i(\mathcal{N}_i/V, T) 
 + \left (1 - \sum_i^{\textrm{nuclei}}\mathcal{N}_i v_i\right) V \left[f_n + f_p\right].
-\end{equation*}
+\end{equation}
 Minimizing this free energy results in a very similar set of equations to the NSE 
 equations, but with a correction term to the number density of species $i$ because of 
 the energetic cost of excluding nucleons from its volume 
-\begin{equation*}
+\begin{equation}
 n_{i,EV} = A_i^{3/2} G_i(T) n_Q \exp\left(\left[Z_i \mu_p + N_i \mu_n - m_i - v_i(P_n + P_p) \right]/T\right).
-\end{equation*} 
+\end{equation} 
 
 The constraint equations for our model free energy bear a strong resemblance 
 to the excluded volume NSE equations (by construction).  This can be seen by recasting 
 equation \ref{eq:dFdN} to 
-\begin{equation*}
+\begin{equation}
 n_i = A_i^{3/2} n_Q \exp(Z_i (\mu_{p,o} - m_p) + N_i (\mu_{n,o} - m_n) + \tilde B_i - v_i P_o),
-\end{equation*}
+\end{equation}
 where 
-\begin{equation*}
+\begin{equation}
 \tilde B_i(v_i, n_{p,o}, n_{n,o}, T) = 
  Z_i m_p + N_i m_n - v_i f_{B,i} - F_{FS,i} - E_{0,i}.
-\end{equation*}
+\end{equation}
 We can also see that equation \ref{eq:dFdv} is independent of $\mathcal{N}_i$ 
 when $n_i$ is non-zero.  This allows us to express the nuclear volume as a 
 function of only the properties of the external medium, $v_i = v_i(n_{p,o},
@@ -232,9 +232,9 @@ cannot be met for any volume.  This just implies that $n_i$ must be zero, which
 also provides a solution to equation \ref{eq:dFdv}.  When solutions are admitted, 
 the expression for the number density of species $i$ can be further massaged to look like standard NSE by expressing the thermal average 
 of the excitation energy above the ground state as 
-\begin{equation*}
+\begin{equation}
 \langle E^* \rangle = T \frac{d \ln G}{d \ln T},
-\end{equation*} 
+\end{equation} 
 where $G(T)$ is the internal partition function of the gas and $E^*$ is the 
 excitation energy above the zero temperature ground state.  To get the 
 internal partition function outside the exponential as would be the case in 
@@ -243,9 +243,9 @@ NSE, we must make the identification $ G_i = \exp(d \ln G/ d\ln T)$.
 level density.  Check if this is in fact the case.}
 
 When the outside densities are low, $P_o$ is negligible and the second
-constraint equation results in \begin{equation*}
+constraint equation results in \begin{equation}
 P_{B,i} + P_{FS,i} = 0.
-\end{equation*} 
+\end{equation} 
 As long as the finite size term is not strongly affected by the exterior medium
 (which is expected at low densities), this equation only depends on $v_i$.
 Therefore, it just determines the volume of nucleus $i$ in vacuum, and thereby
@@ -259,16 +259,16 @@ standard equations for low density NSE.
 The Gibbs phase construction assumes there are no surface effects and that the
 phase bubbles are stationary.  Employing these two approximations forces us to
 set $E_{FS,i}$ and $\mu_{K,i}$ to zero (or assume they are negligible).  Our
-constraint equations are then \begin{eqnarray*}
+constraint equations are then \begin{eqnarray}
 n_i P_{B,i} = n_i P_o \\ 
 v_i f_{B,i} + E_{0,i} =  Z_i \mu_{p,o} + N_i \mu_{n,o} - v_i P_o.
-\end{eqnarray*}
+\end{eqnarray}
 The relation $P_B = n_p \mu_p + n_n \mu_n - f_B$ (which holds for 
 homogeneous matter) can then be employed to recast
-the constraints as \begin{eqnarray*}
+the constraints as \begin{eqnarray}
 n_i P_{B,i} = n_i P_o \\ 
 Z_i \left(\mu_{p,i} - \mu_{p,o}\right) + N_i \left(\mu_{n,i} - \mu_{n,o}\right) = 0\\
-\end{eqnarray*}
+\end{eqnarray}
 These equations are either satisfied by nucleus $i$ when it's density is zero or
 when it satisfies the Gibbs phase equilibrium conditions.  Since there is no
 difference between different nuclei with the same $Y_p$ because there is are no
@@ -306,13 +306,13 @@ large for voids.
 We currently employ the Wigner-Seitz approximation to Coulomb corrections.  In
 principle more complicated models could easily be used.  The volume of a charge
 neutral spherical cell containing a nucleus of charge $Z_i$ is 
-\begin{equation*} 
+\begin{equation} 
 v_{WS,i} = \frac{Z_i - v_i n_{p,o}}{n_e - n_{p,o}}
-\end{equation*}
+\end{equation}
 and the fraction of this volume filled by the nucleus is 
-\begin{equation*}
+\begin{equation}
 u_i = v_i/v_{WS,i} = \frac{n_e - n_{p,o}}{n_{p,i} - n_{p,o}}. 
-\end{equation*} 
+\end{equation} 
 The total Coulomb contribution to the free energy for a single nucleus is then
 given by
 \begin{equation}
@@ -322,7 +322,7 @@ F_{C,i}(v_i, n_{p,o}, n_e) = \frac{3\alpha}{5 r_i} \left(Z_i - v_i n_{p,o}\right
 where $\mathcal{D}(u) = 1 - 3/2 u^{1/3} + u/2$.  This expression is valid wether
 the exterior phase is low or high density and is applicable when calculating
 voids.  Derivatives of this are also required 
-\begin{eqnarray*}
+\begin{eqnarray}
 && \pd{F_{WS,i}}{\ln n_e} = F_{WS,i} \frac{\mathcal{D}'}{\mathcal{D}}
 \pd{u_i}{\ln n_e} \\
 && \pd{F_{WS,i}}{\ln n_{p,o}} = F_{WS,i} \frac{\mathcal{D}'}{\mathcal{D}}
@@ -330,7 +330,7 @@ voids.  Derivatives of this are also required
 -P_{C,i} &=&  \pd{F_{WS,i}}{v_i} = \frac{F_{WS,i}}{v_i} 
 \left[ \frac{\mathcal{D}'}{\mathcal{D}}  \pd{u_i}{\ln v_i} 
 - \frac{2n_{p,o}}{n_{p,i} - n_{p,o}} - \frac{1}{3} \right].
-\end{eqnarray*}
+\end{eqnarray}
   
 \subsection{Surface Tension}
 \todo{Come up with a decent surface tension prescription}
@@ -343,10 +343,10 @@ voids.  Derivatives of this are also required
 \subsection{Gibbs Phase Equilibrium Solver}
 \subsection{NSE Solver}
 The NSE solver and equation of state are found in the file \texttt{src/EquationsOfState/EOSNSE.hpp}.  As was shown above, standard NSE, excluded volume NSE, and our model free energy share a very similar form.  Therefore, a generic NSE solver with excluded volume corrections has been implemented.  It takes a vector of nuclear species that all inherit from the class \texttt{NucleusBase}.  For a given exterior state, these nuclei can return their binding energy, their internal partition function \todo{implement the partition function for generality}, and their volume.  This implies that the NSE solver should be agnostic about what type of nuclei are being passed to it.  Often, it is hard to find a solution to the NSE equations when the composition is dominated by nuclei.  To increase the range over which the solver converges, we use a trick where we turn on the binding energies and volumes of the nuclei as if they were a perturbation.  The number densities then are given by 
-\begin{equation*}
+\begin{equation}
 n_{i} = A_i^{3/2} G_i(T) n_Q \exp\left(\left[Z_i (\mu_p - m_p) + N_i (\mu_n - m_n) 
 - \lambda_B B_i - \lambda_v v_i P_o \right]/T\right).
-\end{equation*}
+\end{equation}
 A solution can easily be found when the $\lambda$s are zero, and then they can be slowly increased to find a solution to our actual system of equations.   There also seem to be problems when the neutrons and protons are assumed to be an interacting gas.  This results in the chemical potentials decreasing with increasing density and prevents a solution from being found.  Currently, it is unclear to me why this is the case. \todo{Understand why this is the case.}
 
 \begin{figure}[t]
