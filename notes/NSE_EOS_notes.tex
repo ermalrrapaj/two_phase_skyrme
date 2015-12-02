@@ -67,6 +67,7 @@
 \newcommand{\mo}{\mathrm{M}_\odot }
 \newcommand{\code}[1]{{\tt #1}}
 \newcommand{\todo}[1]{{$\blacksquare$~\textbf{\color{blue}[TODO: #1]}}~$\blacksquare$}
+\newcommand{\warn}[1]{{$\blacksquare$~\textbf{\color{red}[WARNING: #1]}}~$\blacksquare$}
 
 % See the ``Article customise'' template for come common customisations
 
@@ -118,6 +119,7 @@ allowed these neutron and proton number of the nucleus to vary, we arrive at the
 model free energy used in LS.  
 
 \subsection{Minimization of the Free Energy}
+\label{sec:minimization}
 To find the thermodynamic state of the system, we must minimize our free energy
 with respect to the free parameters in our model subject to the constraints of
 total neutron number, proton number, and volume conservation.  These constraints
@@ -150,6 +152,11 @@ $P_{FS,i} = -\partial (F_{S,i}) / \partial v_i$.
 
 
 \subsection{Connection to NSE} 
+Here we discuss the physics of NSE for an ensemble of non-interacting nuclei and
+show how a similar formulation results from our multi-nucleus Gibbs
+construction.  
+
+\subsubsection{Basic NSE} 
 For a reaction $i \leftrightarrow j + k$, it is easy to show that the principle
 of detailed balance implies that 
 \begin{equation}
@@ -168,6 +175,7 @@ known, the number densities of all other species in the medium are known.
 Assuming that the heavy nuclei obey Boltzmann statistics (i.e. $\mu_i = m_i + T
 \ln \left[n_i/(G_i n_Q)\right]$ gives 
 \begin{equation}
+\label{eq:nse1}
 n_i = A_i^{3/2} G_i(T) n_Q \exp\left(\left[Z_i \mu_p + N_i \mu_n
 - m_i \right]/T\right), 
 \end{equation} 
@@ -178,24 +186,44 @@ density can be expressed as
 n_i = \frac{A_i^{3/2} G_i(T)}{2^{A_i}n_Q^{A_i-1}}  n_n^{N_i} n_p^{Z_i}
 \exp(BE_i/T), 
 \end{equation} 
-where $BE_i$ is the binding energy of species $i$.  
+where $BE_i$ is the binding energy and $G_i$ is the internal partition function
+of species $i$.  
 
 Rather than being given the free proton and neutron densities, we often
 only know the total neutron and proton densities.  In that case the equations of
 neutron and proton number conservation must be solved as functions of the free
 proton and neutron number densities
 \begin{eqnarray}
-&&\sum_i N_i n_i(n_{n,o}, n_{p,o}) = n_n, \\
-&&\sum_i Z_i n_i(n_{n,o}, n_{p,o}) = n_p.
+\label{eq:nse2}
+&&n_{n,o} + \sum_i^\textrm{nuclei} N_i n_i(n_{n,o}, n_{p,o}) = n_n, \\
+\label{eq:nse3}
+&&n_{p,o} + \sum_i^\textrm{nuclei} Z_i n_i(n_{n,o}, n_{p,o}) = n_p.
 \end{eqnarray}  
 
 The equations of NSE can also be derived by writing minimizing the free energy of a 
 multi-component gas subject to the constraints of neutron and proton number
 conservation.  The free energy is just 
 \begin{equation}
-F_{NSE} = \sum_i^{\textrm{nuclei, n, p}} V f_i(\mathcal{N}_i/V, T), 
+F_{NSE} = V f_B(n_{p,o}, n_{n,o}, T) +  
+\sum^{\textrm{nuclei}}_i \mathcal{N}_i \mathrm{f}_i(\mathcal{N}_i/V, T), 
 \end{equation} 
-where $V$ is the total volume of the system and $\mathcal{N}_i$ is the total number of particles of species $i$.  The NSE equations result if this free energy is minimized.  
+
+where $V$ is the total volume of the system, $\mathcal{N}_i$ is the total
+number of particles of species $i$, and 
+\begin{equation}
+\mathrm{f}_i = m_i + T \ln \left[\frac{\mathcal{N}_i}{V G_i(T)} 
+\left(\frac{2 \pi \hbar^2}{m_i T} \right)^{3/2}  \right] - T
+\end{equation}
+is the specific free energy of species $i$. \warn{We need to be careful about
+including the rest mass in the free energy,  the Skyrme output does not include
+it so the nucleon binding energies should come in.  This needs to be cleaned up
+both in the notes and in the code (although the code is currently consistent)}
+The NSE equations (equations \ref{eq:nse1}, \ref{eq:nse2}, and \ref{eq:nse3})
+result if this free energy is minimized with respect to the $\mathcal{N}_i$
+while maintaining fixed total neutron number, proton number, and volume (similar
+to the procedure in section \ref{sec:minimization}).  
+
+\subsubsection{NSE with Excluded Volume Correction}
 A slightly more complicated for nuclei in a medium takes into account that the nuclei
 take up volume.  The nuclei can exist in the whole volume, but neutrons and protons 
 can only exist in the volume not taken up by nuclei.  The free energy for this system
@@ -211,6 +239,7 @@ the energetic cost of excluding nucleons from its volume
 n_{i,EV} = A_i^{3/2} G_i(T) n_Q \exp\left(\left[Z_i \mu_p + N_i \mu_n - m_i - v_i(P_n + P_p) \right]/T\right).
 \end{equation} 
 
+\subsubsection{Relation of Multi-nucleus Gibbs to NSE}
 The constraint equations for our model free energy bear a strong resemblance 
 to the excluded volume NSE equations (by construction).  This can be seen by recasting 
 equation \ref{eq:dFdN} to 
