@@ -87,11 +87,8 @@ public:
   
   EOSData FromNAndT(const EOSData& eosIn);
   
-  EOSData GetTotalEOS(const EOSData& eosOut);
-
   std::vector<double> GetExteriorDensities(const EOSData& eosIn);
-  
-  double GetNe(const EOSData& eosIn);
+  std::vector<double> GetTotalDensities(const EOSData& eosIn);
   
   double GetMinimumT() const {return mTMin;}
   double GetMaximumT() const {return 200.0/Constants::HBCFmMeV;}
@@ -104,6 +101,8 @@ private:
   std::vector<std::unique_ptr<NucleusBase>> mNuclei; 
   double mTMin;
   std::shared_ptr<EOSBase> mpEos; 
+
+  std::array<double, 3> GetNucleiScalars(const EOSData& eosOut, double ne);
 
 };
 

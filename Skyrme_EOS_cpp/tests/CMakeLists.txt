@@ -30,6 +30,10 @@ add_executable(nse_test nse_test.cpp)
 #add_test(NSE nse_test)
 target_link_libraries(nse_test eos ${EOSBUILDER_EXTERNAL_LIBS} )
 
+add_executable(nse_test_new nse_test_new.cpp) 
+#add_test(NSE nse_test)
+target_link_libraries(nse_test_new eos ${EOSBUILDER_EXTERNAL_LIBS} )
+
 add_executable(gibbs_archive gibbs_archive.cpp) 
 target_link_libraries(gibbs_archive eos ${EOSBUILDER_EXTERNAL_LIBS} )
 
