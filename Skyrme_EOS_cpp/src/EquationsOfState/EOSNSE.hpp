@@ -86,8 +86,12 @@ public:
   } 
   
   EOSData FromNAndT(const EOSData& eosIn);
+  
+  EOSData GetTotalEOS(const EOSData& eosOut);
 
   std::vector<double> GetExteriorDensities(const EOSData& eosIn);
+  
+  double GetNe(const EOSData& eosIn);
   
   double GetMinimumT() const {return mTMin;}
   double GetMaximumT() const {return 200.0/Constants::HBCFmMeV;}
