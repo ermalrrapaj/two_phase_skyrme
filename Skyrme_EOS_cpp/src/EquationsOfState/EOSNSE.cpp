@@ -6,6 +6,7 @@
 ///
 ///
 
+#include <algorithm> 
 #include "EquationsOfState/EOSNSE.hpp"
 #include "Util/OneDimensionalRoot.hpp"
 #include "Util/MultiDimensionalRoot.hpp" 
@@ -80,14 +81,14 @@ std::vector<double> EOSNSE::GetTotalDensities(const EOSData& eosIn) {
   EOSData eosOut = mpEos->FromNAndT(eosIn);
   auto nse_func = [&eosOut, this](double xx)->double{
     auto nucleiProps = GetNucleiScalars(eosOut, exp(xx)); 
-    double yy = nucleiProps[1] + (1.0 - nucleiProps[2])*eosOut.Np() - exp(xx);
+    double yy = (nucleiProps[1] + (1.0 - nucleiProps[2])*eosOut.Np())/exp(xx) - 1.0;
     //std::cout << yy << " " << exp(xx) << std::endl;
     return yy;
   };
 
-  OneDimensionalRoot rootFinder1D(1.e-9, 1000);
-  double ne_low = log(eosIn.Np()*1.e0/100.0);
-  double ne_high = log(0.2*1.e0);
+  OneDimensionalRoot rootFinder1D(1.e-7, 1000);
+  double ne_low = log(1.e-5*eosIn.Np());
+  double ne_high = log(std::max(eosIn.Np(), 0.1));
   double ne = exp(rootFinder1D(nse_func, ne_low, ne_high));
   auto nucleiProps = GetNucleiScalars(eosOut, ne); 
   return {nucleiProps[0] + eosIn.Nn()*(1.0 - nucleiProps[2]), 

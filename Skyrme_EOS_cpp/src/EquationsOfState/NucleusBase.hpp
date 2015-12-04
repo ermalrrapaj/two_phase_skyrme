@@ -32,6 +32,8 @@ public:
     
 protected:
   int mZ, mN, mA;
+  double CoulombPressure(double v, double npo, double ne) const;
+  double CoulombEnergy(double v, double npo, double ne) const;
 
 }; 
 
@@ -42,8 +44,8 @@ public:
       mBE(BE), mTg(TGrid), mPFg(PFGrid), mV(v) {}
 
   /// \todo Still need to include partition function in binding energy
-  double GetBindingEnergy(const EOSData& /*eosIn*/, double /*ne*/) const { 
-    return mBE;
+  double GetBindingEnergy(const EOSData& eosExt, double ne) const { 
+    return mBE - 1.0*CoulombEnergy(mV, 0.0, ne);
   }
   
   double GetBindingEnergy(const EOSData& eosIn, double ne, double /*v*/) const { 
@@ -80,8 +82,8 @@ public:
 protected:
   double SurfacePressure(double v) const;
   double SurfaceEnergy(double v) const;
-  double CoulombPressure(double v, double npo, double ne) const;
-  double CoulombEnergy(double v, double npo, double ne) const;
+  //double CoulombPressure(double v, double npo, double ne) const;
+  //double CoulombEnergy(double v, double npo, double ne) const;
   std::unique_ptr<EOSBase> mpEos;
   double mSs0; 
   double mSigma0; 

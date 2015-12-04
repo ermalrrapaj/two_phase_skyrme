@@ -52,8 +52,7 @@ double LDNucleus::GetBindingEnergy(const EOSData& eosIn,
   double N = (double) NucleusBase::mN;
   double T = eosIn.T(); 
    
-  EOSData eosBulk = mpEos->FromNAndT(
-      EOSData::InputFromTNnNp(T, N/v, Z/v)); 
+  EOSData eosBulk = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, N/v, Z/v)); 
   return -(eosBulk.E() - eosBulk.T()*eosBulk.S()) * NucleusBase::mA 
          - eosIn.P() * v - SurfaceEnergy(v) - CoulombEnergy(v, eosIn.Np(), ne);
 
@@ -77,14 +76,14 @@ inline double DpoD(double u) {
 }
 }
 
-double LDNucleus::CoulombEnergy(double v, double npo, double ne) const {
+double NucleusBase::CoulombEnergy(double v, double npo, double ne) const {
   double u = (ne - npo) / ((double)NucleusBase::mZ/v - npo);
   return 3.0 * Constants::ElementaryChargeSquared 
       / (5.0 * pow(3.0 * v / (4.0 * Constants::Pi), 1.0/3.0))
       * pow((double)NucleusBase::mZ - v*npo, 2) * D(u);
 }
 
-double LDNucleus::CoulombPressure(double v, double npo, double ne) const {
+double NucleusBase::CoulombPressure(double v, double npo, double ne) const {
   double Z = (double) NucleusBase::mZ;
   double denom = 1.0 / (Z/v - npo);
   double u = (ne - npo) * denom;
