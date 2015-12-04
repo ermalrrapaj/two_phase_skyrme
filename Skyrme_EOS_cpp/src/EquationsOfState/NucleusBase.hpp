@@ -30,10 +30,11 @@ public:
   double GetZ() const {return (double) mZ;} 
   double GetA() const {return (double) mA;} 
     
-protected:
-  int mZ, mN, mA;
   double CoulombPressure(double v, double npo, double ne) const;
   double CoulombEnergy(double v, double npo, double ne) const;
+
+protected:
+  int mZ, mN, mA;
 
 }; 
 
