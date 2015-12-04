@@ -42,7 +42,7 @@ int main() {
         auto eosExt = eos.FromNAndT(EOSData::InputFromTNnNp(T, nn0, np0)); 
         if (ns[2] < 1.0) { 
             std::cout << ns[0] << " " << ns[1] << " " 
-            << nn0 << " " << np0 << " " << ns[2] << std::endl;
+            << nn0 << " " << np0 << " " << ns[2] << " "<<nuclei[3]->CoulombEnergy(nuclei[3]->GetVolume(eosExt, ns[0]), npo, ns[0])<<std::endl;
           if (fabs(ns[0]/nno - 1.0) > 0.02 || fabs(ns[1]/npo - 1.0)>0.02) delta *= 0.8;
           if (fabs((ns[0] + ns[1])/(npo + nno)-1.0) < 1.e-3) delta /= 0.8;
           delta = std::max(1.e-4, delta);

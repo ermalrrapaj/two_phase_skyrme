@@ -93,10 +93,10 @@ std::vector<double> EOSNSE::GetTotalDensities(const EOSData& eosIn) {
   auto nucleiProps = GetNucleiScalars(eosOut, ne); 
   return {nucleiProps[0] + eosIn.Nn()*(1.0 - nucleiProps[2]), 
           nucleiProps[1] + eosIn.Np()*(1.0 - nucleiProps[2]), 
-          nucleiProps[2]};
+          nucleiProps[2], nucleiProps[3]};
 }
 
-std::array<double, 3> EOSNSE::GetNucleiScalars(const EOSData& eosOut, double ne) {
+std::array<double, 4> EOSNSE::GetNucleiScalars(const EOSData& eosOut, double ne) {
   double mun = eosOut.Mun(); 
   double mup = eosOut.Mup(); 
   double T   = eosOut.T(); 
@@ -104,7 +104,8 @@ std::array<double, 3> EOSNSE::GetNucleiScalars(const EOSData& eosOut, double ne)
   
   double nn = 0.0; 
   double np = 0.0;
-  double uNuc  = 0.0; 
+  double uNuc  = 0.0;
+  double vNuc  = 0.0;
   for (auto& nuc : mNuclei) {
     double v = nuc->GetVolume(eosOut, ne);
     double BE = nuc->GetBindingEnergy(eosOut, ne, v);
@@ -112,8 +113,9 @@ std::array<double, 3> EOSNSE::GetNucleiScalars(const EOSData& eosOut, double ne)
     double ni = nQ * pow((double) nuc->GetA(), 1.5) * exp(aa/T);
     np += nuc->GetZ()*ni;
     nn += nuc->GetN()*ni;
-    uNuc += v*ni; 
+    uNuc += v*ni;
+    vNuc += v; 
   }
-  return {nn, np, uNuc};
+  return {nn, np, uNuc, vNuc};
 }
 

@@ -102,7 +102,7 @@ private:
   double mTMin;
   std::shared_ptr<EOSBase> mpEos; 
 
-  std::array<double, 3> GetNucleiScalars(const EOSData& eosOut, double ne);
+  std::array<double, 4> GetNucleiScalars(const EOSData& eosOut, double ne);
 
 };
 
