@@ -7,6 +7,7 @@
 ///
 
 #include <algorithm> 
+#include <omp.h>
 #include "EquationsOfState/EOSNSE.hpp"
 #include "Util/OneDimensionalRoot.hpp"
 #include "Util/MultiDimensionalRoot.hpp" 
@@ -140,13 +141,19 @@ std::array<double, 4> EOSNSE::GetNucleiScalars(const EOSData& eosOut, double ne)
   double uNuc  = 0.0;
   double vNuc  = 0.0;
   // This is a good candidate for OpenMP parallelization
-  for (auto& nuc : mNuclei) {
-    double v = nuc->GetVolume(eosOut, ne);
-    double BE = nuc->GetBindingEnergy(eosOut, ne, v);
-    double aa = nuc->GetN()*mun + nuc->GetZ()*mup + BE - v*eosOut.P(); 
-    double ni = std::min(nQ * pow((double) nuc->GetA(), 1.5) * exp(aa/T), 1.e200);
-    nn += nuc->GetN()*ni;
-    np += nuc->GetZ()*ni;
+  #pragma omp parallel for 
+  #pragma omp default(shared) 
+  #pragma omp schedule(static) 
+  #pragma omp reduce(+:nn,np,uNuc,vNuc) 
+  for (int i=0; i<mNuclei.size(); ++i) {
+    double v = mNuclei[i]->GetVolume(eosOut, ne);
+    double BE = mNuclei[i]->GetBindingEnergy(eosOut, ne, v);
+    double aa = mNuclei[i]->GetN()*mun + mNuclei[i]->GetZ()*mup 
+        + BE - v*eosOut.P(); 
+    double ni = std::min(nQ * pow((double) mNuclei[i]->GetA(), 1.5) 
+        * exp(aa/T), 1.e200);
+    nn += mNuclei[i]->GetN()*ni;
+    np += mNuclei[i]->GetZ()*ni;
     uNuc += v*ni;
     vNuc += v; 
   }
