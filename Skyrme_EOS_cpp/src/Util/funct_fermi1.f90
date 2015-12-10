@@ -19,7 +19,7 @@
 
 
       double precision function zfermim12(x)
-      include 'implno.dek'
+      implicit none
 !..
 !..this routine applies a rational function expansion to get the fermi-dirac
 !..integral of order -1/2 evaluated at x. maximum error is 1.23d-12.
@@ -86,7 +86,7 @@
 
 
       double precision function zfermi12(x)
-      include 'implno.dek'
+      implicit none
 !..
 !..this routine applies a rational function expansion to get the fermi-dirac
 !..integral of order 1/2 evaluated at x. maximum error is 5.47d-13.
@@ -153,7 +153,7 @@
 
 
       double precision function zfermi1(x)
-      include 'implno.dek'
+      implicit none
 !..
 !..this routine applies a rational function expansion to get the fermi-dirac
 !..integral of order 1 evaluated at x. maximum error is 1.0e-8.
@@ -213,35 +213,35 @@
 
 
 
-      double precision function zfermi32(x, calc_deriv, dzfermi32)
-      include 'implno.dek'
+      recursive double precision function zfermi32(x, calc_deriv, dzfermi32)
+      implicit none
 !..
 !..this routine applies a rational function expansion to get the fermi-dirac
 !..integral of order 3/2 evaluated at x. maximum error is 5.07d-13.
 !..reference: antia apjs 84,101 1993
 !..
 !..declare
-      integer          i,m1,k1,m2,k2
+      integer          i,m1,k1,m2,k2,k
       integer, intent(in) :: calc_deriv
       double precision, intent(out) :: dzfermi32
       double precision x,an,a1(12),b1(12),a2(12),b2(12),rn,den,xx
       double precision drn, dden, dxx, sqx
 !..load the coefficients of the expansion
       data  an,m1,k1,m2,k2 /1.5d0, 6, 7, 9, 10/
-      data  (a1(i),i=1,7)/4.32326386604283d4,   8.55472308218786d4, &
+      data  (a1(k),k=1,7)/4.32326386604283d4,   8.55472308218786d4, &
                           5.95275291210962d4,   1.77294861572005d4, &
                           2.21876607796460d3,   9.90562948053193d1, &
                           1.0d0/
-      data  (b1(i),i=1,8)/3.25218725353467d4,   7.01022511904373d4, &
+      data  (b1(k),k=1,8)/3.25218725353467d4,   7.01022511904373d4, &
                           5.50859144223638d4,   1.95942074576400d4, &
                           3.20803912586318d3,   2.20853967067789d2, &
                           5.05580641737527d0,   1.99507945223266d-2/
-      data (a2(i),i=1,10)/2.80452693148553d-13, 8.60096863656367d-11, &
+      data (a2(k),k=1,10)/2.80452693148553d-13, 8.60096863656367d-11, &
                           1.62974620742993d-8,  1.63598843752050d-6, &
                           9.12915407846722d-5,  2.62988766922117d-3, &
                           3.85682997219346d-2,  2.78383256609605d-1, &
                           9.02250179334496d-1,  1.0d0/
-      data (b2(i),i=1,11)/7.01131732871184d-13, 2.10699282897576d-10, &
+      data (b2(k),k=1,11)/7.01131732871184d-13, 2.10699282897576d-10, &
                           3.94452010378723d-8,  3.84703231868724d-6, &
                           2.04569943213216d-4,  5.31999109566385d-3, &
                           6.39899717779153d-2,  3.14236143831882d-1, &
@@ -321,7 +321,7 @@
 
 
       double precision function zfermi2(x)
-      include 'implno.dek'
+      implicit none
 !..
 !..this routine applies a rational function expansion to get the fermi-dirac
 !..integral of order 2 evaluated at x. maximum error is 1.0e-8.
@@ -383,7 +383,7 @@
 
 
       double precision function zfermi52(x)
-      include 'implno.dek'
+      implicit none
 !..
 !..this routine applies a rational function expansion to get the fermi-dirac
 !..integral of order 5/2 evaluated at x. maximum error is 2.47d-13.
@@ -448,7 +448,7 @@
 
 
       double precision function zfermi3(x)
-      include 'implno.dek'
+      implicit none
 !..
 !..this routine applies a rational function expansion to get the fermi-dirac
 !..integral of order 3 evaluated at x. maximum error is 1.0e-8.
@@ -509,7 +509,7 @@
 
 
       double precision function ifermim12(f)
-      include 'implno.dek'
+      implicit none
 !..
 !..this routine applies a rational function expansion to get the inverse
 !..fermi-dirac integral of order -1/2 when it is equal to f.
@@ -565,32 +565,36 @@
 
 
 
-      double precision function ifermi12(f, calc_deriv, difermi12)
-      include 'implno.dek'
+      recursive double precision function ifermi12(f, calc_deriv, difermi12)
+      implicit none
 !..
 !..this routine applies a rational function expansion to get the inverse
 !..fermi-dirac integral of order 1/2 when it is equal to f.
 !..maximum error is 4.19d-9.   reference: antia apjs 84,101 1993
 !..
 !..declare
-      integer          i,m1,k1,m2,k2
+      integer          i,m1,k1,m2,k2,k
+      !$OMP THREADPRIVATE(i, m1, k1, m2, k2, k)
       double precision f,an,a1(12),b1(12),a2(12),b2(12),rn,den,ff
+      !$OMP THREADPRIVATE(f, an, a1, b1, a2, b2, rn, den, ff)
       double precision drn, dden, dff
+      !$OMP THREADPRIVATE(drn, dden, dff))
+
       double precision, intent(out) :: difermi12
       integer, intent(in) :: calc_deriv
 
 !..load the coefficients of the expansion
       data  an,m1,k1,m2,k2 /0.5d0, 4, 3, 6, 5/
-      data  (a1(i),i=1,5)/ 1.999266880833d4,   5.702479099336d3, &
+      data  (a1(k),k=1,5)/ 1.999266880833d4,   5.702479099336d3, &
                            6.610132843877d2,   3.818838129486d1, &
                            1.0d0/
-      data  (b1(i),i=1,4)/ 1.771804140488d4,  -2.014785161019d3, &
+      data  (b1(k),k=1,4)/ 1.771804140488d4,  -2.014785161019d3, &
                            9.130355392717d1,  -1.670718177489d0/
-      data  (a2(i),i=1,7)/-1.277060388085d-2,  7.187946804945d-2, &
+      data  (a2(k),k=1,7)/-1.277060388085d-2,  7.187946804945d-2, &
                           -4.262314235106d-1,  4.997559426872d-1, &
                           -1.285579118012d0,  -3.930805454272d-1, &
                            1.0d0/
-      data  (b2(i),i=1,6)/-9.745794806288d-3,  5.485432756838d-2, &
+      data  (b2(k),k=1,6)/-9.745794806288d-3,  5.485432756838d-2, &
                           -3.299466243260d-1,  4.077841975923d-1, &
                           -1.145531476975d0,  -6.067091689181d-2/
       difermi12 = 0.d0  
@@ -664,7 +668,7 @@
 
 
       double precision function ifermi32(f)
-      include 'implno.dek'
+      implicit none
 !..
 !..this routine applies a rational function expansion to get the inverse
 !..fermi-dirac integral of order 3/2 when it is equal to f.
@@ -721,7 +725,7 @@
 
 
       double precision function ifermi52(f)
-      include 'implno.dek'
+      implicit none
 !..
 !..this routine applies a rational function expansion to get the inverse
 !..fermi-dirac integral of order 5/2 when it is equal to f.
