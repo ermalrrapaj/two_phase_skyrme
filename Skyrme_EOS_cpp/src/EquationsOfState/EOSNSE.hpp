@@ -55,6 +55,18 @@
 /// \end{eqnarray*}
 /// 
 
+class NSEProperties { 
+public:
+  NSEProperties(double nnTot, double npTot, double T, EOSData eosExterior,
+      double unuc = 0.0, double avgEc = 0.0, double avgBe = 0.0, 
+      double avgPv = 0.0) :
+      nnTot(nnTot), npTot(npTot), T(T), unuc(unuc), avgEc(avgEc), avgBe(avgBe),
+      avgPv(avgPv), eosExterior(eosExterior) {}
+  double nnTot, npTot, T;
+  double unuc, avgEc, avgBe, avgPv; 
+  EOSData eosExterior;
+}; 
+
 class EOSNSE : public EOSBase {
 public:
   EOSNSE(const std::vector<std::unique_ptr<NucleusBase>>& nuclei,
@@ -88,7 +100,8 @@ public:
   EOSData FromNAndT(const EOSData& eosIn);
   
   std::vector<double> GetExteriorDensities(const EOSData& eosIn);
-  std::vector<double> GetTotalDensities(const EOSData& eosIn);
+  NSEProperties GetTotalDensities(const EOSData& eosIn);
+  NSEProperties GetExteriorProtonDensity(double ne, double nno, double T);
   
   double GetMinimumT() const {return mTMin;}
   double GetMaximumT() const {return 200.0/Constants::HBCFmMeV;}
