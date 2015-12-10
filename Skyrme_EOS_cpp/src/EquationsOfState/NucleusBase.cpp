@@ -13,6 +13,18 @@
 #include <iostream> 
 #include <math.h> 
 
+StaticNucleus LDNucleus::GetStaticNucleus() const {
+  double n0 = 1.e-10;
+  EOSData eosIn = mpEos->FromNAndT(
+      EOSData::InputFromTNbYe(1.e-3/197.3, n0, 0.5));
+  double v = GetVolume(eosIn, n0); 
+  double BE = GetBindingEnergy(eosIn, n0, v);
+  int A = NucleusBase::mZ + NucleusBase::mN;
+  std::cerr << NucleusBase::mZ << " " << NucleusBase::mN << " " << (double) A/v
+      << " " << BE/A*197.3 << std::endl;
+  return StaticNucleus(NucleusBase::mZ, A, BE, {}, {}, v);
+}
+
 double LDNucleus::GetVolume(const EOSData& eosIn, double ne) const {
   double Z = (double) NucleusBase::mZ; 
   double N = (double) NucleusBase::mN;
@@ -26,20 +38,26 @@ double LDNucleus::GetVolume(const EOSData& eosIn, double ne) const {
     return (Pb + Ps + Pc)/eosIn.P() - 1.0;  
   };
   
-  OneDimensionalRoot rootFinder(1.e-12); 
+  OneDimensionalRoot rootFinder(1.e-8); 
   double vlo, vhi;
-  if (eosIn.Np() < ne) {
+  if (eosIn.Np() <= ne) {
     // Just choose an extremely small volume as the lower bound
-    vlo = 1.e-6 * (N + Z);
+    vlo = 1.e-8 * (N + Z);
     // The maximum volume allowed for the given background electron density 
     // if the nuclear volume were larger, nuclei of this species would 
     // completely fill the space. 
     vhi = 0.9999 * Z / ne;
   } else {
-    vlo = 1.0001 * Z / ne; 
-    vhi = 1.e4 * (N+Z); 
+   vlo = 1.000001* Z / ne; 
+   vhi = 1.e12 * (N+Z); 
   }
-  return rootFinder(pFunc, vlo, vhi);
+  try {
+    return rootFinder(pFunc, vlo, vhi);
+  } catch(...) { 
+    vlo = (N+Z)/0.2;
+    vhi = (N+Z)/1.e-3;
+    return rootFinder(pFunc, vlo, vhi);
+  }
 }
 
 double LDNucleus::GetBindingEnergy(const EOSData& eosIn, double ne) const {
@@ -54,7 +72,7 @@ double LDNucleus::GetBindingEnergy(const EOSData& eosIn,
    
   EOSData eosBulk = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, N/v, Z/v)); 
   return -(eosBulk.E() - eosBulk.T()*eosBulk.S()) * NucleusBase::mA 
-         - eosIn.P() * v - SurfaceEnergy(v) - CoulombEnergy(v, eosIn.Np(), ne);
+         - SurfaceEnergy(v) - CoulombEnergy(v, eosIn.Np(), ne);
 
 }
 
@@ -80,7 +98,8 @@ double NucleusBase::CoulombEnergy(double v, double npo, double ne) const {
   double u = v*ne / (double)NucleusBase::mZ;
   double Ec = 3.0 * Constants::ElementaryChargeSquared 
       / (5.0 * pow(3.0 / (4.0 * Constants::Pi), 1.0/3.0))
-      * pow((double)NucleusBase::mZ, 2) * (0.5*pow(u,2.0/3.0) - 1.5);
+      * pow((double)NucleusBase::mZ, 2) * (0.5*pow(u,2.0/3.0) - 1.5) 
+      * pow(ne/(double)NucleusBase::mZ,1.0/3.0);
   return Ec;
 }
 

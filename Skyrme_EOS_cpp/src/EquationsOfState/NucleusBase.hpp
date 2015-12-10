@@ -49,7 +49,7 @@ public:
 
   /// \todo Still need to include partition function in binding energy
   double GetBindingEnergy(const EOSData& eosExt, double ne) const { 
-    return mBE - 1.0*CoulombEnergy(mV, 0.0, ne);
+    return mBE - CoulombEnergy(mV, 0.0, ne);
   }
   
   double GetBindingEnergy(const EOSData& eosIn, double ne, double /*v*/) const { 
@@ -70,10 +70,14 @@ protected:
 
 class LDNucleus : public NucleusBase { 
 public:
+  
   LDNucleus(int Z, int A, const EOSBase& eos) : NucleusBase(Z, A), 
       mpEos(eos.MakeUniquePtr()),
       mSigma0(1.15/Constants::HBCFmMeV),
       mSs0(45.8/Constants::HBCFmMeV) {} 
+  
+  StaticNucleus GetStaticNucleus() const;
+
   double GetVolume(const EOSData& eosIn, double ne) const;
   double GetBindingEnergy(const EOSData& eosIn, double ne) const;
   double GetBindingEnergy(const EOSData& eosIn, double ne, double v) const;
