@@ -30,8 +30,11 @@ public:
   double GetZ() const {return (double) mZ;} 
   double GetA() const {return (double) mA;} 
     
-  double CoulombPressure(double v, double npo, double ne) const;
-  double CoulombEnergy(double v, double npo, double ne) const;
+  virtual double CoulombPressure(double v, double npo, double ne) const { 
+      return 0.0;
+  }
+  virtual double CoulombPressureExternal(double v, double npo, double ne) const;
+  virtual double CoulombEnergy(double v, double npo, double ne) const;
 
 protected:
   int mZ, mN, mA;
@@ -83,8 +86,8 @@ public:
 protected:
   double SurfacePressure(double v) const;
   double SurfaceEnergy(double v) const;
-  //double CoulombPressure(double v, double npo, double ne) const;
-  //double CoulombEnergy(double v, double npo, double ne) const;
+  double CoulombPressure(double v, double npo, double ne) const;
+  double CoulombEnergy(double v, double npo, double ne) const;
   std::unique_ptr<EOSBase> mpEos;
   double mSs0; 
   double mSigma0; 

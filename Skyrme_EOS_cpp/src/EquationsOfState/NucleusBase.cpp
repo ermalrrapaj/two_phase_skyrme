@@ -71,22 +71,39 @@ namespace {
 inline double D(double u) {
   return 1.0 - 1.5 * pow(u, 1.0/3.0) + 0.5*u;
 }
-inline double DpoD(double u) {
-  return -0.5 * pow(u, -2.0/3.0) + 0.5/(D(u) +  1.e-40);
+inline double uDpoD(double u) {
+  return (-0.5 * pow(u, 1.0/3.0) + 0.5*u)/(D(u) +  1.e-40);
 }
 }
 
 double NucleusBase::CoulombEnergy(double v, double npo, double ne) const {
-  double u = (ne - npo) / ((double)NucleusBase::mZ/v - npo);
-  return 3.0 * Constants::ElementaryChargeSquared 
-      / (5.0 * pow(3.0 * v / (4.0 * Constants::Pi), 1.0/3.0))
-      * pow((double)NucleusBase::mZ - v*npo, 2) * D(u);
+  double u = v*ne / (double)NucleusBase::mZ;
+  double Ec = 3.0 * Constants::ElementaryChargeSquared 
+      / (5.0 * pow(3.0 / (4.0 * Constants::Pi), 1.0/3.0))
+      * pow((double)NucleusBase::mZ, 2) * (0.5*pow(u,2.0/3.0) - 1.5);
+  return Ec;
 }
 
-double NucleusBase::CoulombPressure(double v, double npo, double ne) const {
+double NucleusBase::CoulombPressureExternal(double v, double npo, double ne) const {
+  double u = v*(ne - npo) / ((double)NucleusBase::mZ - v*npo);
+  return 3.0 * Constants::ElementaryChargeSquared 
+      / (5.0 * pow(3.0 / (4.0 * Constants::Pi), 1.0/3.0))
+      * pow((double)NucleusBase::mZ - v*npo, 2) * pow(u,-1.0/3.0)/3.0
+      * v/((double)NucleusBase::mZ - v*npo);
+}
+
+double LDNucleus::CoulombEnergy(double v, double npo, double ne) const {
+  double u = v*(ne - npo) / ((double)NucleusBase::mZ - v*npo);
+  double Ec = 3.0 * Constants::ElementaryChargeSquared 
+      / (5.0 * pow(3.0 * v / (4.0 * Constants::Pi), 1.0/3.0))
+      * pow((double)NucleusBase::mZ - v*npo, 2) * D(u);
+  return Ec;
+}
+
+double LDNucleus::CoulombPressure(double v, double npo, double ne) const {
   double Z = (double) NucleusBase::mZ;
   double denom = 1.0 / (Z/v - npo);
   double u = (ne - npo) * denom;
   return CoulombEnergy(v, npo, ne) / v  
-      * (DpoD(u)*u*denom*Z / (v*v) - 2.0*npo/(Z/v - npo) - 1.0/3.0 ); 
+      * (uDpoD(u)*denom*Z / (v*v) - 2.0*npo/(Z/v - npo) - 1.0/3.0 ); 
 }
