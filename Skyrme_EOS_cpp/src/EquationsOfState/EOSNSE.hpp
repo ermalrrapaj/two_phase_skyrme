@@ -102,6 +102,7 @@ public:
   std::vector<double> GetExteriorDensities(const EOSData& eosIn);
   NSEProperties GetTotalDensities(const EOSData& eosIn);
   NSEProperties GetExteriorProtonDensity(double ne, double nno, double T);
+  NSEProperties GetExteriorNeutronDensity(double ne, double npo, double T);
   
   double GetMinimumT() const {return mTMin;}
   double GetMaximumT() const {return 200.0/Constants::HBCFmMeV;}

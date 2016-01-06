@@ -10,6 +10,7 @@
 #include <omp.h>
 #include "EquationsOfState/EOSNSE.hpp"
 #include "Util/OneDimensionalRoot.hpp"
+#include "Util/OneDimensionalMinimization.hpp"
 #include "Util/MultiDimensionalRoot.hpp" 
 
 EOSNSE::EOSNSE(const EOSNSE& other) : 
@@ -75,37 +76,150 @@ std::vector<double> EOSNSE::GetExteriorDensities(const EOSData& eosIn) {
   return dens;
 }
 
-NSEProperties EOSNSE::GetExteriorProtonDensity(double ne, double nno, 
+NSEProperties EOSNSE::GetExteriorNeutronDensity(double ne, double npo, 
     double T) {
   
-  auto nse_func = [nno, ne, T, this](double xx)->double{
-    double npo = exp(xx);
+  OneDimensionalRoot rootFinder1D(1.e-8, 100);
+  
+  double nn_low = 1.e-10;
+  double nn_high = 2.0;
+  
+  // Find a good interval 
+  auto nse_func = [npo, ne, T, this](double xx)->double{
+    double nno = exp(xx);
     EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, nno, npo));
     auto nucleiProps = GetNucleiScalars(eosOut, ne); 
-    double yy = (nucleiProps[1] + (1.0 - nucleiProps[2])*npo)/ne - 1.0;
+    double yy = 1.0 - (nucleiProps[1] + (1.0 - nucleiProps[2])*npo)/ne;
+    std::cerr << nno << " " << " " << nucleiProps[1] << " " << eosOut.Mun() 
+        << " " << eosOut.Mup() << " " << yy << std::endl;
     return yy;
   };
 
-  // Find a good interval 
-  double np_low = 1.e-300;
-  double np_high = ne;
-  while(fabs(nse_func(log(np_high)))>1.e10) np_high *= 0.1;
-  if (nse_func(log(np_high))*nse_func(log(np_low))>0.0) {
-    while (nse_func(log(np_high))*nse_func(log(np_low))>0.0) {
-      np_low = np_high;
-      np_high *= 10.0;
-    }
+  //while(fabs(nse_func(log(nn_high)))>1.e10) nn_high *= 0.9;
+  
+  //while (nse_func(log(nn_high))*nse_func(log(nn_low))>0.0) {
+  //  nn_low = nn_high;
+  //  nn_high *= 10.0;
+  //}
+  while (nse_func(log(nn_high))*nse_func(log(nn_low))>0.0) {
+    nn_high *=0.99;
   }
-   
-  // Find solution in interval
-  OneDimensionalRoot rootFinder1D(1.e-7, 100);
-  double npo = exp(rootFinder1D(nse_func, log(np_low), log(np_high)));
+  
+  double nno = exp(rootFinder1D(nse_func, log(nn_low), log(nn_high)));
  
   // Set up output  
   EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, nno, npo));
   auto nucleiProps = GetNucleiScalars(eosOut, ne); 
   return NSEProperties(nucleiProps[0] + eosOut.Nn()*(1.0 - nucleiProps[2]), 
-    nucleiProps[1] + eosOut.Np()*(1.0 - nucleiProps[2]), T, eosOut, nucleiProps[2]);
+      nucleiProps[1] + eosOut.Np()*(1.0 - nucleiProps[2]), 
+      T, eosOut, nucleiProps[2]);
+}
+
+NSEProperties EOSNSE::GetExteriorProtonDensity(double ne, double nno, 
+    double T) {
+  
+  OneDimensionalRoot rootFinder1D(1.e-8, 100);
+  OneDimensionalMinimization minimize(1.e-12, 1000);
+  
+  double np_low = 1.e-300;
+  double np_high = ne;
+  
+  // Find a good interval 
+  auto nse_func = [nno, ne, T, this](double xx)->double{
+    double npo = exp(xx);
+    EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, nno, npo));
+    auto nucleiProps = GetNucleiScalars(eosOut, ne); 
+    double yy = 1.0 - (nucleiProps[1] + (1.0 - nucleiProps[2])*npo)/ne;
+    return yy;
+  };
+
+  // Try finding the maximum of nse_func
+  //double npmax = exp(minimize(nse_func, log(0.8*ne), log(1.e-300), log(ne)));  
+  //double npmax2 = exp(minimize(nse_func, log(0.8*ne), log(0.7*ne), log(ne)));  
+  //
+  //if (nse_func(log(npmax))*nse_func(log(np_low)) < 0.0) np_high = npmax;
+  //else if (nse_func(log(npmax))*nse_func(log(np_high)) < 0.0) np_low = npmax;
+  
+  double two, one, zero; 
+  double ntwo, none, nzero; 
+  
+  double nstart = 1.e-5; 
+  ntwo = nstart; none = nstart; nzero = nstart; 
+  two = nse_func(log(nstart));
+  one = nse_func(log(nstart));
+  zero = nse_func(log(nstart));
+  for (double npt = nstart; npt<1.11*ne; npt*=1.1) {
+    ntwo = none;
+    two = one;
+    none = nzero;
+    one = zero; 
+    nzero = std::min(npt, ne);
+    zero = nse_func(log(nzero));
+    double npmax2 = -1.0;
+    if (one>two && one>zero) {
+      npmax2 = exp(minimize(nse_func, log(none), log(ntwo), log(nzero), true));  
+      std::cerr << " Should be local maximum " << ntwo << " " << npmax2 << " " 
+        << nzero; 
+    }
+    if (one<two && one<zero) {
+      npmax2 = exp(minimize(nse_func, log(none), log(ntwo), log(nzero)));  
+      std::cerr << " Should be local minimum " << ntwo << " " << npmax2 << " " 
+        << nzero; 
+    }
+    if (npt >= ne) {
+      npmax2 = exp(minimize(nse_func, log(none), log(ntwo), log(nzero), true));  
+      if (npmax2>ntwo*(1.0+1.e-7) && npmax2<nzero*(1.0-1.e-7)) {
+      std::cerr << " Maybe there is a maxima here " << ntwo << " " << npmax2 << " "; 
+      } else {
+        npmax2 = -1.0;
+      }
+    }
+    if (npmax2>0.0) {  
+      std::cerr << " " << nse_func(log(1.e-300)) <<" "<< two << " " 
+          << nse_func(log(npmax2)) << " " << zero << " " << nse_func(log(ne)) <<
+          std::endl;
+      if (nse_func(log(npmax2))*nse_func(log(ne)) <= 0.0) { 
+        np_low = npmax2;
+        np_high = ne;
+      } else if (nse_func(log(npmax2))*nse_func(log(ntwo)) <= 0.0) { 
+        np_low = ntwo;
+        np_high = npmax2;
+      } else if (nse_func(log(npmax2))*nse_func(log(nzero)) <= 0.0) {
+        np_low = npmax2;
+        np_high = nzero;
+      } else if (nse_func(log(npmax2))*nse_func(log(1.e-300)) <= 0.0) { 
+        np_high = npmax2;
+        np_low = 1.e-300;
+      }
+    }
+  }
+  //np_low = exp(minimize(nse_func, log(0.95*ne), log(0.9*ne), log(ne), true));  
+  //np_high = ne; 
+  //while(fabs(nse_func(log(np_high)))>1.e10) np_high *= 0.9;
+  //
+  //while (nse_func(log(np_high))*nse_func(log(np_low))>0.0) {
+  //  np_low = np_high;
+  //  np_high *= 10.0;
+  //}
+  //while (nse_func(log(np_high))*nse_func(log(np_low))>0.0) {
+  //  np_high *=0.99;
+  //}
+  
+  // Find solution in interval
+  if (nse_func(log(np_high))*nse_func(log(np_low))>0.0) std::cerr 
+      << "Expect bad interval." << std::endl;
+  std::cerr << np_low << " " << np_high << " " << nse_func(log(0.9*ne)) << " " 
+  << nse_func(log(np_low)) 
+      << " " <<nse_func(log(np_high)) << std::endl;
+  double npo = exp(rootFinder1D(nse_func, log(np_low), log(np_high)));
+  std::cerr << np_low << " " << npo << " " << np_high << std::endl;
+ 
+  // Set up output  
+  EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, nno, npo));
+  auto nucleiProps = GetNucleiScalars(eosOut, ne); 
+  return NSEProperties(nucleiProps[0] + eosOut.Nn()*(1.0 - nucleiProps[2]), 
+      nucleiProps[1] + eosOut.Np()*(1.0 - nucleiProps[2]), 
+      T, eosOut, nucleiProps[2]);
 }
 
 // find the total electron number density from the exterior
@@ -154,6 +268,7 @@ std::array<double, 4> EOSNSE::GetNucleiScalars(const EOSData& eosOut, double ne)
         * exp(aa/T), 1.e200);
     nn += mNuclei[i]->GetN()*ni;
     np += mNuclei[i]->GetZ()*ni;
+    
     uNuc += v*ni;
     vNuc += v; 
   }

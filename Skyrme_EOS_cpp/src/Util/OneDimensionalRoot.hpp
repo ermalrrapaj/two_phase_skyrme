@@ -37,12 +37,16 @@ public:
     const gsl_root_fsolver_type *T = gsl_root_fsolver_brent; 
     gsl_root_fsolver *s = gsl_root_fsolver_alloc(T); 
     gsl_root_fsolver_set(s, &F, xlo, xhi); 
-    if (func(xlo)*func(xhi)>0) {
+    
+    double flo = func(xlo); 
+    double fhi = func(xhi); 
+    if (flo*fhi>0) {
       std::stringstream stout; 
       stout << "Bad interval in one-d root find " << xlo << " " 
-          << xhi << " " << func(xlo) << " " << func(xhi) << std::endl;
+          << xhi << " " << flo << " " << fhi << std::endl;
       throw std::runtime_error(stout.str());
-    } 
+    }
+     
     int status, status1, status2; 
     int iter = 0; 
     double x_lo, x_hi;
@@ -60,14 +64,6 @@ public:
     
     gsl_set_error_handler(NULL);
     
-    if (status != 0 || iter >= mMaxIter && fabs((x_hi-x_lo)/x_lo)>1.e-12) {
-      std::stringstream stout; 
-      stout << "Root find did not converge " << x_lo << " " << x_hi << " " 
-          << " " << (x_hi - x_lo)/x_lo << " " 
-          << func(x_lo) << " " << func(x_hi) << std::endl;
-      throw std::runtime_error(stout.str());
-    }
-    
     double xcen; 
     if (fabs(func(x_lo))<fabs(func(x_hi))) {
       xcen = x_lo;
@@ -75,6 +71,15 @@ public:
       xcen = x_hi;
     }
     if (fabs(func(xcen))>fabs(func(0.5*(x_lo+x_hi)))) xcen = 0.5*(x_lo+x_hi);
+    
+    if ((status != 0 || iter >= mMaxIter) && (fabs((x_hi-x_lo)/x_lo)>1.e-12 
+        || fabs(func(xcen)) > 1.e-2)) {
+      std::stringstream stout; 
+      stout << "Root find did not converge " << x_lo << " " << x_hi << " " 
+          << " " << (x_hi - x_lo)/x_lo << " " 
+          << func(x_lo) << " " << func(x_hi) << std::endl;
+      throw std::runtime_error(stout.str());
+    }
     
     //if (fabs(func(xcen))>mTol*1.e2 && ) { 
     //    std::stringstream stout; 

@@ -15,13 +15,13 @@
 int main() {
   const double HBC = Constants::HBCFmMeV;
   
-  EOSSkyrme eos; // = EOSSkyrme::FreeGas();
+  EOSSkyrme eos;// = EOSSkyrme::FreeGas();
   EOSSkyrme eosInside; 
    
   std::vector<std::unique_ptr<NucleusBase>> nuclei; 
   std::vector<std::unique_ptr<NucleusBase>> nucleiStatic; 
   for (int Z=28; Z<=28; Z++) {
-    for (int N=28; N<=28; N++) {
+    for (int N=25; N<=52; N++) {
       nuclei.push_back(LDNucleus(Z, Z+N, eosInside).MakeUniquePtr());
       nucleiStatic.push_back(
           LDNucleus(Z, Z+N, eosInside).GetStaticNucleus().MakeUniquePtr());
@@ -48,33 +48,43 @@ int main() {
   std::cout << "[16] BE (first nucleus, static) " << std::endl; 
   std::cout << "[17] rho (first nucleus) " << std::endl; 
   
-  double T = 1.5/HBC;
+  double T = 1.0/HBC;
   
-  for (double np0 = 1.e-2; np0<1.1e-2; np0 *= 1.2) {
-    double nn0 = 1.e-20;
-    double delta = 0.1;
-    double npo = np0;
-    double nno = nn0;
-    while (nn0<5.e-1) { 
+  for (double np0 = 1.e-2; np0<1.1e-2; np0 *= 2.0) {
+    double nn0 = 1.e-15;
+    double delta = 0.01;
+    double deltaMin = 1.e-8;
+    double deltaMax = 1.0;
+    NSEProperties nseT = 
+      nseEosStatic.GetExteriorProtonDensity(np0, nn0, T);
+    double npo = nseT.npTot;
+    double nno = nseT.nnTot;
+    while (nn0<1.00000001e-15) { 
       try {
         //NSEProperties nse = 
         //    nseEos.GetTotalDensities(EOSData::InputFromTNnNp(T, nn0, np0)); 
         NSEProperties nse = 
-            nseEos.GetExteriorProtonDensity(np0, nn0, T);
-        NSEProperties nseStat = 
-            nseEosStatic.GetExteriorProtonDensity(np0, nn0, T);
+            nseEosStatic.GetExteriorNeutronDensity(np0, nn0, T);
+        //NSEProperties nseStat = 
+        //    nseEosStatic.GetExteriorProtonDensity(np0, nn0, T);
         double npt = nse.npTot;
         double nnt = nse.nnTot;
         double npe = nse.eosExterior.Np();
         double nne = nse.eosExterior.Nn();
-         
+
+        if (fabs(nnt/nno - 1.0) > 0.1 && delta>deltaMin) {
+          nn0 /= 1.0 + delta; 
+          delta *= 0.5;
+          std::cerr << " Back step \n"; 
+        } else { 
+        //std::cerr << nne << " " << nnt << " " << delta << std::endl; 
         std::cout << nnt << " " << npt << " " 
           << nne << " " << npe << " " 
           << nse.unuc << " " 
-          << nseStat.nnTot << " " << nseStat.npTot << " " 
-          << nseStat.eosExterior.Nn() << " " << nseStat.eosExterior.Np() << " " 
-          << nseStat.unuc << " " << 
-          nuclei[0]->CoulombEnergy(
+          //<< nseStat.nnTot << " " << nseStat.npTot << " " 
+          //<< nseStat.eosExterior.Nn() << " " << nseStat.eosExterior.Np() << " " 
+          //<< nseStat.unuc << " " 
+          << nuclei[0]->CoulombEnergy(
           nuclei[0]->GetVolume(nse.eosExterior, npt), npe, npt)
           << " " << nse.eosExterior.Mun() << " " << nse.eosExterior.Mup() 
           << " " << nse.eosExterior.P()  
@@ -84,13 +94,13 @@ int main() {
           * 197.3 / (double) nucleiStatic[0]->GetA()
           << " " << nuclei[0]->GetA()/nuclei[0]->GetVolume(nse.eosExterior, npt)
           << std::endl;
-        if (fabs(nnt/nno - 1.0) > 0.02 || fabs(npt/npo - 1.0)>0.02) 
-            delta *= 0.8;
-        if (fabs((nnt+npt)/(npo + nno)-1.0) < 1.e-3) delta /= 0.8;
-        delta = std::max(1.e-4, delta);
-        delta = std::min(1.e-1, delta);
-        npo = npt;
-        nno = nnt;
+
+          if (fabs(nnt/nno - 1.0)<0.01) delta /= 0.5;
+          nno = nnt;
+          npo = npt;
+        }
+        delta = std::max(deltaMin, delta);
+        delta = std::min(deltaMax, delta);
       } catch(std::exception& e ) {
         std::cerr << e.what();
       }
