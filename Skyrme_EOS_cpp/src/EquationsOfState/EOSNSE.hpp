@@ -101,7 +101,7 @@ public:
   
   std::vector<double> GetExteriorDensities(const EOSData& eosIn);
   NSEProperties GetTotalDensities(const EOSData& eosIn);
-  NSEProperties GetExteriorProtonDensity(double ne, double nno, double T);
+  std::vector<NSEProperties> GetExteriorProtonDensity(double ne, double nno, double T);
   NSEProperties GetExteriorNeutronDensity(double ne, double npo, double T);
   
   double GetMinimumT() const {return mTMin;}
