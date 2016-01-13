@@ -21,35 +21,52 @@
 class OneDimensionalRoot { 
 public:
   OneDimensionalRoot(double tol=1.e-8, int maxIter=50) :
-      mTol(tol), mMaxIter(maxIter) {} 
+      mTol(tol), mMaxIter(maxIter) {
+    T = gsl_root_fsolver_brent; 
+    s = gsl_root_fsolver_alloc(T); 
+  } 
+  
+  ~OneDimensionalRoot() { gsl_root_fsolver_free(s);}
 
   template<class FUNCTION>
-  double operator() (FUNCTION func, double xlo, double xhi) {
-    
-    // Similar to stack overflow 13289311 
-    gsl_function F; 
-    F.function = [] (double x, void * p)->double { 
-      return (*static_cast<FUNCTION*>(p))(x);
-    };
-    F.params = &func;
-    
-    gsl_set_error_handler_off();
-    const gsl_root_fsolver_type *T = gsl_root_fsolver_brent; 
-    gsl_root_fsolver *s = gsl_root_fsolver_alloc(T); 
-    gsl_root_fsolver_set(s, &F, xlo, xhi); 
+  double operator() (FUNCTION func, const double xlo, const double xhi) {
     
     double flo = func(xlo); 
     double fhi = func(xhi); 
+
+    if (fabs(flo)<mTol) return xlo;
+    if (fabs(fhi)<mTol) return xhi;
+
     if (flo*fhi>0) {
       std::stringstream stout; 
       stout << "Bad interval in one-d root find " << xlo << " " 
           << xhi << " " << flo << " " << fhi << std::endl;
       throw std::runtime_error(stout.str());
     }
-     
+    
+    
+    gsl_set_error_handler_off();
+    
+    // Similar to stack overflow 13289311 via Jonas 
+    gsl_function F; 
+    F.function = [] (double x, void * p)->double { 
+      return (*static_cast<FUNCTION*>(p))(x);
+    };
+    F.params = &func;
+    
+    
+    //const gsl_root_fsolver_type *T; 
+    //gsl_root_fsolver *s;
+    //
+    //T = gsl_root_fsolver_brent; 
+    //s = gsl_root_fsolver_alloc(T); 
+    gsl_root_fsolver_set(s, &F, xlo, xhi); 
+    
     int status, status1, status2; 
     int iter = 0; 
     double x_lo, x_hi;
+    x_lo = xlo;
+    x_hi = xhi;
     do { 
       iter++; 
       status = gsl_root_fsolver_iterate(s);
@@ -62,6 +79,7 @@ public:
     } while ((status == GSL_CONTINUE || 
         (status1 == GSL_CONTINUE && status2 == GSL_CONTINUE)) && iter < mMaxIter);
     
+    //gsl_root_fsolver_free(s);    
     gsl_set_error_handler(NULL);
     
     double xcen; 
@@ -88,7 +106,6 @@ public:
     //        << " " << func(x_lo) << " " << func(x_hi) << std::endl;
     //    throw std::runtime_error(stout.str());
     //}
-    
     return xcen; 
   
   }
@@ -96,7 +113,9 @@ public:
 protected: 
   double mTol; 
   int mMaxIter; 
-
+  const gsl_root_fsolver_type *T; 
+  gsl_root_fsolver *s;
+  
 };
 #endif // EOS_ONEDIMENSIONALROOT_HPP_
 
