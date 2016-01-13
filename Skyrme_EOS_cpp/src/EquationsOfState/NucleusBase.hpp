@@ -49,7 +49,7 @@ public:
 
   /// \todo Still need to include partition function in binding energy
   double GetBindingEnergy(const EOSData& eosExt, double ne) const { 
-    return mBE - CoulombEnergy(mV, 0.0, ne);
+    return mBE - CoulombEnergy(mV, eosExt.Np(), ne);
   }
   
   double GetBindingEnergy(const EOSData& eosIn, double ne, double /*v*/) const { 
