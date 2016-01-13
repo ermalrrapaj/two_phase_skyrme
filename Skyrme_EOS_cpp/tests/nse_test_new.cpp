@@ -55,7 +55,7 @@ int main() {
   
   double T = 1.0/HBC;
   
-  for (double np0 = 1.e-2; np0<6.e-2; np0 *= 2.0) {
+  for (double np0 = 4.e-2; np0<8.e-2; np0 *= 1.5) {
     std::cout << np0 << std::endl;
     double nn0 = 1.e-14;
     double delta = 0.01;
@@ -74,7 +74,9 @@ int main() {
         //    nseEos.GetTotalDensities(EOSData::InputFromTNnNp(T, nn0, np0)); 
         std::vector<NSEProperties> nsev = 
             nseEosStatic.GetExteriorProtonDensity(np0, nn0, T);
+        
         allPts.insert(allPts.end(), nsev.begin(), nsev.end());
+         
         NSEProperties nse = nsev.back();
         double npt = nse.npTot;
         double nnt = nse.nnTot;
@@ -98,15 +100,27 @@ int main() {
       }
       nn0 *= 1.0 + delta; 
     }
-
-    for (int i=0; i<allPts.size(); ++i) {
-    }
-
+    
+    // The combined sorting procedure makes plots continous.  The exterior 
+    // neutron density is triple valued for fixed total neutron density, so the
+    // first sort results in a messy line.  When calculating the EoS, only one 
+    // of the three points will have the minimum free energy.
+     
     // Sort the points by total neutron density
     std::sort(allPts.begin(), allPts.end(), [](NSEProperties a, NSEProperties b) {
-        return b.nnTot < a.nnTot;
+        return b.nnTot > a.nnTot;
     });
-     
+    
+    // Find the minimum exterior proton density
+    auto minEl = std::min_element(allPts.begin(), allPts.end(), [](NSEProperties a, NSEProperties b) {
+        return a.eosExterior.Np() < b.eosExterior.Np();
+    }); 
+    
+    // Sort all element above minimum exterior density by exterior density  
+    std::sort(minEl, allPts.end(), [](NSEProperties a, NSEProperties b) {
+        return b.eosExterior.Nb() > a.eosExterior.Nb();
+    });
+      
     // Write out the points  
     for (auto& nse : allPts) { 
       double npt = nse.npTot;
