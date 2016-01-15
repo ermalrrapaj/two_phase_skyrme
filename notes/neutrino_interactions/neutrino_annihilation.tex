@@ -1,0 +1,326 @@
+
+%\documentclass[12pt]{amsart}
+%\usepackage{geometry} % see geometry.pdf on how to lay out the page. There's lots.
+%\geometry{a4paper} % or letter or a5paper or ... etc
+% \geometry{landscape} % rotated page geometry
+
+\documentclass[12pt,letter]{article}
+
+%\usepackage[latin1]{inputenc}
+\usepackage{epsfig}
+\usepackage{amsmath}
+\usepackage{mdframed}
+%\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{setspace}
+\usepackage[colorlinks,citecolor=blue]{hyperref}
+\usepackage{xcolor}
+\usepackage[sort&compress,numbers]{natbib}
+%\usepackage{natbibspacing}
+
+\setlength{\oddsidemargin}{.46cm}
+\setlength{\evensidemargin}{-0.46cm}
+\setlength{\evensidemargin}{0.0cm}
+\setlength{\textwidth}{15.5cm}
+\setlength{\parskip}{1.0ex plus 0.6ex minus 0.6ex}
+\setlength{\parindent}{1.0em} 
+\setlength{\textheight}{22.5cm}
+\setlength{\topmargin}{-2cm}
+\setlength{\footskip}{2cm}
+\setlength{\parindent}{0.0cm}
+
+\def\aj{Astron. J.}
+\def\apj{Astrophys. J.}
+\def\apjl{Astrophys. J. Lett.}
+\def\apjs{Astrophys. J. Supp. Ser. }
+\def\aa{Astron. Astrophys. }
+\def\aap{Astron. Astrophys. }
+\def\araa{Ann.\ Rev. Astron. Astroph. }
+\def\physrep{Phys. Rep. }
+\def\mnras{Mon. Not. Roy. Astron. Soc. }
+\def\mmsun{M_\odot}
+\def\prl{Phys. Rev. Lett.}
+\def\prd{Phys. Rev. D.}
+\def\azh{Soviet Astron.}
+\def\apss{Astrophys. Space Sci.}
+\def\cqg{Class. Quantum Grav.}
+
+
+\usepackage{mathpazo}
+\DeclareMathOperator{\diff}{d\!}
+\newcommand{\modot}{M$_\odot$\hspace*{0.05cm}}
+\def\apj{Astrophys. Journal}
+\def\apjl{Astrophys. Journal Letters}
+\def\aap{Astron. Astrophys.}
+
+\setlength{\parskip}{.2cm}
+
+\newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}} 
+\newcommand{\pdtwo}[3]{\frac{\partial #1}{\partial #2 \partial #3}} 
+\newcommand{\pdtri}[4]{\frac{\partial #1}{\partial #2 \partial #3 \partial #4}} 
+\newcommand{\grad}{\vec{\nabla}}
+\newcommand{\ddiv}{\vec{\nabla}\cdot}
+\newcommand{\intl}{\int\limits}
+\newcommand{\msun}{M$_\odot$\ }
+\newcommand{\mo}{\mathrm{M}_\odot }
+\newcommand{\code}[1]{{\tt #1}}
+\newcommand{\todo}[1]{{$\blacksquare$~\textbf{\color{blue}[TODO: #1]}}~$\blacksquare$}
+
+% See the ``Article customise'' template for come common customisations
+
+\title{A Note on Neutrino Interaction Rates}
+\author{Luke Roberts}
+\date{} % delete this line to display the current date
+
+%%% BEGIN DOCUMENT
+\begin{document}
+
+\maketitle
+
+Here I describe how to calculate the kernels for neutrino annihilation rates.  I use a metric with signature $\eta = (+,-,-,-)$.  In general, the spin summed and averaged squared matrix element is a Lorentz invariant that depends on contractions of the momenta of various particles.  For example, the weak matrix element is given by  
+\begin{equation*}
+\left\langle \left| M \right|^2 \right \rangle = 16 G_F^2 \left [ 
+(C_V + C_A)^2 p^\mu_1 p_\mu^2 p^\nu_3 p_\nu^4
++(C_V - C_A)^2 p^\mu_2 p_\mu^3 p^\nu_1 p_\nu^4
+-(C_V^2 - C_A^2) m_2 m_4 p^\nu_1 p_\nu^3
+\right],
+\end{equation*}
+where the indices 1 and 3 represent the neutrino and antineutrino and 2 and 4 represent the electron and positron, respectively (see Bruenn, for instance).  This is also the matrix element for neutrino electron scattering, but with particles 1 and 2 is ingoing and 3 and 4 as outgoing particles. 
+ 
+\section{Scattering and Capture} 
+The differential cross section for neutrino scattering or capture is 
+\begin{eqnarray*}
+\frac{d \sigma(E_1)}{V} &=& \frac{1}{2 E_1} d\textrm{LIPS}_3 \int d\textrm{LIPS}_2 
+\int d\textrm{LIPS}_4 \\
+&& \times \, (2 \pi)^4 \delta^{(4)}\left(p^\mu_1 - p^\mu_3 + p^\mu_2 - p^\mu_4 \right)
+\left\langle \left| M \right|^2 \right \rangle (1-f_3) f_2 (1-f_4),
+\end{eqnarray*}
+where 
+\begin{equation*}
+d\textrm{LIPS}_i = \frac{d^3p_i}{(2\pi)^3 2 E_i} 
+= \frac{p_i dE_i d \Omega_i}{(2\pi)^3 2} 
+\end{equation*}
+is the Lorentz invariant phase space element of species $i$.  Here, we define 
+\begin{equation}
+q^\mu = p_1^\mu - p_3^\mu,
+\end{equation}
+which is the energy momentum transfer from the neutrinos (or neutrino and lepton) to the other particle or particles involved in the interaction.  We can split this into neutrino dependent and neutrino independent pieces to get 
+\begin{eqnarray*}
+\frac{d \sigma(E_1)}{V} &=& \frac{1}{2 E_1}  d\textrm{LIPS}_3 (1-f_3) 
+p^1_\mu p^3_\nu \\
+&&\times \, 16 G_F^2\left( 
+ (C_V+C_A)^2 \Pi_{(1)}^{\mu \nu}
++(C_V-C_A)^2 \Pi_{(2)}^{\mu \nu}
+-(C_V^2-C_A^2) \Pi_{(3)}^{\mu \nu} \right)
+\end{eqnarray*}
+which defines the structure functions 
+\begin{eqnarray*}
+\Pi_{(1)}^{\mu \nu}(q^\alpha) = \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
+(2 \pi)^4 \delta^{(4)}\left(q^\alpha + p^\alpha_2 - p^\alpha_4 \right) 
+f_2(1-f_4)p^\mu_2 p^\nu_4 \nonumber\\
+\Pi_{(2)}^{\mu \nu}(q^\alpha) = \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
+(2 \pi)^4 \delta^{(4)}\left(q^\alpha + p^\alpha_2 - p^\alpha_4 \right) 
+f_2(1-f_4) p^\nu_2 p^\mu_4 \nonumber\\
+\Pi_{(3)}^{\mu \nu}(q^\alpha) = \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
+(2 \pi)^4 \delta^{(4)}\left(q^\alpha + p^\alpha_2 - p^\alpha_4 \right) 
+f_2(1-f_4) \eta^{\mu \nu} m_2 m_4.
+\end{eqnarray*} 
+We now consider $\Pi_{(1)}$ and later generalize from this.  Using the momentum space delta function, we can integrate out the momenta of particle 4.  This gives
+\begin{equation*}
+p^\mu_4 = (E_4, \, 
+-p_2 \cos \phi_2 \sqrt{1-\mu_2^2}, \,
+-p_2 \sin \phi_2 \sqrt{1-\mu_2^2}, \,
+-p_2 \mu_2 - q)
+\end{equation*}
+and 
+\begin{equation*}
+E_4^2 = E_2^2 - m_2^2 + m_4^2 + q^2 + 2 p_2 q \mu_2.  
+\end{equation*}
+Transforming the energy delta function to an angular delta function gives 
+\begin{equation*}
+\delta\left(q_0 + E_2 - \sqrt{E_2^2 - m_2^2 + m_4^2 + q^2 + 2 p_2 q \mu_2} \right) 
+= \frac{E_4 \delta(\mu - \mu_0)}{p_2 q} 
+\end{equation*} 
+with $\mu_0 = \frac{q_\mu^2 + 2 E_2 q_0 + m_2^2 - m_4^2}{2 p_2 q}$.  Using this, we can write structure function as 
+\begin{eqnarray*}
+\Pi^{\mu \nu}_{(1)} &=& \frac{1}{(4 \pi^2) q} \int dE_2 d\Omega_2 
+\delta (\mu - \mu_0) f_2 (1 - f_4) p_2^\mu p_4^\nu 
+\\ && \times \, 
+\Theta \left(-\frac{q_0}{2} + \frac{\beta_m q}{2} \sqrt{\beta_m^2-\frac{4m_2^2}{q_\mu^2}} - E_2\right)
+\Theta \left(E_2 + \frac{q_0}{2} + \frac{\beta_m q}{2} \sqrt{\beta_m^2-\frac{4m_2^2}{q_\mu^2}}\right),
+\end{eqnarray*} 
+where $\beta_m = 1 + (m_2^2 - m_4^2)/q_\mu^2$.  We have the kinematic relations
+\begin{eqnarray*}
+q = \sqrt{p_1^2 + p_3^2 - 2 p_1 p_3 \mu_{13}} \\
+q_0 = p_1 - p_3 \\ 
+\end{eqnarray*}
+which imply that $q_\mu^2 < 0$.  \todo{Think more carefully about these kinematics}
+ 
+ 
+\section{Annihilation}
+The differential annihilation cross section for neutrino annihilation is 
+\begin{eqnarray*}
+\frac{d \sigma(E_1)}{V} &=& \frac{1}{2 E_1} d\textrm{LIPS}_3 \int d\textrm{LIPS}_2 
+\int d\textrm{LIPS}_4 \\
+&& \times \, (2 \pi)^4 \delta^{(4)}\left(p^\mu_1 + p^\mu_3 - p^\mu_2 - p^\mu_4 \right)
+\left\langle \left| M \right|^2 \right \rangle f_3 (1-f_2)(1-f_4).
+\end{eqnarray*}
+If we define the energy momentum transfer from the neutrinos to the leptons as
+\begin{equation*}
+q^\mu = p_1^\mu + p_3^\mu = (q_0,0,0,-q)
+\end{equation*}
+and employ the matrix element given above, we can rewrite the differential cross section as 
+\begin{eqnarray*}
+\frac{d \sigma(E_1)}{V} &=& \frac{1}{2 E_1}  d\textrm{LIPS}_3 f_3 
+p^1_\mu p^3_\nu \\
+&&\times \, 16 G_F^2\left( 
+ (C_V+C_A)^2 \Lambda_{(1)}^{\mu \nu}
++(C_V-C_A)^2 \Lambda_{(2)}^{\mu \nu}
+-(C_V^2-C_A^2) \Lambda_{(3)}^{\mu \nu} \right)
+\end{eqnarray*}
+which defines 
+\begin{eqnarray*}
+\Lambda_{(1)}^{\mu \nu}(q^\alpha) = \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
+(2 \pi)^4 \delta^{(4)}\left(q^\alpha - p^\alpha_2 - p^\alpha_4 \right) 
+(1-f_2)(1-f_4)p^\mu_2 p^\nu_4 \nonumber\\
+\Lambda_{(2)}^{\mu \nu}(q^\alpha) = \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
+(2 \pi)^4 \delta^{(4)}\left(q^\alpha - p^\alpha_2 - p^\alpha_4 \right) 
+(1-f_2)(1-f_4) p^\nu_2 p^\mu_4 \nonumber\\
+\Lambda_{(3)}^{\mu \nu}(q^\alpha) = \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
+(2 \pi)^4 \delta^{(4)}\left(q^\alpha - p^\alpha_2 - p^\alpha_4 \right) 
+(1-f_2)(1-f_4) \eta^{\mu \nu} m_2 m_4.
+\end{eqnarray*}
+We now consider $\Lambda_{(1)}$, everything else generalizes from this easily.  
+First, we use the momentum space delta function to get rid of the integration over the momentum of particle 4.  This demands that  
+\begin{equation*}
+p_4^\mu = \left(E_4, p_3 \cos \phi_3 \sqrt{1-\mu_3^2}, 
+p_3 \cos \phi_3 \sqrt{1-\mu_3^2}, p_3 \mu_3 - q\right),  
+\end{equation*}
+which gives 
+\begin{equation*}
+E_4^2 = E_3^2 + q^2 - 2 p_3 q \mu_3.
+\end{equation*}
+Then, we transform from a delta function in energy to a delta function in $\mu_3$ using the relation
+\begin{equation*}
+\delta(g(x)) = \frac{\delta(x-x_0)}{|g'(x_0)|}.
+\end{equation*} 
+This gives 
+\begin{equation*}
+\delta\left(q_0 - E_2 - \sqrt{E_2^2 + q^2 - 2 p_2 q \mu_2}\right) 
+= \frac{2 E_4 \delta(\mu - \mu_0)}{p_2 q}    
+\end{equation*}
+with $\mu_0 = \frac{2 E_2 q_0 - q_\mu^2}{2 p_2 q}$.  Combining these results gives,
+\begin{equation*}
+\Lambda_{(1)}^{\mu \nu} = \frac{2}{(4 \pi)^2 q}\int dE_2 d\Omega_2 
+\delta(\mu-\mu_0) (1-f_2)(1-f_4)p^\mu_2 p^\nu_4,
+\end{equation*}
+where the $E_4$ provided by the delta function is canceled by the one provided by the LIPS.  Because the integral over $\mu_2$ only runs from -1 to 1, the delta function puts limits on the the integration over energy.  Setting $\mu_2$ equal to 1 and -1 results and solving for $E_2$ results in the limits 
+\begin{equation*}
+E_{min/max} = \frac{q_0}{2} \pm \frac{q}{2} \sqrt{1 - \frac{4 m^2}{q_\mu^2}}.
+\end{equation*} 
+
+\subsection{No Final State Blocking}
+When final state blocking is neglected (i.e. $f_2 = f_4 = 0$) these equations simplify significantly.  First, we note that $\Lambda_{(1)} = \Lambda_{(2)}$ and the $\Lambda$s become symmetric tensors.  We can also write 
+\begin{equation*}
+\Lambda_{(1)}^{\mu \nu} = 
+h(q^\alpha q_\alpha) q^\mu q^\nu + g(q^\alpha q_\alpha) \eta^{\mu \nu},
+\end{equation*}
+since there is no preferred direction in the integration.  
+
+First, we calculate 
+\begin{equation*}
+\Lambda_{(3)}^{\mu \nu} = \frac{m_1 m_2 \eta^{\mu \nu}}{2^3 \pi^2 q} 
+\int_{E_{min}}^{E_{max}} dE_2  \int d\Omega_2 
+\delta(\mu_2 - \mu_0) = \eta^{\mu \nu} \frac{m_1 m_2}{2^2 \pi} 
+\sqrt{1 - \frac{4m^2}{q_\alpha^2}}.
+\end{equation*}
+
+Next we calculate $\Lambda_{(1)}^{11} = -g$.  
+\begin{eqnarray*}
+\Lambda_{(1)}^{11} &=& \frac{2}{(4 \pi)^2 q}\int_{E_{min}}^{E_{max}} dE_2 
+d\Omega_2 \delta(\mu-\mu_0) p^2_2 
+(-\cos \phi \sqrt{1-\mu_2^2})(\cos \phi \sqrt{1-\mu_2^2}) \\
+&=& -\frac{2 \pi}{(4 \pi)^2 q}\int_{E_{min}}^{E_{max}} dE_2 
+p^2_2(1-\mu_0^2) \\
+&=& -\frac{2 \pi}{(4 \pi)^2 q}\int_{E_{min}}^{E_{max}} dE_2 
+\left[p^2_2 - \frac{1}{q^2} 
+\left(E_2^2 q_0^2 + q_\alpha^4/4 - E_2 q_0 q_\alpha^2\right) \right] \\
+&=& -\frac{\pi q_\alpha^2}{3(4 \pi)^2}
+\left(1 - \frac{4m^2}{q_\alpha^2}\right)^{3/2} \\
+&=& -\frac{q_\alpha^2}{48 \pi}
+\left(1 - \frac{4m^2}{q_\alpha^2}\right)^{3/2}
+\end{eqnarray*}
+
+Finally, we can calculate $\Lambda_{(1)}^{00} = h q_0^2 + g$ and get $h$.  
+\begin{eqnarray*}
+\Lambda_{(1)}^{00} &=& \frac{2}{(4 \pi)^2 q}\int_{E_{min}}^{E_{max}} dE_2 
+d\Omega_2 \delta(\mu-\mu_0)  
+E_2(q_0 - E_2) \\
+&=& \frac{4 \pi}{(4 \pi)^2 q}\int_{E_{min}}^{E_{max}} dE_2 
+E_2(q_0 - E_2) \\
+&=& \frac{1}{48 \pi q_\alpha^2 }
+\left(4 m^2 q^2 + q_\alpha^2(2q_0^2 + q_\alpha^2) \right)  
+\sqrt{1-\frac{4m^2}{q_\alpha^2}}
+\end{eqnarray*}  
+which gives 
+\begin{equation*}
+h = \frac{q_\alpha^2 + 2 m^2}{24 \pi \, q_\alpha^2} \sqrt{1 - \frac{4m^2}{q_\alpha^2}}.
+\end{equation*}
+Therefore, we have 
+\begin{eqnarray*}
+\Lambda_{(1,2)}^{\mu\nu} &=&
+\frac{q_\alpha^2 + 2 m^2}{24 \pi \, q_\alpha^2} \lambda
+q^\mu q^\nu
++  \frac{q_\alpha^2}{48 \pi} 
+\lambda^3 \eta^{\mu \nu}, \\
+\Lambda_{(3)}^{\mu\nu} &=& \frac{m^2}{4 \pi} 
+\lambda \eta^{\mu \nu},
+\end{eqnarray*}
+with $\lambda = \sqrt{1 - 4m^2/q_\alpha^2}$ and the kinematic constraints that $q_\alpha^2 > 4m^2$ and $q_0>q$ (Note: I have checked $\Lambda^{33}$ by hand and it agrees with this result, see the mathematica notebook).  Before considering the differential cross section, it is useful to look at some kinematic quantities in terms of the neutrino momenta 
+\begin{eqnarray*}
+q &=& \sqrt{p_1^2 + p_3^2 + 2 p_1 p_3 \mu_{13}} \\
+q_0 &=& p_1 + p_3 \\
+q_\mu^2 &=& q_0^2 - q^2 = 2 p_1 p_3(1-\mu_{13}) \\ 
+p_1 \cdot p_3 &=& p_1 p_3 (1-\mu_{13}) = q_\mu^2/2 \\
+p_1 \cdot q &=& p_1 \cdot p_3 = q_\mu^2/2
+\end{eqnarray*}
+The total cross section is now given by 
+\begin{eqnarray*}
+\frac{\sigma(E_1)}{V} &=& \frac{16 G_F^2}{4 (2 \pi)^3 E_1}  
+\int \frac{d^3p_3}{E_3} f_3 \frac{q_\alpha^2 \lambda}{4 \pi} \\
+&&\times \, \left[ 
+ (C_V^2+C_A^2) \frac{q_\alpha^2 + 2 m^2}{3}
++(C_V^2+C_A^2) \frac{q_\alpha^2 - 4 m^2}{6} 
++(C_A^2-C_V^2) m^2 \right] \\
+\frac{\sigma(E_1)}{V} &=& \frac{G_F^2}{(2 \pi)^4}  
+\int d\Omega_3 \int_{\frac{2 m^2}{E_1 (1-\mu_3)}}^\infty dE_3 \frac{E_3}{E_1}
+ q_\alpha^2 \lambda \, \left[(C_V^2+C_A^2) q_\alpha^2 
+ - (C_V^2-C_A^2) 2 m^2 \right]f_3.
+\end{eqnarray*}
+The lower limit on the energy integral comes from demanding that $q_\mu^2>4m^2$.  Clearly, the differential cross section can never be negative if the kinematic constraint $q_\mu^2 > 4m^2$ is obeyed.    
+\todo{Check that the factors in front of the differential cross section are correct.  Units work out Look at old notes for this.}
+The total annihilation rate will be 
+\begin{eqnarray*}
+\dot N &=& \int \frac{d^3p_1}{(2\pi)^3} \frac{\sigma(E_1)}{V} \\
+&=& \frac{G_F^2}{(2 \pi)^7}  
+\int d\Omega_1 \int d\Omega_3 \int_0^\infty dE_1
+\int_{\frac{2 m^2}{E_1 (1-\mu_3)}}^\infty dE_3 \, E_3 E_1
+ q_\alpha^2 \lambda \, \left[(C_V^2+C_A^2) q_\alpha^2 
+ - (C_V^2-C_A^2) 2 m^2 \right]f_3 \\
+ &=& \frac{G_F^2}{(2 \pi)^7}  
+\int d\Omega_1 \int d\Omega_3 \int_0^\infty dE_1
+\int_{\frac{2 m^2}{E_1 (1-\mu_3)}}^\infty dE_3 \, E_1^2 E_3^2 (1-\mu_{13})
+\lambda \, \\
+&& \times \left[(C_V^2+C_A^2) E_1 E_3 (1-\mu_{13}) 
+ - (C_V^2-C_A^2) 2 m^2 \right]f_3 
+\end{eqnarray*}
+Aside from the lower limit on the $E_3$ integral and the factor of $\lambda$, this has the same form as the Ruffert et al. result.  
+\end{document}
+
+
+
+
+
+
