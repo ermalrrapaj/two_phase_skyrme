@@ -18,6 +18,7 @@
 \usepackage[colorlinks,citecolor=blue]{hyperref}
 \usepackage{xcolor}
 \usepackage[sort&compress,numbers]{natbib}
+\usepackage{mathtools}
 %\usepackage{natbibspacing}
 
 \setlength{\oddsidemargin}{.46cm}
@@ -47,6 +48,22 @@
 \def\apss{Astrophys. Space Sci.}
 \def\cqg{Class. Quantum Grav.}
 
+\newcommand{\diver}[1]{\nabla \cdot \begin{bf}#1\end{bf}}
+\newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\td}[2]{\frac{d #1}{d #2}}
+\newcommand{\ld}[1]{\pd{#1}{t} + \begin{bf}v\end{bf}\cdot \nabla #1}
+\newcommand{\thd}[3]{\biggl(\pd{#1}{#2}\biggr)_{#3}}
+\newcommand{\avg}[1]{\langle #1 \rangle}
+\newcommand{\sci}[2]{#1  \times 10^{#2}}
+\newcommand{\script}[1]{\begin{cal} #1 \end{cal} }
+\newcommand{\vect}[1]{\begin{bf} #1 \end{bf}}
+\newcommand{\comm}[2]{\left[ #1 , #2 \right] }
+\newcommand{\bra}[1]{\left \langle #1 \right |}
+\newcommand{\ket}[1]{\left | #1 \right \rangle}
+\newcommand{\braket}[2]{\langle #1 | #2 \rangle}
+\newcommand{\code}[1]{\verb~#1~}
+\newcommand{\vb}[1]{\begin{verbatim}#1\end{verbatim}}
+\newcommand{\fsl}[1]{\ensuremath{\mathrlap{\!\not{\phantom{#1}}}#1}}
 
 \usepackage{mathpazo}
 \DeclareMathOperator{\diff}{d\!}
@@ -57,7 +74,6 @@
 
 \setlength{\parskip}{.2cm}
 
-\newcommand{\pd}[2]{\frac{\partial #1}{\partial #2}} 
 \newcommand{\pdtwo}[3]{\frac{\partial #1}{\partial #2 \partial #3}} 
 \newcommand{\pdtri}[4]{\frac{\partial #1}{\partial #2 \partial #3 \partial #4}} 
 \newcommand{\grad}{\vec{\nabla}}
@@ -65,7 +81,6 @@
 \newcommand{\intl}{\int\limits}
 \newcommand{\msun}{M$_\odot$\ }
 \newcommand{\mo}{\mathrm{M}_\odot }
-\newcommand{\code}[1]{{\tt #1}}
 \newcommand{\todo}[1]{{$\blacksquare$~\textbf{\color{blue}[TODO: #1]}}~$\blacksquare$}
 
 % See the ``Article customise'' template for come common customisations
@@ -388,6 +403,65 @@ The total annihilation rate will be
  - (C_V^2-C_A^2) 2 m^2 \right]f_3 
 \end{eqnarray*}
 Aside from the lower limit on the $E_3$ integral and the factor of $\lambda$, this has the same form as the Ruffert et al. result.  
+
+\section{Spinor Technology and Matrix Elements in RMF Theory}
+For Walecka type field theories, we generally have a Lagrangian of the the form 
+\begin{eqnarray}
+\script{L} &=& \sum_B \bar \Psi_B (-i \gamma^\mu \partial_\mu - M_B 
++ g_{\sigma B} \sigma - g_{\omega B} \gamma^\mu \omega_\mu)\Psi_B 
++ \frac{1}{2} m_\omega^2 \omega_\mu \omega^\mu 
+- \frac{1}{4} W_{\mu \nu} W^{\mu \nu} \\
+&& - \partial_\mu \sigma \partial^\mu \sigma 
+- \frac{1}{2} m_\sigma^2 \sigma^2 - U(\sigma)
+\end{eqnarray}
+where we have subsumed all of the vector fields into one vector field 
+$\omega_\mu$ and the mass term schematically accounts for all of these. We also
+define $W_{\mu \nu} = \partial_\mu \omega_\nu - \partial_\nu \omega_\mu$.  We 
+can then write down the field equations from 
+\begin{eqnarray}
+\partial_\mu \left(\pd{\script{L}}{(\partial_\mu \psi)}\right) =  
+\pd{\script{L}}{\psi} 
+\end{eqnarray}
+We also assume that the fields are homogenous and stationary and also assume that the vector field has zero spatial components.  For the $\sigma$ field, we are left with
+\begin{eqnarray}
+\partial_\mu \partial^\mu \sigma - m_\sigma^2 \sigma = -\sum_B g_{\sigma B} \bar \Psi_B \Psi_B + \td{U(\sigma)}{\sigma} \\
+m_\sigma^2 \sigma = -\td{U(\sigma)}{\sigma} + \frac{1}{V}\sum_B g_{\sigma B}\avg{ \bar \Psi_B \Psi_B}
+\end{eqnarray}
+In the second line spatial homogeneity has been assumed and the brackets denote the thermal average (including an integration over space.
+For the $\omega$ field we are left with
+\begin{eqnarray}
+m_\omega^2\omega_0 = \frac{1}{V} \sum_B g_{\omega B} \avg{ \bar \Psi_B \gamma^0 \Psi_B} \\
+m_\omega^2\omega_0 = \frac{1}{V} \sum_B g_{\omega B} \avg{ \Psi_B^\dagger \Psi_B}
+\end{eqnarray}
+Where the second line was obtained from the properties of the gamma matrices (i.e. $\gamma^0 \gamma^0 = 1$).  Clearly, the thermally averaged quantity is just the conserved charge portion of the baryon current.  
+The field equation for the baryon field is given by
+\begin{eqnarray}
+(-i \gamma^\mu \partial_\mu - M_B + g_{\sigma B} \sigma - g_{\omega B} \gamma^\mu \omega_\mu)\Psi_B = 0 \\
+\bar \Psi_B(i \gamma^\mu \ \overleftarrow{\partial}_\mu - M_B + g_{\sigma B} \sigma - g_{\omega B} \gamma^\mu \omega_\mu) = 0
+\end{eqnarray}
+
+It is now useful to expand the baryon fields in terms of creation and annihilation operators $a_s$ and $b_s$ and the standard four-component spinners $u_s$ and $v_s$ as 
+\begin{eqnarray}
+\Psi(x) = \sum_{s=+,-} \int \frac{d^3p}{(2 \pi)^3 E} \left(a_s(\vec{p}) u_s(\vec{p}) e^{ip\cdot x} + b^\dagger_s(\vec{p}) v_s(\vec{p}) e^{-ip\cdot x} \right ) \\ 
+\bar \Psi(x) =  \sum_{s=+,-} \int \frac{d^3p}{(2 \pi)^3 E} \left(a_s^\dagger(\vec{p}) \bar u_s(\vec{p}) e^{-ip\cdot x} + b_s(\vec{p}) \bar v_s(\vec{p}) e^{ip\cdot x} \right )
+\end{eqnarray}
+Using the field equation for the baryon fields with the above expansions results in
+\begin{eqnarray}
+( \gamma^\mu p_\mu - M_*  - g_{\omega B} \gamma^\mu \omega_\mu)u_s(\vec{p}) = 0 \\
+\bar u_s(\vec{p})  ( \gamma^\mu p_\mu - M_*  - g_{\omega B} \gamma^\mu \omega_\mu)= 0 \\
+( -\gamma^\mu p_\mu - M_* - g_{\omega B} \gamma^\mu \omega_\mu)v_s(\vec{p}) = 0 \\
+\bar v_s(\vec{p}) ( -\gamma^\mu p_\mu - M_* - g_{\omega B} \gamma^\mu \omega_\mu)= 0 
+\end{eqnarray}
+Defining $\tilde p_\mu = p_\mu \mp g_{\omega B} \omega_\mu$ makes these exactly the same as the dispersion relations for a free field theory, except with $\tilde p_\mu$ instead of $p_\mu$.  Determining the eigenvalues of this equation results in the dispersion relation
+\begin{equation}
+\script{E}^\pm = g_{\omega B} \omega_0 \pm \sqrt{p^2 + M^2_*} \equiv g_{\omega B} \omega_0 \pm E
+\end{equation}
+Additionally, this implies that the Gordon identities and other properties of the spinors are unaltered from the free field case aside from the aforementioned replacement.  Therefore, we have 
+\begin{eqnarray}
+\sum_{s=\pm} \bar u_s(\vec{p}) u_s(\vec{p}) &=& -\fsl{\tilde p} + M_* \\
+\sum_{s=\pm} \bar v_s(\vec{p}) v_s(\vec{p}) &=& -\fsl{\tilde p} - M_*.
+\end{eqnarray}
+This in turn implies that the mean field matrix element can be found from the free matrix element by the replacement $p_\mu \rightarrow \tilde p_\mu$.  Additionally, I think the Lorentz invariant phase space factor should have $E$ in the denominator instead of $\script{E}$.
 \end{document}
 
 
