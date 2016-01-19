@@ -16,6 +16,34 @@
 static double HBC = Constants::HBCFmMeV; 
 static double MNUC = 938.918/HBC;
 
+
+namespace {
+inline double D(double u) {
+  return 1.0 - 1.5 * pow(u, 1.0/3.0) + 0.5*u;
+}
+inline double uDpoD(double u) {
+  return (-0.5 * pow(u, 1.0/3.0) + 0.5*u)/(D(u) +  1.e-40);
+}
+}
+
+double NucleusBase::CoulombEnergy(double v, double npo, double ne) const {
+  double u = v*ne / (double)NucleusBase::mZ;
+  double Ec = 3.0 * Constants::ElementaryChargeSquared 
+      / (5.0 * pow(3.0 / (4.0 * Constants::Pi), 1.0/3.0))
+      * pow((double)NucleusBase::mZ, 2) * (0.5*pow(u,2.0/3.0) - 1.5) 
+      * pow(ne/(double)NucleusBase::mZ,1.0/3.0);
+  return Ec;
+}
+
+double NucleusBase::CoulombPressureExternal(double v, double npo, double ne) const {
+  double u = v*(ne - npo) / ((double)NucleusBase::mZ - v*npo);
+  return 3.0 * Constants::ElementaryChargeSquared 
+      / (5.0 * pow(3.0 / (4.0 * Constants::Pi), 1.0/3.0))
+      * pow((double)NucleusBase::mZ - v*npo, 2) * pow(u,-1.0/3.0)/3.0
+      * v/((double)NucleusBase::mZ - v*npo);
+}
+
+
 StaticNucleus LDNucleus::GetStaticNucleus() const {
   double n0 = 1.e-10;
   EOSData eosIn = mpEos->FromNAndT(
@@ -26,6 +54,54 @@ StaticNucleus LDNucleus::GetStaticNucleus() const {
   std::cerr << NucleusBase::mZ << " " << NucleusBase::mN << " " << (double) A/v
       << " " << BE/A*197.3 << std::endl;
   return StaticNucleus(NucleusBase::mZ, A, BE, {}, {}, v);
+}
+
+double StaticNucleus::FreeEnergy(const EOSData& eosIn, double ne, double ni) const {
+	double T = eosIn.T();
+	double BE = GetBindingEnergy(eosIn, ne);
+	double nQ = pow(MNUC*T/2/Constants::Pi,1.5); 
+	double Fk = T*log(ni/nQ/pow(NucleusBase::mA,1.5))-T;
+	double FE= Fk-BE;
+	return FE;	
+}
+
+double StaticNucleus::Entropy (const EOSData& eosIn, double ne, double ni) const {
+	return 0.0;
+}
+
+double StaticNucleus::NucleusPressure (const EOSData& eosIn, double ne, double uo) const{
+	double npo = 0.0;//eosIn.Np();
+	double T = eosIn.T();
+	double v = GetVolume(eosIn, ne);
+	double u = v*(ne - npo) / ((double)NucleusBase::mZ - v*npo+  1.e-40);
+	double EC = CoulombEnergy(v, npo, ne);
+	double DuDlogne = v*ne / ((double)NucleusBase::mZ - v*npo+  1.e-40);
+	double DuDlognpo = npo * ( v*u/((double)NucleusBase::mZ - v*npo+  1.e-40)
+	                     -v/((double)NucleusBase::mZ - v*npo+  1.e-40) );
+	double DDu = 0.5*(1 - pow(u, -2.0/3.0))/(D(u) +  1.e-40);
+	
+	double DFDlogne = EC*DDu*DuDlogne;
+	double DFDlognpo = EC*(DDu*DuDlognpo - v/((double)NucleusBase::mZ - v*npo+  1.e-40));
+	double pressure = T +uo *DFDlognpo + DFDlogne;
+	return pressure;
+}	
+
+double StaticNucleus::Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const {
+	double npo = eosIn.Np();
+	double T = eosIn.T();
+	double v = GetVolume(eosIn, ne);
+	double u = v*(ne - npo) / ((double)NucleusBase::mZ - v*npo);
+	double EC = CoulombEnergy(v, npo, ne);
+	double DuDnpo = v*u/((double)NucleusBase::mZ - v*npo)
+	                     -v/((double)NucleusBase::mZ - v*npo) ;
+	double DDu = 0.5*(1 - pow(u, -2.0/3.0))/D(u);
+	double DFDnpo = EC*(DDu*DuDnpo - v/((double)NucleusBase::mZ - v*npo)/npo);
+	double mup = ni/uo * DFDnpo;
+	return mup;
+}
+
+double StaticNucleus::Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const {
+	return 0.0;
 }
 
 double LDNucleus::GetVolume(const EOSData& eosIn, double ne) const {
@@ -71,21 +147,36 @@ double LDNucleus::GetBindingEnergy(const EOSData& eosIn,
     double ne, double v) const {
   double Z = (double) NucleusBase::mZ; 
   double N = (double) NucleusBase::mN;
+  double A = (double) NucleusBase::mA;
   double T = eosIn.T(); 
    
   EOSData eosBulk = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, N/v, Z/v)); 
-  return -(eosBulk.E() - eosBulk.T()*eosBulk.S()) * NucleusBase::mA 
+  return -(eosBulk.E() - eosBulk.T()*eosBulk.S()) * A 
          - SurfaceEnergy(v) - CoulombEnergy(v, eosIn.Np(), ne);
 
 }
 
 double LDNucleus::FreeEnergy(const EOSData& eosIn, double ne, double ni) const {
 	double T = eosIn.T();
+	double A = (double) NucleusBase::mA;
 	double BE = GetBindingEnergy(eosIn,ne);
 	double nQ = pow(MNUC*T/2/Constants::Pi,1.5); 
-	double Fk = T*log(ni/nQ/pow(NucleusBase::mA,1.5))-T;
+	double Fk = T*log(ni/nQ/pow(A,1.5))-T;
 	double FE= Fk-BE;
 	return FE;	
+}
+
+double LDNucleus::Entropy (const EOSData& eosIn, double ne, double ni) const {
+	double v = GetVolume(eosIn, ne);
+	double Z = (double) NucleusBase::mZ; 
+	double N = (double) NucleusBase::mN;
+	double A = (double) NucleusBase::mA;
+	double T = eosIn.T();  
+	double nQ = pow(MNUC*T/2/Constants::Pi,1.5);
+	EOSData eosBulk = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, N/v, Z/v));
+	double Sk = 2.5-log(pow(A,-1.5)*ni/nQ);
+	double Stot = Sk + A*eosBulk.S();
+	return Stot;
 }
 
 double LDNucleus::SurfacePressure(double v) const {
@@ -97,31 +188,6 @@ double LDNucleus::SurfaceEnergy(double v) const {
   return pow(36.0 * Constants::Pi, 1.0/3.0) * mSigma0 * pow(v, 2.0/3.0); 
 }
 
-namespace {
-inline double D(double u) {
-  return 1.0 - 1.5 * pow(u, 1.0/3.0) + 0.5*u;
-}
-inline double uDpoD(double u) {
-  return (-0.5 * pow(u, 1.0/3.0) + 0.5*u)/(D(u) +  1.e-40);
-}
-}
-
-double NucleusBase::CoulombEnergy(double v, double npo, double ne) const {
-  double u = v*ne / (double)NucleusBase::mZ;
-  double Ec = 3.0 * Constants::ElementaryChargeSquared 
-      / (5.0 * pow(3.0 / (4.0 * Constants::Pi), 1.0/3.0))
-      * pow((double)NucleusBase::mZ, 2) * (0.5*pow(u,2.0/3.0) - 1.5) 
-      * pow(ne/(double)NucleusBase::mZ,1.0/3.0);
-  return Ec;
-}
-
-double NucleusBase::CoulombPressureExternal(double v, double npo, double ne) const {
-  double u = v*(ne - npo) / ((double)NucleusBase::mZ - v*npo);
-  return 3.0 * Constants::ElementaryChargeSquared 
-      / (5.0 * pow(3.0 / (4.0 * Constants::Pi), 1.0/3.0))
-      * pow((double)NucleusBase::mZ - v*npo, 2) * pow(u,-1.0/3.0)/3.0
-      * v/((double)NucleusBase::mZ - v*npo);
-}
 
 double LDNucleus::CoulombEnergy(double v, double npo, double ne) const {
   double u = v*(ne - npo) / ((double)NucleusBase::mZ - v*npo);
@@ -148,10 +214,10 @@ double LDNucleus::NucleusPressure (const EOSData& eosIn, double ne, double uo) c
 	double DuDlogne = v*ne / ((double)NucleusBase::mZ - v*npo);
 	double DuDlognpo = npo * ( v*u/((double)NucleusBase::mZ - v*npo)
 	                     -v/((double)NucleusBase::mZ - v*npo) );
-	double DDu = 0.5*(1 - pow(u, -2.0/3.0))/D(u);
+	double DDu = 0.5*(1 - pow(u, -2.0/3.0))/(D(u) +  1.e-40);
 	
 	double DFDlogne = EC*DDu*DuDlogne;
-	double DFDlognpo = EC*(DDU*DuDlognpo - v/((double)NucleusBase::mZ - v*npo));
+	double DFDlognpo = EC*(DDu*DuDlognpo - v/((double)NucleusBase::mZ - v*npo));
 	double pressure = T +uo *DFDlognpo + DFDlogne;
 	return pressure;
 }
@@ -165,8 +231,8 @@ double LDNucleus::Nucleusmup (const EOSData& eosIn, double ne, double uo, double
 	double DuDnpo = v*u/((double)NucleusBase::mZ - v*npo)
 	                     -v/((double)NucleusBase::mZ - v*npo) ;
 	double DDu = 0.5*(1 - pow(u, -2.0/3.0))/D(u);
-	double DFDnpo = EC*(DDU*DuDnpo - v/((double)NucleusBase::mZ - v*npo)/npo);
-	mup = ni/uo * DFDnpo;
+	double DFDnpo = EC*(DDu*DuDnpo - v/((double)NucleusBase::mZ - v*npo)/npo);
+	double mup = ni/uo * DFDnpo;
 	return mup;
 }
 

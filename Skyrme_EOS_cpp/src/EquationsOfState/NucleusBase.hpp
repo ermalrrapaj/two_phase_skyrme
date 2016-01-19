@@ -35,10 +35,11 @@ public:
   }
   virtual double CoulombPressureExternal(double v, double npo, double ne) const;
   virtual double CoulombEnergy(double v, double npo, double ne) const;
-  virtual double FreeEnergy(const EOSData& eosIn, double ne, double ni) const;
-  virtual double NucleusPressure (const EOSData& eosIn, double ne, double uo) const;
-  virtual double Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const;
-  virtual  double Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const;
+  virtual double FreeEnergy(const EOSData& eosIn, double ne, double ni) const =0;
+  virtual double Entropy(const EOSData& eosIn, double ne, double ni) const =0;
+  virtual double NucleusPressure (const EOSData& eosIn, double ne, double uo) const=0;
+  virtual double Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const =0;
+  virtual double Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const =0;
 
 protected:
   int mZ, mN, mA;
@@ -62,10 +63,10 @@ public:
 	
   double GetVolume(const EOSData& /*eosIn*/, double /*ne*/) const {return mV;}
   
-  /// Needs to be implemented
+  
   double FreeEnergy(const EOSData& eosIn, double ne, double ni) const;
-
-  /// Needs to be implemented
+  double Entropy (const EOSData& eosIn, double ne, double ni) const;
+  
   double NucleusPressure (const EOSData& eosIn, double ne, double uo) const;
   double Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const;
   double Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const;
@@ -94,6 +95,7 @@ public:
   double GetBindingEnergy(const EOSData& eosIn, double ne) const;
   double GetBindingEnergy(const EOSData& eosIn, double ne, double v) const;
   double FreeEnergy(const EOSData& eosIn, double ne, double ni) const;
+  double Entropy (const EOSData& eosIn, double ne, double ni) const;
   double NucleusPressure (const EOSData& eosIn, double ne, double uo) const;
   double Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const;
   double Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const;

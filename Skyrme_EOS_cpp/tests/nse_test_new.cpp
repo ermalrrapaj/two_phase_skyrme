@@ -35,29 +35,29 @@ int main() {
   EOSNSE nseEosStatic(nucleiStatic, eos);
   
   std::ofstream ofile("nse_test_new.out", std::ofstream::out);  
-  ofile << "[1] n_{n,t} " << std::endl; 
-  ofile << "[2] n_{p,t} " << std::endl; 
+  ofile << "[1] n_{n,t}_1 " << std::endl; 
+  ofile << "[2] n_{p,t}_1 " << std::endl; 
   ofile << "[3] n_{n,o} " << std::endl; 
   ofile << "[4] n_{p,o} " << std::endl; 
-  ofile << "[5] sum v_i n_i " << std::endl; 
-  ofile << "[6] n_{n,t} (static) " << std::endl; 
-  ofile << "[7] n_{p,t} (static) " << std::endl; 
-  ofile << "[8] n_{n,o} (static) " << std::endl; 
-  ofile << "[9] n_{p,o} (static) " << std::endl; 
-  ofile << "[10] sum v_i n_i (static) " << std::endl; 
-  ofile << "[11] E_c (first nucleus) " << std::endl; 
-  ofile << "[12] mu_{n,o} " << std::endl; 
-  ofile << "[13] mu_{p,o} " << std::endl; 
-  ofile << "[14] P_o " << std::endl; 
-  ofile << "[15] BE (first nucleus) " << std::endl; 
-  ofile << "[16] BE (first nucleus, static) " << std::endl; 
-  ofile << "[17] rho (first nucleus) " << std::endl; 
-  
+  ofile << "[5] sum v_i n_i " << std::endl;  
+  ofile << "[6] E_c (first nucleus) " << std::endl; 
+  ofile << "[7] P_o " << std::endl;
+  ofile << "[8] BE (first nucleus) " << std::endl; 
+  ofile << "[9] BE (first nucleus, static) " << std::endl; 
+  ofile << "[10] rho (first nucleus) " << std::endl;
+  ofile << "[11] n_{n,t}_2 " << std::endl; 
+  ofile << "[12] n_{p,t}_2 " << std::endl; 
+  ofile << "[13] mun_tot " << std::endl; 
+  ofile << "[14] mup_tot " << std::endl; 
+  ofile << "[15] P_tot " << std::endl; 
+  ofile << "[16] E_tot " << std::endl; 
+  ofile << "[17] S_tot " << std::endl;
+   
   double T = 1.0/HBC;
   
   for (double np0 = 4.e-2; np0<8.e-2; np0 *= 1.5) {
     std::cout << np0 << std::endl;
-    double nn0 = 1.e-14;
+    double nn0 = 1.e-12;
     double delta = 0.01;
     double deltaMin = 1.e-8;
     double deltaMax = 1.0;
@@ -66,6 +66,7 @@ int main() {
     double npo = nseT.npTot;
     double nno = nseT.nnTot;
     std::vector<NSEProperties> allPts;
+    std::vector<EOSData> alldata; 
     
     // Find all of the points
     while (nn0<0.08) { 
@@ -120,47 +121,68 @@ int main() {
     std::sort(minEl, allPts.end(), [](NSEProperties a, NSEProperties b) {
         return b.eosExterior.Nb() > a.eosExterior.Nb();
     });
-      
+     double npt[2],nnt[2],npe,nne,mun,mup,BePerNuc,BePerNucStat,nucRho,Ec,Unuc,P[2],Etot,Stot;  
     // Write out the points  
     for (auto& nse : allPts) { 
-      double npt = nse.npTot;
-      double nnt = nse.nnTot;
-      double npe = nse.eosExterior.Np();
-      double nne = nse.eosExterior.Nn();
+	  alldata.push_back(nseEosStatic.GetState(nse));}
+	 
+ 	  
+  
+  for (int i =0; i< allPts.size(); i++){
+	  npt[0] = allPts[i].npTot;
+      nnt[0] = allPts[i].nnTot;
+      P[0] = allPts[i].eosExterior.P();
+      npe = allPts[i].eosExterior.Np();
+      nne = allPts[i].eosExterior.Nn();
+      Unuc = allPts[i].unuc;
       
-      double BePerNuc = 0.0;
-      double nucRho = 0.0;
-      double Ec = 0.0;
+      BePerNuc = 0.0;
+      nucRho = 0.0;
+      Ec = 0.0;
       try { 
-        BePerNuc = nuclei[0]->GetBindingEnergy(nse.eosExterior, npt)
+        BePerNuc = nuclei[0]->GetBindingEnergy(allPts[i].eosExterior, npt[0])
           * 197.3 / (double) nuclei[0]->GetA();
-        nucRho = nuclei[0]->GetA()/nuclei[0]->GetVolume(nse.eosExterior, npt);
-        Ec = nuclei[0]->CoulombEnergy(nuclei[0]->GetVolume(nse.eosExterior, npt), npe, npt);
+        nucRho = nuclei[0]->GetA()/nuclei[0]->GetVolume(allPts[i].eosExterior, npt[0]);
+        Ec = nuclei[0]->CoulombEnergy(nuclei[0]->GetVolume(allPts[i].eosExterior, npt[0]), npe, npt[0]);
       } catch(...) {}
       
-      double BePerNucStat = nucleiStatic[0]->GetBindingEnergy(nse.eosExterior, npt)
+      BePerNucStat = nucleiStatic[0]->GetBindingEnergy(allPts[i].eosExterior, npt[0])
           * 197.3 / (double) nuclei[0]->GetA();
-      
+	  
+	  
+      npt[1] = alldata[i].Np();
+      nnt[1] = alldata[i].Nn();
+      P[1] = alldata[i].P();
+      Etot = alldata[i].E();
+      Stot = alldata[i].S();
+      mun = alldata[i].Mun();
+      mup = alldata[i].Mup();
       
       std::string frmt;
-      for (int ii=0; ii<12; ++ii) frmt.append("% 10.3e "); 
+      for (int ii=0; ii<17; ++ii) frmt.append("% 10.3e "); 
       ofile << boost::format(frmt) 
-        % nnt 
-        % npt 
+        % nnt[0] 
+        % npt[0] 
         % nne 
         % npe 
-        % nse.unuc
+        % Unuc
         % Ec
-        % nse.eosExterior.Mun() 
-        % nse.eosExterior.Mup() 
-        % nse.eosExterior.P()  
+        % P[0]  
         % BePerNuc 
         % BePerNucStat 
         % nucRho
+        % nnt[1]
+        % npt[1]
+        % mun
+        % mup
+        % P[1]
+        % Etot
+        % Stot
         << std::endl;
     }
     ofile << std::endl;
   }
+  
   return 0;
 }
 

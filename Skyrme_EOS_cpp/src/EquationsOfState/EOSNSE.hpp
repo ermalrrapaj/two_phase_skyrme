@@ -64,7 +64,7 @@ public:
       avgPv(avgPv), eosExterior(eosExterior) {}
   double nnTot, npTot, T;
   double unuc, avgEc, avgBe, avgPv; 
-  EOSData eosExterior;
+  EOSData eosExterior; 
 }; 
 
 class EOSNSE : public EOSBase {
@@ -98,6 +98,8 @@ public:
   } 
   
   EOSData FromNAndT(const EOSData& eosIn);
+  
+  EOSData GetState(const NSEProperties& Prop);
   
   std::vector<double> GetExteriorDensities(const EOSData& eosIn);
   NSEProperties GetTotalDensities(const EOSData& eosIn);
