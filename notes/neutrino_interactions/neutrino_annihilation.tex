@@ -102,15 +102,61 @@ Here I describe how to calculate the kernels for neutrino annihilation rates.  I
 -(C_V^2 - C_A^2) m_2 m_4 p^\nu_1 p_\nu^3
 \right],
 \end{equation*}
-where the indices 1 and 3 represent the neutrino and antineutrino and 2 and 4 represent the electron and positron, respectively (see Bruenn, for instance).  This is also the matrix element for neutrino electron scattering, but with particles 1 and 2 is ingoing and 3 and 4 as outgoing particles. 
- 
+where the indices 1 and 3 represent the neutrino and antineutrino and 2 and 4 represent the electron and positron, respectively (see Bruenn, for instance).  This is also the matrix element for neutrino electron scattering, but with particles 1 and 2 is ingoing and 3 and 4 as outgoing particles.
+
+We can also choose the standard decomposition of the matrix element in terms of the lepton tensor and something like the polarization function 
+\begin{equation*}
+\left\langle \left| M \right|^2 \right \rangle = \frac{G_F^2}{8}
+L_{\mu \nu} \Omega^{\mu \nu},
+\end{equation*}
+where 
+\begin{eqnarray*}
+L^{\mu \nu} &=& \textrm{Tr}\left[
+(-\fsl{p}_1 + m_1) \gamma^\mu(1-\gamma^5) 
+(-\fsl{p}_3 + m_3) \gamma^\nu(1-\gamma^5)  
+\right] \\
+&\approx& 8 \left[p_1^\mu p_3^\nu + p_1^\nu p_3^\mu 
+- (p_1 \cdot p_3) \eta^{\mu \nu}   
++ i \epsilon^{\lambda \nu \kappa \mu} p_\lambda^1 p_\kappa^3
+\right] \\
+&=& 8 \left[2p_1^\mu p_1^\nu - p_1^\nu q^\mu - p_1^\mu q^\nu 
++ (p_1 \cdot q) \eta^{\mu \nu}   
+- i \epsilon^{\lambda \nu \kappa \mu} p_\lambda^1 q_\kappa
+\right].
+\end{eqnarray*}
+The baryon contribution to the matrix 
+element is given by 
+\begin{eqnarray*}
+\Omega^{\mu \nu} &=& \textrm{Tr}\left[
+(-\fsl{p}_2 + m_2) 
+\left\{ C_V\gamma^\mu -C_A\gamma^\mu \gamma^5 
++ F_3\frac{i \sigma^{\mu \alpha}q_\alpha}{2 M_N} \right\}
+(-\fsl{p}_4 + m_4)
+\left \{ C_V\gamma^\nu -C_A\gamma^\nu \gamma^5 
++ F_3\frac{i \sigma^{\nu \alpha}q_\alpha}{2 M_N} \right\}
+\right] \\
+&=& C_V^2 \Lambda^{\mu \nu}_V + C_A^2 \Lambda^{\mu \nu}_A + 2 C_V C_A \Lambda^{\mu \nu}_{VA} + ..., 
+\end{eqnarray*}
+where 
+\begin{eqnarray*}
+\Omega_V^{\mu \nu} &=& 4 \left[
+p_2^\mu p_4^\nu + p_2^\nu p_4^\mu + (m_2 m_4 - p_2 \cdot p_4) \eta^{\mu \nu}
+\right] \\
+\Omega_A^{\mu \nu} &=& \Omega_V^{\mu \nu} - \eta^{\mu \nu} \Omega_A \\
+\Omega_A &=& 8 m_2 m_4 \\
+\Omega_{VA}^{\mu \nu} &=& - 4i \epsilon^{\alpha \mu \beta \nu} 
+p^2_\alpha p^4_\beta.
+\end{eqnarray*}
+
+\todo{Derive weak magnetism pieces}
+
 \section{Scattering and Capture} 
 The differential cross section for neutrino scattering or capture is 
 \begin{eqnarray*}
 \frac{d \sigma(E_1)}{V} &=& \frac{1}{2 E_1} d\textrm{LIPS}_3 \int d\textrm{LIPS}_2 
 \int d\textrm{LIPS}_4 \\
 && \times \, (2 \pi)^4 \delta^{(4)}\left(p^\mu_1 - p^\mu_3 + p^\mu_2 - p^\mu_4 \right)
-\left\langle \left| M \right|^2 \right \rangle (1-f_3) f_2 (1-f_4),
+\left\langle \left| M \right|^2 \right \rangle f_2 (1-f_3) (1-f_4),
 \end{eqnarray*}
 where 
 \begin{equation*}
@@ -123,34 +169,45 @@ q^\mu = p_1^\mu - p_3^\mu=(q_0,0,0,-q),
 \end{equation}
 which is the energy momentum transfer from the neutrinos (or neutrino and lepton) to the other particle or particles involved in the interaction.  We can split this into neutrino dependent and neutrino independent pieces to get 
 \begin{eqnarray*}
-\frac{d \sigma(E_1)}{V} &=& \frac{1}{2 E_1(1- \exp((\mu_4 - \mu_2 - q_0)/T)}  d\textrm{LIPS}_3 (1-f_3) 
+\frac{d \sigma(E_1)}{V} &=& \frac{d\textrm{LIPS}_3 (1-f_3) }{2 E_1(1- \exp((\mu_4 - \mu_2 - q_0)/T)}  
 p^1_\mu p^3_\nu \\
 &&\times \, 16 G_F^2\left( 
  (C_V+C_A)^2 \Pi_{(1)}^{\mu \nu}
 +(C_V-C_A)^2 \Pi_{(2)}^{\mu \nu}
 -(C_V^2-C_A^2) \Pi_{(3)}^{\mu \nu} \right) \\
-&=& \frac{1}{2 E_1(1- \exp((\mu_4 - \mu_2 - q_0)/T)}  d\textrm{LIPS}_3 (1-f_3) 
+&=& \frac{d\textrm{LIPS}_3 (1-f_3)}{2 E_1(1- \exp((\mu_4 - \mu_2 - q_0)/T)}   
 p^1_\mu p^3_\nu \\
 &&\times \, 16 G_F^2\left( 
   C_V^2 \left(\Pi_{(+)}^{\mu \nu} - \Pi_{(3)}^{\mu \nu} \right) 
 + C_A^2 \left(\Pi_{(+)}^{\mu \nu} + \Pi_{(3)}^{\mu \nu} \right) 
 + 2 C_V C_A \Pi_{(-)}^{\mu \nu}
- \right)
+ \right) \\
+&=& \frac{G_F^2 \, d\textrm{LIPS}_3 (1-f_3)}
+{16 E_1(1 - \exp((\mu_4 - \mu_2 - q_0)/T)} 
+ L_{\mu \nu} 
+\left( 
+  C_V^2 \Pi_V^{\mu \nu} 
++ C_A^2 \Pi_A^{\mu \nu}
++ 2 C_V C_A \Pi_{VA}^{\mu \nu}
+ \right )
 \end{eqnarray*}
 which defines the structure functions 
 \begin{eqnarray*}
-\Pi_{(1)}^{\mu \nu}(q^\alpha) = \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
+\Pi_{(1)}^{\mu \nu}(q^\alpha) &=& \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
 (2 \pi)^4 \delta^{(4)}\left(q^\alpha + p^\alpha_2 - p^\alpha_4 \right) 
 (f_2-f_4)p^\mu_2 p^\nu_4 \nonumber\\
-\Pi_{(2)}^{\mu \nu}(q^\alpha) = \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
+\Pi_{(2)}^{\mu \nu}(q^\alpha) &=& \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
 (2 \pi)^4 \delta^{(4)}\left(q^\alpha + p^\alpha_2 - p^\alpha_4 \right) 
 (f_2-f_4) p^\nu_2 p^\mu_4 \nonumber\\
-\Pi_{(\pm)}^{\mu \nu}(q^\alpha) = \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
+\Pi_{(\pm)}^{\mu \nu}(q^\alpha) &=& \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
 (2 \pi)^4 \delta^{(4)}\left(q^\alpha + p^\alpha_2 - p^\alpha_4 \right) 
 (f_2-f_4)(p^\nu_2 p^\mu_4 \pm p^\nu_4 p^\mu_2) \nonumber\\
-\Pi_{(3)}^{\mu \nu}(q^\alpha) = \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
+\Pi_{(3)}^{\mu \nu}(q^\alpha) &=& \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
 (2 \pi)^4 \delta^{(4)}\left(q^\alpha + p^\alpha_2 - p^\alpha_4 \right) 
-(f_2-f_4) \eta^{\mu \nu} m_2 m_4.
+(f_2-f_4) \eta^{\mu \nu} m_2 m_4 \\
+\Pi_{i}^{\mu \nu}(q^\alpha) &=& \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
+(2 \pi)^4 \delta^{(4)}\left(q^\alpha + p^\alpha_2 - p^\alpha_4 \right) 
+(f_2-f_4) \Omega_i^{\mu \nu}.
 \end{eqnarray*} 
 We now consider $\Pi_{(1)}$ and later generalize from this.  Using the momentum space delta function, we can integrate out the momenta of particle 4.  This gives
 \begin{equation*}
@@ -170,13 +227,13 @@ Transforming the energy delta function to an angular delta function gives
 \end{equation*} 
 with $\mu_0 = \frac{q_\mu^2 + 2 E_2 q_0 + m_2^2 - m_4^2}{2 p_2 q}$.  Using this, we can write structure function as 
 \begin{eqnarray*}
-\Pi^{\mu \nu}_{(1)} &=& \frac{1}{(4 \pi)^2 q} \int_{0}^\infty dE_2 
+\Pi^{\mu \nu}_{i} &=& \frac{1}{(4 \pi)^2 q} \int_{0}^\infty dE_2 
 \int d \Omega_2 \delta(\mu - \mu_0) \theta(E_2-e_{m})
-(f_2 - f_4) p_2^\mu p_4^\nu,
+(f_2 - f_4) \Omega_i^{\mu \nu},
 \end{eqnarray*} 
 where $\beta_m = 1 + (m_2^2 - m_4^2)/q_\mu^2$ and
 \begin{equation}
-e_{m}=-\beta_m \frac{q_0}{2} + \frac{q}{2} \sqrt{\beta_m^2 - \frac{4 m_2^2}{q_\mu^2}}.
+e_{m}=-\beta \frac{q_0}{2} + \frac{q}{2} \sqrt{\beta^2 - \frac{4 m_2^2}{q_\mu^2}}.
 \end{equation}  
 We have the kinematic relations
 \begin{eqnarray*}
