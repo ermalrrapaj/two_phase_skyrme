@@ -59,7 +59,7 @@ int main() {
     std::cout << np0 << std::endl;
     double nn0 = 1.e-12;
     double delta = 0.01;
-    double deltaMin = 1.e-8;
+    double deltaMin = 1.e-1;
     double deltaMax = 1.0;
     NSEProperties nseT = 
       nseEosStatic.GetExteriorProtonDensity(np0, nn0, T)[0];
@@ -69,7 +69,7 @@ int main() {
     std::vector<EOSData> alldata; 
     
     // Find all of the points
-    while (nn0<0.08) { 
+    while (nn0<1.e-11) { 
       try {
         //NSEProperties nse = 
         //    nseEos.GetTotalDensities(EOSData::InputFromTNnNp(T, nn0, np0)); 

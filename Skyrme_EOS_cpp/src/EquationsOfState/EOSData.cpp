@@ -134,9 +134,12 @@ EOSData EOSData::Output(const double T, const double nn, const double np,
   if (!(dednp!=dednp)) out.mE.SetDNp(dednp);
   if (!(dedt!=dedt)) out.mE.SetDT(dedt);
   
-  if (!(pp!=pp)) out.mP.Set(pp);
-  if (!(ss!=ss)) out.mS.Set(ss);
-  if (!(ee!=ee)) out.mE.Set(ee);
+  if (pp!=pp) throw std::range_error("Pressure is a NaN");
+  out.mP.Set(pp);
+  if (ss!=ss) throw std::range_error("Entropy is a NaN");
+  out.mS.Set(ss);
+  if (ee!=ee) throw std::range_error("Energy is a NaN");
+  out.mE.Set(ee);
   
   return out; 
 }

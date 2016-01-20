@@ -60,7 +60,7 @@ double StaticNucleus::FreeEnergy(const EOSData& eosIn, double ne, double ni) con
 	double T = eosIn.T();
 	double BE = GetBindingEnergy(eosIn, ne);
 	double nQ = pow(MNUC*T/2/Constants::Pi,1.5); 
-	double Fk = T*log(ni/nQ/pow(NucleusBase::mA,1.5))-T;
+	double Fk = T*log((ni+1.e-100)/nQ/pow(NucleusBase::mA,1.5))-T;
 	double FE= Fk-BE;
 	return FE;	
 }

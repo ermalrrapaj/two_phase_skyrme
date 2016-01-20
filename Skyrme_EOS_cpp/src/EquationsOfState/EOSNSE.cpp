@@ -245,13 +245,14 @@ EOSData EOSNSE::GetState(const NSEProperties& Prop){
 	double mup = Prop.eosExterior.Mup();  
 	double muntot = mun, muptot	= muptot;
 	double nQ = pow(Constants::NeutronMassInFm * T / (2.0 * Constants::Pi), 1.5);  
-	double nn = nn0; 
-	double np = np0;
+	double nn = 0.0; 
+	double np = 0.0;
 	double uNuc  = 0.0;
 	double vNuc  = 0.0;
-	double Ftot = (nn0+np0)*(Prop.eosExterior.E()+Prop.eosExterior.S());
+	double Ftot = (nn0+np0)*(Prop.eosExterior.E() - Prop.eosExterior.S()*T);
 	double Stot = (nn0+np0)*Prop.eosExterior.S();
 	double Ptot = Prop.eosExterior.P();
+  
   // This is a good candidate for OpenMP parallelization
   #pragma omp parallel for 
   #pragma omp default(shared) 
@@ -269,9 +270,12 @@ EOSData EOSNSE::GetState(const NSEProperties& Prop){
     Ftot += ni*mNuclei[i]->FreeEnergy(Prop.eosExterior,ne,ni);
     Stot += ni*mNuclei[i]->Entropy(Prop.eosExterior,ne,ni);
     uNuc += v*ni;
-    vNuc += v; 
+    vNuc += v;
   }
+  
   double u0 = 1 - uNuc;
+  nn += u0*nn0;
+  np += u0*np0;
   
   // This is another good candidate for OpenMP parallelization
   #pragma omp parallel for 
@@ -279,20 +283,20 @@ EOSData EOSNSE::GetState(const NSEProperties& Prop){
   #pragma omp schedule(static) 
   #pragma omp reduce(+:Ptot,muntot,muptot)
   for (int i=0; i<mNuclei.size(); ++i){ 
-	double v = mNuclei[i]->GetVolume(Prop.eosExterior, ne);
-	double BE = mNuclei[i]->GetBindingEnergy(Prop.eosExterior, ne, v);
-	double aa = mNuclei[i]->GetN()*mun + mNuclei[i]->GetZ()*mup 
-			+ BE - v*Prop.eosExterior.P(); 
-	double ni = std::min(nQ * pow((double) mNuclei[i]->GetA(), 1.5) 
-			* exp(aa/T), 1.e200);
-	Ptot += ni*mNuclei[i]->NucleusPressure(Prop.eosExterior,ne,u0);
-	muntot += mNuclei[i]->Nucleusmun(Prop.eosExterior,ne,u0,ni);
-	muptot += mNuclei[i]->Nucleusmup(Prop.eosExterior,ne,u0,ni);
+	  double v = mNuclei[i]->GetVolume(Prop.eosExterior, ne);
+	  double BE = mNuclei[i]->GetBindingEnergy(Prop.eosExterior, ne, v);
+	  double aa = mNuclei[i]->GetN()*mun + mNuclei[i]->GetZ()*mup 
+	  		+ BE - v*Prop.eosExterior.P(); 
+	  double ni = std::min(nQ * pow((double) mNuclei[i]->GetA(), 1.5) 
+	  		* exp(aa/T), 1.e200);
+	  Ptot += ni*mNuclei[i]->NucleusPressure(Prop.eosExterior,ne,u0);
+	  muntot += mNuclei[i]->Nucleusmun(Prop.eosExterior,ne,u0,ni);
+	  muptot += mNuclei[i]->Nucleusmup(Prop.eosExterior,ne,u0,ni);
   }
   Ftot/=(nn+np);
   Stot/=(nn+np);
-  double Etot = Ftot - Stot;
-  EOSData totalData = EOSData :: Output(T, nn, np, mun, mup, Ptot, Stot, Etot);
+  double Etot = Ftot + T*Stot;
+  EOSData totalData = EOSData::Output(T, nn, np, mun, mup, Ptot, Stot, Etot);
   return totalData;
 }	
 
