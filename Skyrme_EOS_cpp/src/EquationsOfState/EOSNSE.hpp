@@ -57,14 +57,23 @@
 
 class NSEProperties { 
 public:
-  NSEProperties(double nnTot, double npTot, double T, EOSData eosExterior,
+  NSEProperties(double nnTot=0.0, double npTot=0.0, double T=0.0, EOSData eosExterior = EOSData(),
       double unuc = 0.0, double avgEc = 0.0, double avgBe = 0.0, 
-      double avgPv = 0.0) :
+      double avgPv = 0.0, double E = 0.0, double S = 0.0, double F =0.0,
+      double P = 0.0, double mun =0.0, double mup = 0.0) :
       nnTot(nnTot), npTot(npTot), T(T), unuc(unuc), avgEc(avgEc), avgBe(avgBe),
-      avgPv(avgPv), eosExterior(eosExterior) {}
-  double nnTot, npTot, T;
-  double unuc, avgEc, avgBe, avgPv; 
+      avgPv(avgPv), eosExterior(eosExterior), E(E), S(S), F(F), P(P),
+      mun(mun), mup(mup) {}
+  double nnTot, npTot, T, mun, mup;
+  double unuc, avgEc, avgBe, avgPv, E, S, P, F; 
   EOSData eosExterior; 
+  /// 
+  friend class boost::serialization::access; 
+  template<class Archive> 
+  void serialize(Archive & ar, const unsigned int /* File Version */) {
+    ar & nnTot & npTot & T & mun & mup & unuc & avgEc & avgBe & avgPv & E
+    & S & P & F & eosExterior;
+  }
 }; 
 
 class EOSNSE : public EOSBase {
@@ -100,6 +109,7 @@ public:
   EOSData FromNAndT(const EOSData& eosIn);
   
   EOSData GetState(const NSEProperties& Prop);
+  NSEProperties GetStateNSEprop(const NSEProperties& Prop);
   
   std::vector<double> GetExteriorDensities(const EOSData& eosIn);
   NSEProperties GetTotalDensities(const EOSData& eosIn);
@@ -108,16 +118,26 @@ public:
   
   double GetMinimumT() const {return mTMin;}
   double GetMaximumT() const {return 200.0/Constants::HBCFmMeV;}
-
+  
+  void SeTNSEdata (const std::vector<NSEProperties> & NSEDat);
+  std::vector<NSEProperties> GetNSEdata();
+  
   std::unique_ptr<EOSBase> MakeUniquePtr() const {
     return std::unique_ptr<EOSBase>(new EOSNSE(*this));
   }  
-
+	/// Allows for easy serialization of the class so the phase boundary can 
+  /// easily be read from file.  
+  friend class boost::serialization::access; 
+  template<class Archive> 
+  void serialize(Archive & ar, const unsigned int /* File Version */) {
+    ar & mTMin & NSEprop;
+  }
+  
 private: 
   std::vector<std::unique_ptr<NucleusBase>> mNuclei; 
   double mTMin;
+  std::vector<NSEProperties> NSEprop;
   std::shared_ptr<EOSBase> mpEos; 
-
   std::array<double, 4> GetNucleiScalars(const EOSData& eosOut, double ne);
 
 };

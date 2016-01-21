@@ -300,6 +300,83 @@ EOSData EOSNSE::GetState(const NSEProperties& Prop){
   return totalData;
 }	
 
+NSEProperties EOSNSE::GetStateNSEprop(const NSEProperties& Prop){
+	double T = Prop.eosExterior.T();
+	double ne = Prop.npTot;
+	double np0 = Prop.eosExterior.Np();
+	double nn0 = Prop.eosExterior.Nn();
+	double mun = Prop.eosExterior.Mun(); 
+	double mup = Prop.eosExterior.Mup();  
+	double muntot = mun, muptot	= muptot;
+	double nQ = pow(Constants::NeutronMassInFm * T / (2.0 * Constants::Pi), 1.5);  
+	double nn = 0.0; 
+	double np = 0.0;
+	double uNuc  = 0.0;
+	double vNuc  = 0.0;
+	double Ftot = (nn0+np0)*(Prop.eosExterior.E() - Prop.eosExterior.S()*T);
+	double Stot = (nn0+np0)*Prop.eosExterior.S();
+	double Ptot = Prop.eosExterior.P();
+	double avgEc = 0.0;
+	double nitot =0.0;
+	double avgBe = 0.0;
+    double avgPv = 0.0;
+  
+  // This is a good candidate for OpenMP parallelization
+  #pragma omp parallel for 
+  #pragma omp default(shared) 
+  #pragma omp schedule(static) 
+  #pragma omp reduce(+:nn,np,uNuc,vNuc,Ftot,Stot) 
+  for (int i=0; i<mNuclei.size(); ++i) {
+    double v = mNuclei[i]->GetVolume(Prop.eosExterior, ne);
+    double BE = mNuclei[i]->GetBindingEnergy(Prop.eosExterior, ne, v);
+    double EC = mNuclei[i]->CoulombEnergy(v, np0, ne);
+    avgBe += BE;
+    avgEc += EC;
+    double aa = mNuclei[i]->GetN()*mun + mNuclei[i]->GetZ()*mup 
+        + BE - v*Prop.eosExterior.P(); 
+    double ni = std::min(nQ * pow((double) mNuclei[i]->GetA(), 1.5) 
+        * exp(aa/T), 1.e200);
+    nitot += ni;
+    nn += mNuclei[i]->GetN()*ni;
+    np += mNuclei[i]->GetZ()*ni;
+    Ftot += ni*mNuclei[i]->FreeEnergy(Prop.eosExterior,ne,ni);
+    Stot += ni*mNuclei[i]->Entropy(Prop.eosExterior,ne,ni);
+    uNuc += v*ni;
+    vNuc += v;
+  }
+  avgBe /=(nitot+1.e-40);
+  avgEc /=(nitot+1.e-40); 
+  double u0 = 1 - uNuc;
+  nn += u0*nn0;
+  np += u0*np0;
+  
+  // This is another good candidate for OpenMP parallelization
+  #pragma omp parallel for 
+  #pragma omp default(shared) 
+  #pragma omp schedule(static) 
+  #pragma omp reduce(+:Ptot,muntot,muptot)
+  for (int i=0; i<mNuclei.size(); ++i){ 
+	  double v = mNuclei[i]->GetVolume(Prop.eosExterior, ne);
+	  double BE = mNuclei[i]->GetBindingEnergy(Prop.eosExterior, ne, v);
+	  double aa = mNuclei[i]->GetN()*mun + mNuclei[i]->GetZ()*mup 
+	  		+ BE - v*Prop.eosExterior.P(); 
+	  double ni = std::min(nQ * pow((double) mNuclei[i]->GetA(), 1.5) 
+	  		* exp(aa/T), 1.e200);
+	  Ptot += ni*mNuclei[i]->NucleusPressure(Prop.eosExterior,ne,u0);
+	  avgPv += ni*mNuclei[i]->NucleusPressure(Prop.eosExterior,ne,u0);
+	  muntot += mNuclei[i]->Nucleusmun(Prop.eosExterior,ne,u0,ni);
+	  muptot += mNuclei[i]->Nucleusmup(Prop.eosExterior,ne,u0,ni);
+  }
+  Ftot/=(nn+np+1.e-40);
+  Stot/=(nn+np+1.e-40);
+  avgPv/=(nitot+1.e-40);
+  double Etot = Ftot + T*Stot;  
+  NSEProperties totalData(nn, np, T, Prop.eosExterior, uNuc, avgEc, avgBe, avgPv,
+                           Etot, Stot, Ftot, Ptot, muntot, muptot);
+  //EOSData totalData = EOSData::Output(T, nn, np, mun, mup, Ptot, Stot, Etot);
+  return totalData;
+}
+
 
 // find the total electron number density from the exterior
 // proton and neutron number densities 
@@ -322,6 +399,13 @@ NSEProperties EOSNSE::GetTotalDensities(const EOSData& eosIn) {
     nucleiProps[1] + eosOut.Np()*(1.0 - nucleiProps[2]), eosIn.T(), eosOut, 
     nucleiProps[2]);
 }
+
+	void EOSNSE::SeTNSEdata (const std::vector<NSEProperties> & NSEDat) {
+		NSEprop = NSEDat;
+	}
+  std::vector<NSEProperties> EOSNSE::GetNSEdata() {
+	  return NSEprop;
+  }
 
 std::array<double, 4> EOSNSE::GetNucleiScalars(const EOSData& eosOut, double ne) {
   double mun = eosOut.Mun(); 

@@ -5,6 +5,7 @@
 #include <memory>
 #include <algorithm>
 #include <string> 
+#include <sys/stat.h> 
 
 #include "boost/format.hpp"
 
@@ -17,11 +18,10 @@
 #include "EquationsOfState/EOSNSE.hpp"
 
 int main() {
+  struct stat buffer;
   const double HBC = Constants::HBCFmMeV;
-  
   EOSSkyrme eos;// = EOSSkyrme::FreeGas();
-  EOSSkyrme eosInside; 
-   
+  EOSSkyrme eosInside;
   std::vector<std::unique_ptr<NucleusBase>> nuclei; 
   std::vector<std::unique_ptr<NucleusBase>> nucleiStatic; 
   for (int Z=28; Z<=28; Z++) {
@@ -31,9 +31,10 @@ int main() {
           LDNucleus(Z, Z+N, eosInside).GetStaticNucleus().MakeUniquePtr());
     }
   }
+  if((stat ("nse.dat", &buffer) != 0)){
   EOSNSE nseEos(nuclei, eos);
   EOSNSE nseEosStatic(nucleiStatic, eos);
-  
+  /*
   std::ofstream ofile("nse_test_new.out", std::ofstream::out);  
   ofile << "[1] n_{n,t}_1 " << std::endl; 
   ofile << "[2] n_{p,t}_1 " << std::endl; 
@@ -52,8 +53,9 @@ int main() {
   ofile << "[15] P_tot " << std::endl; 
   ofile << "[16] E_tot " << std::endl; 
   ofile << "[17] S_tot " << std::endl;
-   
+   */
   double T = 1.0/HBC;
+  std::vector<NSEProperties> allPtsNSE;
   
   for (double np0 = 4.e-2; np0<8.e-2; np0 *= 1.5) {
     std::cout << np0 << std::endl;
@@ -69,7 +71,7 @@ int main() {
     std::vector<EOSData> alldata; 
     
     // Find all of the points
-    while (nn0<1.e-11) { 
+    while (nn0<0.02) { 
       try {
         //NSEProperties nse = 
         //    nseEos.GetTotalDensities(EOSData::InputFromTNnNp(T, nn0, np0)); 
@@ -125,9 +127,12 @@ int main() {
     // Write out the points  
     for (auto& nse : allPts) { 
 	  alldata.push_back(nseEosStatic.GetState(nse));}
+	
+	for (auto& nse : allPts) { 
+	  allPtsNSE.push_back(nseEosStatic.GetStateNSEprop(nse));}  
 	 
  	  
-  
+ /* 
   for (int i =0; i< allPts.size(); i++){
 	  npt[0] = allPts[i].npTot;
       nnt[0] = allPts[i].nnTot;
@@ -181,6 +186,22 @@ int main() {
         << std::endl;
     }
     ofile << std::endl;
+  */}
+  nseEosStatic.SeTNSEdata(allPtsNSE);
+ // std::ofstream ofile("nse_test_new.out", std::ofstream::out);
+  //EOSSingleNucleus gibbs(eos);
+  std::ofstream ofs("nse.dat"); 
+  boost::archive::text_oarchive oa(ofs); 
+  oa << nseEosStatic; 
+  ofs.close();
+  }
+  else {
+	  EOSNSE nsedat(nucleiStatic, eos); 
+	  std::ifstream ifs("nse.dat");
+	  boost::archive::text_iarchive ia(ifs); 
+	  ia >> nsedat;
+      ifs.close();
+  
   }
   
   return 0;
