@@ -31,7 +31,7 @@ int main() {
           LDNucleus(Z, Z+N, eosInside).GetStaticNucleus().MakeUniquePtr());
     }
   }
-  if((stat ("nse.dat", &buffer) != 0)){
+  //if((stat ("nse.dat", &buffer) != 0)){
   EOSNSE nseEos(nuclei, eos);
   EOSNSE nseEosStatic(nucleiStatic, eos);
   /*
@@ -57,7 +57,8 @@ int main() {
   double T = 1.0/HBC;
   std::vector<NSEProperties> allPtsNSE;
   
-  for (double np0 = 4.e-2; np0<8.e-2; np0 *= 1.5) {
+ // for (double np0 = 4.e-2; np0<8.e-2; np0 *= 1.5) {
+   double np0=4.e-2;
     std::cout << np0 << std::endl;
     double nn0 = 1.e-12;
     double delta = 0.01;
@@ -71,7 +72,7 @@ int main() {
     std::vector<EOSData> alldata; 
     
     // Find all of the points
-    while (nn0<0.02) { 
+    while (nn0<0.08) { 
       try {
         //NSEProperties nse = 
         //    nseEos.GetTotalDensities(EOSData::InputFromTNnNp(T, nn0, np0)); 
@@ -186,7 +187,7 @@ int main() {
         << std::endl;
     }
     ofile << std::endl;
-  */}
+  */ //}
   nseEosStatic.SeTNSEdata(allPtsNSE);
  // std::ofstream ofile("nse_test_new.out", std::ofstream::out);
   //EOSSingleNucleus gibbs(eos);
@@ -194,7 +195,12 @@ int main() {
   boost::archive::text_oarchive oa(ofs); 
   oa << nseEosStatic; 
   ofs.close();
-  }
+  std::ofstream ofile("nse_test_new_nb_F.out", std::ofstream::out);
+  for (auto& nse : allPtsNSE) { 
+	  ofile << nse.eosExterior.Nn() << "\t" << nse.nnTot <<"\t"<<nse.F<<std::endl;// allPtsNSE.push_back(nseEosStatic.GetStateNSEprop(nse));
+	  }
+	  ofile.close();
+ /* }
   else {
 	  EOSNSE nsedat(nucleiStatic, eos); 
 	  std::ifstream ifs("nse.dat");
@@ -202,7 +208,7 @@ int main() {
 	  ia >> nsedat;
       ifs.close();
   
-  }
+  }*/
   
   return 0;
 }
