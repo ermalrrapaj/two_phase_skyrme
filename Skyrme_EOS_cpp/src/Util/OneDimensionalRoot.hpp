@@ -80,7 +80,7 @@ public:
         (status1 == GSL_CONTINUE && status2 == GSL_CONTINUE)) && iter < mMaxIter);
     
     //gsl_root_fsolver_free(s);    
-    gsl_set_error_handler(NULL);
+    //gsl_set_error_handler(NULL);
     
     double xcen; 
     if (fabs(func(x_lo))<fabs(func(x_hi))) {

@@ -20,12 +20,12 @@
 int main() {
   struct stat buffer;
   const double HBC = Constants::HBCFmMeV;
-  EOSSkyrme eos;// = EOSSkyrme::FreeGas();
+  EOSSkyrme eos; //= EOSSkyrme::FreeGas();
   EOSSkyrme eosInside;
   std::vector<std::unique_ptr<NucleusBase>> nuclei; 
   std::vector<std::unique_ptr<NucleusBase>> nucleiStatic; 
   for (int Z=28; Z<=28; Z++) {
-    for (int N=27; N<=29; N++) {
+    for (int N=20; N<=40; N++) {
       nuclei.push_back(LDNucleus(Z, Z+N, eosInside).MakeUniquePtr());
       nucleiStatic.push_back(
           LDNucleus(Z, Z+N, eosInside).GetStaticNucleus().MakeUniquePtr());
@@ -33,7 +33,7 @@ int main() {
   }
   //if((stat ("nse.dat", &buffer) != 0)){
   EOSNSE nseEos(nuclei, eos);
-  EOSNSE nseEosStatic(nucleiStatic, eos);
+  EOSNSE nseEosStatic(nuclei, eos);
   /*
   std::ofstream ofile("nse_test_new.out", std::ofstream::out);  
   ofile << "[1] n_{n,t}_1 " << std::endl; 
@@ -58,7 +58,7 @@ int main() {
   std::vector<NSEProperties> allPtsNSE;
   
  // for (double np0 = 4.e-2; np0<8.e-2; np0 *= 1.5) {
-   double np0=4.e-2;
+   double np0=2.e-2;
     std::cout << np0 << std::endl;
     double nn0 = 1.e-12;
     double delta = 0.01;
@@ -197,7 +197,8 @@ int main() {
   ofs.close();
   std::ofstream ofile("nse_test_new_nb_F.out", std::ofstream::out);
   for (auto& nse : allPtsNSE) { 
-	  ofile << nse.eosExterior.Nn() << "\t" << nse.nnTot <<"\t"<<nse.F<<std::endl;// allPtsNSE.push_back(nseEosStatic.GetStateNSEprop(nse));
+	  ofile << nse.eosExterior.Nn() << "\t" << nse.nnTot <<"\t" 
+	  		<<nse.F << "\t" << nse.P <<std::endl;// allPtsNSE.push_back(nseEosStatic.GetStateNSEprop(nse));
 	  }
 	  ofile.close();
  /* }

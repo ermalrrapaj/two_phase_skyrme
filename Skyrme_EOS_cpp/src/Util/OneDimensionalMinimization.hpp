@@ -27,6 +27,8 @@ public:
   double operator() (FUNCTION func, const double xgin, const double xloin, 
       const double xhiin, const bool max=false) {
     
+    gsl_set_error_handler_off();
+    
     // Similar to stack overflow 13289311 
     gsl_function F;
     F.function = [] (double x, void * p)->double { 
@@ -40,7 +42,6 @@ public:
     }
     F.params = &func;
     
-    gsl_set_error_handler_off();
     const gsl_min_fminimizer_type *T;
     gsl_min_fminimizer *s;
     
@@ -61,8 +62,9 @@ public:
       status = gsl_min_test_interval(xlo, xhi, mAbsTol, mTol);  
     } while (status == GSL_CONTINUE && iter < mMaxIter);
     
-    gsl_set_error_handler(NULL);
     gsl_min_fminimizer_free(s);
+    
+    //gsl_set_error_handler(NULL);
     
     return xg; 
   
