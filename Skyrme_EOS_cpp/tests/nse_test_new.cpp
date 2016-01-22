@@ -20,7 +20,7 @@
 int main() {
   struct stat buffer;
   const double HBC = Constants::HBCFmMeV;
-  EOSSkyrme eos; //= EOSSkyrme::FreeGas();
+  EOSSkyrme eos = EOSSkyrme::FreeGas();
   EOSSkyrme eosInside;
   std::vector<std::unique_ptr<NucleusBase>> nuclei; 
   std::vector<std::unique_ptr<NucleusBase>> nucleiStatic; 
@@ -60,7 +60,7 @@ int main() {
  // for (double np0 = 4.e-2; np0<8.e-2; np0 *= 1.5) {
    double np0=2.e-2;
     std::cout << np0 << std::endl;
-    double nn0 = 1.e-12;
+    double nn0 = 1.e-14;
     double delta = 0.01;
     double deltaMin = 1.e-1;
     double deltaMax = 1.0;
@@ -72,7 +72,7 @@ int main() {
     std::vector<EOSData> alldata; 
     
     // Find all of the points
-    while (nn0<0.08) { 
+    while (nn0<0.14) { 
       try {
         //NSEProperties nse = 
         //    nseEos.GetTotalDensities(EOSData::InputFromTNnNp(T, nn0, np0)); 
@@ -102,6 +102,7 @@ int main() {
         std::cerr << "Failed at exterior neutron density " << nn0 << std::endl;
         std::cerr << e.what();
       }
+      std::cout << nn0 << std::endl;
       nn0 *= 1.0 + delta; 
     }
     

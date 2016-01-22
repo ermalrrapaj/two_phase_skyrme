@@ -35,11 +35,11 @@ public:
   }
   virtual double CoulombPressureExternal(double v, double npo, double ne) const;
   virtual double CoulombEnergy(double v, double npo, double ne) const;
-  virtual double FreeEnergy(const EOSData& eosIn, double ne, double ni) const =0;
-  virtual double Entropy(const EOSData& eosIn, double ne, double ni) const =0;
-  virtual double NucleusPressure (const EOSData& eosIn, double ne, double uo) const=0;
-  virtual double Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const =0;
-  virtual double Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const =0;
+  virtual double FreeEnergy(const EOSData& eosIn, double ne, double ni) const;
+  virtual double Entropy(const EOSData& eosIn, double ne, double ni) const;
+  virtual double NucleusPressure (const EOSData& eosIn, double ne, double uo) const;
+  virtual double Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const;
+  virtual double Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const;
 
 protected:
   int mZ, mN, mA;
@@ -63,14 +63,6 @@ public:
 	
   double GetVolume(const EOSData& /*eosIn*/, double /*ne*/) const {return mV;}
   
-  
-  double FreeEnergy(const EOSData& eosIn, double ne, double ni) const;
-  double Entropy (const EOSData& eosIn, double ne, double ni) const;
-  
-  double NucleusPressure (const EOSData& eosIn, double ne, double uo) const;
-  double Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const;
-  double Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const;
-  
   std::unique_ptr<NucleusBase> MakeUniquePtr() const { 
     return std::unique_ptr<NucleusBase>(new StaticNucleus(*this));
   }
@@ -84,10 +76,7 @@ protected:
 class LDNucleus : public NucleusBase { 
 public:
   
-  LDNucleus(int Z, int A, const EOSBase& eos) : NucleusBase(Z, A), 
-      mpEos(eos.MakeUniquePtr()),
-      mSigma0(1.15/Constants::HBCFmMeV),
-      mSs0(45.8/Constants::HBCFmMeV) {} 
+  LDNucleus(int Z, int A, const EOSBase& eos);
   
   StaticNucleus GetStaticNucleus() const;
 
@@ -106,13 +95,18 @@ public:
   }
 
 protected:
+  
   double SurfacePressure(double v) const;
   double SurfaceEnergy(double v) const;
   double CoulombPressure(double v, double npo, double ne) const;
   double CoulombEnergy(double v, double npo, double ne) const;
+  
   std::unique_ptr<EOSBase> mpEos;
+  
   double mSs0; 
   double mSigma0; 
+  
+  std::vector<std::pair<double,double>> PvsV;  
 
 };
 

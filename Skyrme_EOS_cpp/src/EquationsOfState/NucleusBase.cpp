@@ -27,10 +27,10 @@ inline double uDpoD(double u) {
 }
 
 double NucleusBase::CoulombEnergy(double v, double npo, double ne) const {
-  double u = v*ne / (double)NucleusBase::mZ;
+  double u = v*(ne - npo) / ((double)NucleusBase::mZ - v*npo);
   double Ec = 3.0 * Constants::ElementaryChargeSquared 
-      / (5.0 * pow(3.0 / (4.0 * Constants::Pi), 1.0/3.0))
-      * pow((double)NucleusBase::mZ, 2) * (0.5*pow(u,2.0/3.0) - 1.5) 
+      / (5.0 * pow(3.0 * v / (4.0 * Constants::Pi), 1.0/3.0))
+      * pow((double)NucleusBase::mZ - npo*v, 2) * (0.5*u - 1.5*pow(u,1.0/3.0)) 
       * pow(ne/(double)NucleusBase::mZ,1.0/3.0);
   return Ec;
 }
@@ -51,63 +51,76 @@ StaticNucleus LDNucleus::GetStaticNucleus() const {
   double v = GetVolume(eosIn, n0); 
   double BE = GetBindingEnergy(eosIn, n0, v);
   int A = NucleusBase::mZ + NucleusBase::mN;
-  std::cerr << NucleusBase::mZ << " " << NucleusBase::mN << " " << (double) A/v
-      << " " << BE/A*197.3 << std::endl;
   return StaticNucleus(NucleusBase::mZ, A, BE, {}, {}, v);
 }
 
-double StaticNucleus::FreeEnergy(const EOSData& eosIn, double ne, double ni) const {
-	double T = eosIn.T();
+double NucleusBase::FreeEnergy(const EOSData& eosIn, double ne, double ni) const {
+	double T  = eosIn.T();
 	double BE = GetBindingEnergy(eosIn, ne);
 	double nQ = pow(MNUC*T/2/Constants::Pi,1.5); 
-	double Fk = T*log((ni+1.e-100)/nQ/pow(NucleusBase::mA,1.5))-T;
-	double FE= Fk-BE;
-	return FE;	
+	double Fk = T*log((ni+1.e-100)/nQ/pow(NucleusBase::mA,1.5)) - T;
+	return Fk - BE;
 }
 
-double StaticNucleus::Entropy (const EOSData& eosIn, double ne, double ni) const {
+double NucleusBase::Entropy (const EOSData& eosIn, double ne, double ni) const {
 	return 0.0;
 }
 
-double StaticNucleus::NucleusPressure (const EOSData& eosIn, double ne, double uo) const{
-	double npo = 0.0;//eosIn.Np();
+double NucleusBase::NucleusPressure (const EOSData& eosIn, double ne, double uo) const{
+	double npo = eosIn.Np();
 	double T = eosIn.T();
 	double v = GetVolume(eosIn, ne);
-	double u = v*(ne - npo) / ((double)NucleusBase::mZ - v*npo+  1.e-40);
+	double u = v*(ne - npo) / ((double)NucleusBase::mZ - v*npo +  1.e-100);
 	double EC = CoulombEnergy(v, npo, ne);
-	double DuDlogne = v*ne / ((double)NucleusBase::mZ - v*npo+  1.e-40);
-	double DuDlognpo = npo * ( v*u/((double)NucleusBase::mZ - v*npo+  1.e-40)
-	                     -v/((double)NucleusBase::mZ - v*npo+  1.e-40) );
-	double DDu = 0.5*(1 - pow(u, -2.0/3.0))/(D(u) +  1.e-40);
-	
-	double DFDlogne = EC*DDu*DuDlogne;
-	double DFDlognpo = EC*(DDu*DuDlognpo - v/((double)NucleusBase::mZ - v*npo+  1.e-40));
-	double pressure = T +uo *DFDlognpo + DFDlogne;
-	return pressure;
-}	
+  double DodD = (0.5*pow(u,5.0/3.0) - 1.5*u)/(0.5*pow(u, 2.0/3.0) - 0.5 + 1.e-40); 
+  double dDdu = 0.5 - 0.5*pow(u, -2.0/3.0);
+  
+  double dECdlogne = EC*DodD * v * ne / ((double)NucleusBase::mZ - v*npo +  1.e-40);
+  double dECdlognpo = -EC*DodD* v * npo / ((double)NucleusBase::mZ - v*npo +  1.e-40)
+    * (1.0 - u);
 
-double StaticNucleus::Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const {
+  return T + dECdlogne + uo*dECdlognpo; 
+}
+
+double NucleusBase::Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const {
 	double npo = eosIn.Np();
 	double T = eosIn.T();
 	double v = GetVolume(eosIn, ne);
 	double u = v*(ne - npo) / ((double)NucleusBase::mZ - v*npo);
 	double EC = CoulombEnergy(v, npo, ne);
-	double DuDnpo = v*u/((double)NucleusBase::mZ - v*npo)
-	                     -v/((double)NucleusBase::mZ - v*npo) ;
+	double DuDnpo = v / ((double)NucleusBase::mZ - v*npo)*(u-1.0);
 	double DDu = 0.5*(1 - pow(u, -2.0/3.0))/D(u);
 	double DFDnpo = EC*(DDu*DuDnpo - v/((double)NucleusBase::mZ - v*npo)/npo);
-	double mup = ni/uo * DFDnpo;
-	return mup;
+	return ni/uo * DFDnpo;
 }
 
-double StaticNucleus::Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const {
+double NucleusBase::Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const {
 	return 0.0;
 }
+
+LDNucleus::LDNucleus(int Z, int A, const EOSBase& eos) : NucleusBase(Z, A),
+      mpEos(eos.MakeUniquePtr()),
+      mSigma0(1.15/Constants::HBCFmMeV),
+      mSs0(45.8/Constants::HBCFmMeV) {
+  double vmax = (double) A / 0.5; 
+  double v = (double) A / 1.e-4;
+  while (v>vmax) {
+    EOSData eosBulk = mpEos->FromNAndT(
+        EOSData::InputFromTNnNp(1.e-3/197.3, (double)(A-Z)/v, (double)Z/v)); 
+    double Pb = eosBulk.P();
+    double Ps = SurfacePressure(v);
+    double Pc = CoulombPressure(v, 0.0, 0.0);
+    std::cout << A-Z << " " << v << " " << Pb + Ps + Pc << std::endl;
+    PvsV.push_back(std::pair<double, double>(Pb+Ps+Pc, v)); 
+    v /= 1.3;
+  } 
+} 
 
 double LDNucleus::GetVolume(const EOSData& eosIn, double ne) const {
   double Z = (double) NucleusBase::mZ; 
   double N = (double) NucleusBase::mN;
   double T = eosIn.T(); 
+  
   auto pFunc = [this, ne, T, Z, N, &eosIn](double v) -> double {
     EOSData eosBulk = mpEos->FromNAndT(
         EOSData::InputFromTNnNp(T, N/v, Z/v)); 
@@ -119,23 +132,39 @@ double LDNucleus::GetVolume(const EOSData& eosIn, double ne) const {
   
   OneDimensionalRoot rootFinder(1.e-8); 
   double vlo, vhi;
-  if (eosIn.Np() <= ne) {
-    // Just choose an extremely small volume as the lower bound
-    vlo = 1.e-8 * (N + Z);
-    // The maximum volume allowed for the given background electron density 
-    // if the nuclear volume were larger, nuclei of this species would 
-    // completely fill the space. 
-    vhi = 0.9999 * Z / ne;
-  } else {
-   vlo = 1.000001* Z / ne; 
-   vhi = 1.e12 * (N+Z); 
-  }
+  //if (PvsV.size()>1) {
+  //int idxl = 0;
+  //int idxu = PvsV.size()-1;
+  //double Pb = eosIn.P(); 
+  //while (idxu-idxl>1) {
+  //  int mid = (int)(idxl/2 + idxu/2);
+  //  if (PvsV[mid].first > Pb) {
+  //    idxl = mid; 
+  //  } else { 
+  //    idxu = mid; 
+  //  } 
+  //}
+
+  //vlo = PvsV[idxl].second; 
+  //vhi = PvsV[idxu].second;
+  //
+  //} else {
+    if (eosIn.Np() <= ne) {
+      // Just choose an extremely small volume as the lower bound
+      vlo = 1.e-8 * (N + Z);
+      // The maximum volume allowed for the given background electron density 
+      // if the nuclear volume were larger, nuclei of this species would 
+      // completely fill the space. 
+      vhi = 0.9999 * Z / ne;
+    } else {
+     vlo = 1.000001* Z / ne; 
+     vhi = 1.e12 * (N+Z); 
+    }
+  //}
   try {
     return rootFinder(pFunc, vlo, vhi);
   } catch(...) { 
-    vlo = (N+Z)/0.2;
-    vhi = (N+Z)/1.e-3;
-    return rootFinder(pFunc, vlo, vhi);
+    return rootFinder(pFunc, (double) (N+Z)/0.2, (double) (N+Z)/1.e-3);
   }
 }
 
