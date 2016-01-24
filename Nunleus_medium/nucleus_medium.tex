@@ -125,7 +125,7 @@ The skyrme energy density:
   E/V &= \sum_{t=n,p}\frac{\hbar^2}{2M_q}\tau_q+\frac{1}{4}t_0\Big[(2+x_0)n^2-(1+2x_0)\sum_{q=n,p} n^2_q\Big]\\
   &+\frac{1}{8}\Big[ a (n \tau+\frac{3}{4}(\triangledown n)^2)+2b\sum_{q=n,p}(n_q \tau_q+\frac{3}{4}(\triangledown n_q)^2)\Big]\\
   &+\frac{1}{24}t_3n^{\alpha}\Big[(2+x_3)n^2-(1+2x_3)\sum_{q=n,p}n_q^2\Big]\\
-  &=(E/V)_{h}+\frac{3}{32}\Big[ a (\triangledown n)^2+2b\sum_{q=n,p}(\triangledown n_q)^2)\Big]\\
+  &=(E/V)_{\text{homogeneous}}+\frac{3}{32}\Big[ a (\triangledown n)^2+2b\sum_{q=n,p}(\triangledown n_q)^2)\Big]\\
  \end{split}
 \end{equation}
 Again assuming $a\ll R^{WS}$:
@@ -146,10 +146,26 @@ And, $a_{WS}=a_B \approx a_n$:
 \begin{mdframed}
 \begin{equation*}
   \begin{split}
-  \sigma=&\frac{3}{64} \frac{(n_H-n_L)^2}{\alpha+\beta_n \ {\delta^H_{np}}^2} \big[a\  +2 b ( 1+\frac{(\alpha+\beta_n \ {\delta^H_{np}}^2)^2}{(\alpha+\beta_p \ {\delta^H_{np}}^2)^2})\big]\\
+  \sigma(n_H-n_L,\delta^H_{np})=&\frac{3}{64} \frac{(n_H-n_L)^2}{\alpha+\beta_n \ {\delta^H_{np}}^2} \big[a\  +2 b ( 1+\frac{(\alpha+\beta_n \ {\delta^H_{np}}^2)^2}{(\alpha+\beta_p \ {\delta^H_{np}}^2)^2})\big]\\
   a_{WS} =& \alpha + \beta (\delta^{H}_{np})^2,\ \alpha \approx 0.53\ \text{fm}, \beta_n \approx 1.14\ \text{fm},\ \beta_p \approx 0.35\ \text{fm} 
   \end{split}
  \end{equation*}
 \end{mdframed}
-For ordinary nuclei (no surrounding nuclear medium) the diffuseness parameter is $a_{WS} = 0.55 \pm 0.05 \ \text{fm}$ 
+For ordinary nuclei (no surrounding nuclear medium) the diffuseness parameter is $a_{WS} = 0.55 \pm 0.05 \ \text{fm}$.
+
+Thus, 
+we can improve our model by accounting for medium effects in the surface tension.
+\begin{equation}
+ \begin{split}
+  E^S= (36\pi)^{1/3}V_i^{2/3}\sigma(n_H-n_L,\delta^H_{np})\\
+  P^S=-\frac{2}{3}(36\pi)^{1/3}V_i^{-1/3}\sigma(n_H-n_L,\delta^H_{np})
+ \end{split}
+\end{equation}
+
+If the diffunesess of ordinary nuclei is used, the assymetry dependence can be negleted:\
+\begin{equation}
+ \sigma(n_H-n_L) = \frac{3}{64} \frac{(n_H-n_L)^2}{a_{WS}}  (a  +4 b),\ a_{WS}\approx 0.55\ \text{fm}
+\end{equation}
+
+
 \end{document}
