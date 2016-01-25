@@ -135,7 +135,12 @@ element is given by
 \left \{ C_V\gamma^\nu -C_A\gamma^\nu \gamma^5 
 + F_3\frac{i \sigma^{\nu \alpha}q_\alpha}{2 M_N} \right\}
 \right] \\
-&=& C_V^2 \Lambda^{\mu \nu}_V + C_A^2 \Lambda^{\mu \nu}_A + 2 C_V C_A \Lambda^{\mu \nu}_{VA} + ..., 
+&=& C_V^2 \Omega^{\mu \nu}_V 
++ C_A^2 \Omega^{\mu \nu}_A 
++ 2 C_V C_A \Omega^{\mu \nu}_{VA} 
++ \left( \frac{F_2}{2 M_N}\right)^2 \Omega^{\mu \nu}_F,
++ 2\frac{F_2}{2 M_N}C_V \Omega^{\mu \nu}_{FV}, 
++ 2\frac{F_2}{2 M_N}C_A \Omega^{\mu \nu}_{FV}, 
 \end{eqnarray*}
 where 
 \begin{eqnarray*}
@@ -145,10 +150,18 @@ p_2^\mu p_4^\nu + p_2^\nu p_4^\mu + (m_2 m_4 - p_2 \cdot p_4) \eta^{\mu \nu}
 \Omega_A^{\mu \nu} &=& \Omega_V^{\mu \nu} - \eta^{\mu \nu} \Omega_A \\
 \Omega_A &=& 8 m_2 m_4 \\
 \Omega_{VA}^{\mu \nu} &=& - 4i \epsilon^{\alpha \mu \beta \nu} 
-p^2_\alpha p^4_\beta.
+p^2_\alpha p^4_\beta \\
+\Omega_F^{\mu \nu} &=& 4 m_2 m_4 \left\{3 q^\mu q^\nu - q_\alpha^2 \eta^{\mu \nu} \right\}
++ \left \{ 12 q^\mu q^\nu - q_\alpha^2 \eta^{\mu \nu} \right \} (p_2 \cdot p_4) \\
+&&+ 8 (p_2 \cdot q)(p_4 \cdot q) \eta^{\mu \nu} 
+- 8 (p_2 \cdot q) p_4^\mu q^\nu
+- 8 (p_4 \cdot q) p_2^\nu q^\mu \\
+\Omega_{FV}^{\mu \nu} &=& 4 \left[(m_2 p_4^\nu - m_4 p_2^\nu)q^\mu 
++ \eta^{\mu \nu}\left(m_4 (p_2 \cdot q) - m_2(p_4\cdot q) \right)  \right] \\
+\Omega_{FA}^{\mu \nu} &=&...
 \end{eqnarray*}
 
-\todo{Derive weak magnetism pieces}
+\todo{Derive axial weak magnetism piece}
 
 \section{Scattering and Capture} 
 The differential cross section for neutrino scattering or capture is 
