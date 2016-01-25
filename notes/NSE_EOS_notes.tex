@@ -308,14 +308,38 @@ finite size effects, this will just look like a two phase construction.
 allowed to vary.}
 
 \section{Thermodynamic Quantities} 
-The pressure is given by 
+Remember the total energy is :
+
+$F_{EV} = \sum_i N_i (F_i +F_{FS,i}) +(V- \sum_i N_i v_i) F_o = \sum_i N_i (F_i +F_{FS,i}) + V_o f_o$. 
+
+Here, $F_i = F_{bulk, i} + F_{CM,i}$.
+
+And, the dependence on the volume of the individual nucleus has been used as a constraint:
+\begin{equation}
+ \begin{split}
+  \frac{\partial F_{EV}}{\partial v_i}=\frac{\partial F_i}{\partial v_i} + \frac{\partial F_{FS,i}}{\partial v_i} + \frac{\partial F_o}{\partial v_i} = 0
+ \end{split}
+\end{equation}
+Then, pressure is given by
+\begin{equation}
+ \begin{split}
+  P =& -\frac{\partial F_{EV}}{\partial V} =-\frac{\partial V_o}{\partial V}\frac{\partial F_{EV}}{\partial V_o}\\
+  =& -\sum_i \mathcal{N}_i (\frac{\partial F_i}{\partial V_o}+\frac{\partial F_{FS,i}}{\partial V_o})-\frac{\partial F_o}{\partial V_o}\\
+  =& P_o+\sum_i n_i T -\sum_i n_i V \Big [\frac{\partial F_{FS,i}}{\partial n_{p,o}} \frac{\partial n_{p,o}}{\partial V_o}+\frac{\partial F_{FS,i}}{\partial n_{n,o}} \frac{\partial n_{n,o}}{\partial V_o}+\frac{\partial F_{FS,i}}{\partial n_{e}} \frac{\partial n_{e}}{\partial V}\Big]\\
+  =& P_o+\sum_i n_i T -\sum_i n_i V \Big [\frac{\partial F_{FS,i}}{\partial n_{p,o}} (-\frac{n_{p,o}}{V_o})+\frac{\partial F_{FS,i}}{\partial n_{n,o}} (-\frac{n_{n,o}}{V_o})+\frac{\partial F_{FS,i}}{\partial n_{e}} (-\frac{n_{e}}{V})\Big]\\
+  =&P_o +\sum_i n_i \Big [T+\frac{1}{u_o} \frac{\partial F_{FS,i}}{\partial \ln n_{p,o}}+\frac{1}{u_o}\frac{\partial F_{FS,i}}{\partial \ln n_{n,o}}+\frac{\partial F_{FS,i}}{\partial \ln n_{e}}\Big ]\\
+ \end{split}
+\end{equation}
+where $\frac{\partial \square }{\partial \text{ln}n_q } \equiv n_q \frac{\partial \square }{\partial n_q }$.
+
+{\color{red} ?
 \begin{equation}
 P = P_o + \sum n_i \left[ T + \frac{\partial F_{FS,i}}{\partial \ln n_e} 
 + u_o \frac{\partial F_{FS,i}}{\partial \ln n_{p,o}} 
 + u_o \frac{\partial F_{FS,i}}{\partial \ln n_{n,o}} \right]  
-\end{equation}
-where $\frac{\partial \square }{\partial \text{ln}n_q } \equiv n_q \frac{\partial \square }{\partial n_q }$, 
-and the entropy is given by 
+\end{equation}}
+
+The entropy is given by 
 \begin{equation}
 s = u_o s_{B,o} + \sum n_i \left(S_{B,i} + \frac{5}{2} - \frac{\mu_{K,i}}{T} 
 - \frac{\partial F_{FS,i}}{\partial T}\right).
@@ -363,7 +387,105 @@ voids.  Derivatives of this are also required
 \end{eqnarray}
   
 \subsection{Surface Tension}
-\todo{Come up with a decent surface tension prescription}
+Our description of the Wigner seitz cell:
+\begin{center}
+ \includegraphics[scale=0.4]{WSC.pdf}
+\end{center}
+
+Woods-Saxon model:
+
+The desnity profile of the Wigner seitz cell is decomposed in terms of the Woods - Saxon function for the high density region (nucleus) and the low denisty 
+region (nuclear medium outside):
+\begin{center}
+ \includegraphics[scale=0.6]{WSCprofile.pdf}
+\end{center}
+\begin{equation}
+ \begin{split}
+  n(r) = & n_{Nuc}(r)+n_{gas}(r) \\
+  =&\frac{n^{H}}{1+\exp[(r-R^{WS})/a_{WS}]} + \frac{n^{L}}{1+\exp[-(r-R^{WS})/a_{WS}]} 
+ \end{split}
+\end{equation}
+where,
+\begin{equation}
+ \begin{split}
+  a_{WS} =& \alpha + \beta (\delta^{H}_{np})^2,\ \alpha \approx 0.53\ \text{fm}, \beta_n \approx 1.14\ \text{fm},\ \beta_p \approx 0.35\ \text{fm} \\
+  R^{WS} =& R_{i}[1-\frac{\pi^2}{3}(\frac{a}{R_i})^2]\\
+  R_i =& (\frac{3 V_i}{4\pi})^{1/3}\\
+  =& (\frac{3 A_i}{4\pi n^H})^{1/3}
+ \end{split}
+\end{equation}
+Assuming $a \ll R_i \rightarrow R^{WS}\approx R_i$. 
+
+In our model, we assume two homogeneous phases of matter at different densities with a sharp transition from one to the other.
+This is represented by the step function in the figure.
+In order to make the 2 descriptions match, our description needs to include a surface contribution:
+\begin{equation}
+ \begin{split}
+  E^H(R^{WS}-4a,R)+E^L(R,R^{WS}+4a)+E^{S}=E^{WS}(R^{WS}-4a,R^{WS}+4a),\ E^{S} = 4\pi (R^{WS})^2 \sigma
+ \end{split}
+\end{equation}
+where, $E^H,\ E^L$ are the energies of homogeneous matter at $\rho^H,\ \rho^L$ respectively. $E^{WS}$ is the 
+energy of non-constant matter.
+
+The skyrme energy density:
+\begin{equation}
+ \begin{split}
+  E/V &= \sum_{t=n,p}\frac{\hbar^2}{2M_q}\tau_q+\frac{1}{4}t_0\Big[(2+x_0)n^2-(1+2x_0)\sum_{q=n,p} n^2_q\Big]\\
+  &+\frac{1}{8}\Big[ a (n \tau+\frac{3}{4}(\triangledown n)^2)+2b\sum_{q=n,p}(n_q \tau_q+\frac{3}{4}(\triangledown n_q)^2)\Big]\\
+  &+\frac{1}{24}t_3n^{\alpha}\Big[(2+x_3)n^2-(1+2x_3)\sum_{q=n,p}n_q^2\Big]\\
+  &=(E/V)_{\text{homogeneous}}+\frac{3}{32}\Big[ a (\triangledown n)^2+2b\sum_{q=n,p}(\triangledown n_q)^2)\Big]\\
+ \end{split}
+\end{equation}
+Again assuming $a\ll R^{WS}$:
+\begin{equation}
+ \begin{split}
+  4\pi (R^{WS})^2\ \sigma \approx& [4\pi (R^{WS})^2\times 8a_{WS}] \times   \frac{3}{32}\Big[ a (\triangledown n)^2+2b\sum_{q=n,p}(\triangledown n_q)^2)\Big] \leftrightarrow \\
+\sigma =& \frac{3a_{WS}}{4} \Big[a (\frac{dn}{dr})^2 +2 b \big( (\frac{dn_n}{dr})^2+(\frac{dn_p}{dr})^2\big) \Big]\bigg |_{R^{WS}}\\ 
+ \end{split}
+\end{equation}
+Given the functional form of the density profile: $(\frac{dn}{dr})^2 \bigg|_{r=R^{WS}} = \frac{(n_H-n_L)^2}{16\ {a_{WS}}^2}$.
+And, $a_{WS}=a_B \approx a_n$:
+\begin{equation}
+ \begin{split}
+  \sigma =& \frac{3}{64} \frac{(n_H-n_L)^2}{a_{WS}}  \big[a\  +2 b ( 1+\frac{a_{WS}^2}{a_p^2})\big]\leftrightarrow \\
+ \end{split}
+\end{equation}
+
+\begin{mdframed}
+\begin{equation*}
+  \begin{split}
+  \sigma(n_H-n_L,\delta^H_{np})=&\frac{3}{64} \frac{(n_H-n_L)^2}{\alpha+\beta_n \ {\delta^H_{np}}^2} \big[a\  +2 b ( 1+\frac{(\alpha+\beta_n \ {\delta^H_{np}}^2)^2}{(\alpha+\beta_p \ {\delta^H_{np}}^2)^2})\big]\\
+  a_{WS} =& \alpha + \beta (\delta^{H}_{np})^2,\ \alpha \approx 0.53\ \text{fm}, \beta_n \approx 1.14\ \text{fm},\ \beta_p \approx 0.35\ \text{fm} 
+  \end{split}
+ \end{equation*}
+\end{mdframed}
+For ordinary nuclei (no surrounding nuclear medium) the diffuseness parameter is $a_{WS} = 0.55 \pm 0.05 \ \text{fm}$.
+
+Thus, 
+we can improve our model by accounting for medium effects in the surface tension.
+\begin{equation}
+ \begin{split}
+  E^S= (36\pi)^{1/3}V_i^{2/3}\sigma(n_H-n_L,\delta^H_{np})\\
+  P^S=-\frac{2}{3}(36\pi)^{1/3}V_i^{-1/3}\sigma(n_H-n_L,\delta^H_{np})
+ \end{split}
+\end{equation}
+
+If the diffunesess of ordinary nuclei is used, the assymetry dependence can be negleted:\
+\begin{equation}
+ \sigma(n_H-n_L) = \frac{3}{64} \frac{(n_H-n_L)^2}{a_{WS}}  (a  +4 b),\ a_{WS}\approx 0.55\ \text{fm}
+\end{equation}
+
+Since the surface tension is a function of density, it will contribute to the chemical potentials of the mixed phase:
+\begin{equation}
+ \begin{split}
+  &\frac{\partial F_{S,i}}{\partial \ln n_e} = 0\\
+  &\frac{\partial F_{S,i}}{\partial \ln n_{p,0}} = -2 n_{p,0}\frac{E_{S,i}}{(n_H-n_L)}\\
+  &\frac{\partial F_{S,i}}{\partial \ln n_{n,0}} = -2 n_{n,0}\frac{E_{S,i}}{(n_H-n_L)}\\
+  &\frac{\partial F_{S,i}}{\partial \ln n_{p,i}} = 2 n_{p,i}\frac{E_{S,i}}{(n_H-n_L)}\\
+  &\frac{\partial F_{S,i}}{\partial \ln n_{n,i}} = 2 n_{n,i}\frac{E_{S,i}}{(n_H-n_L)}\\
+  \end{split}
+\end{equation}
+
 
 \section{Dealing with nuclear inversion}
 \todo{Not sure how to deal with it smoothly} 
