@@ -33,7 +33,7 @@ int main() {
   }
   //if((stat ("nse.dat", &buffer) != 0)){
   EOSNSE nseEos(nuclei, eos);
-  EOSNSE nseEosStatic(nuclei, eos);
+  EOSNSE nseEosStatic(nucleiStatic, eos);
   /*
   std::ofstream ofile("nse_test_new.out", std::ofstream::out);  
   ofile << "[1] n_{n,t}_1 " << std::endl; 
@@ -57,8 +57,7 @@ int main() {
   double T = 1.0/HBC;
   std::vector<NSEProperties> allPtsNSE;
   
- // for (double np0 = 4.e-2; np0<8.e-2; np0 *= 1.5) {
-   double np0=2.e-2;
+  for (double np0 = 2.e-2; np0<8.e-2; np0 *= 20.0) {
     std::cout << np0 << std::endl;
     double nn0 = 1.e-14;
     double delta = 0.01;
@@ -188,7 +187,8 @@ int main() {
         << std::endl;
     }
     ofile << std::endl;
-  */ //}
+  */ 
+  }
   nseEosStatic.SeTNSEdata(allPtsNSE);
  // std::ofstream ofile("nse_test_new.out", std::ofstream::out);
   //EOSSingleNucleus gibbs(eos);
@@ -196,21 +196,20 @@ int main() {
   boost::archive::text_oarchive oa(ofs); 
   oa << nseEosStatic; 
   ofs.close();
+  
   std::ofstream ofile("nse_test_new_nb_F.out", std::ofstream::out);
   for (auto& nse : allPtsNSE) { 
 	  ofile << nse.eosExterior.Nn() << "\t" << nse.nnTot <<"\t" 
 	  		<<nse.F << "\t" << nse.P <<std::endl;// allPtsNSE.push_back(nseEosStatic.GetStateNSEprop(nse));
-	  }
-	  ofile.close();
- /* }
-  else {
-	  EOSNSE nsedat(nucleiStatic, eos); 
-	  std::ifstream ifs("nse.dat");
-	  boost::archive::text_iarchive ia(ifs); 
-	  ia >> nsedat;
-      ifs.close();
+	}
+	ofile.close();
+
+	EOSNSE nsedat(nucleiStatic, eos); 
+	std::ifstream ifs("nse.dat");
+	boost::archive::text_iarchive ia(ifs); 
+	ia >> nsedat;
+  ifs.close();
   
-  }*/
   
   return 0;
 }
