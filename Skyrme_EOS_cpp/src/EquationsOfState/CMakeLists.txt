@@ -6,6 +6,7 @@ set(eos_files
   EOSSkyrme.cpp
   GibbsPhaseConstruct.cpp 
   NucleusBase.cpp
+  LDNucleus.cpp
   EOSNSE.cpp
   EOSElectron.cpp
 )

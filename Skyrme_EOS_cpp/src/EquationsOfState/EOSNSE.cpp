@@ -38,8 +38,6 @@ std::vector<double> EOSNSE::GetExteriorDensities(const EOSData& eosIn) {
     yy[1] = (1.0 - nucleiProps[2])*eosOut.Np() + nucleiProps[1]; 
     yy[0] = yy[0]/eosIn.Nn() - 1.0;
     yy[1] = yy[1]/eosIn.Np() - 1.0;
-    //std::cout << T*197.3 << " " << yy[0] << " " <<yy[1] << " " << 
-    //nucleiProps[2] << " " << eosOut.Nb() << std::endl;
     return yy;
   };
 
@@ -148,8 +146,9 @@ std::vector<NSEProperties> EOSNSE::GetExteriorProtonDensity(double ne,
   two = nse_func(log(nstart));
   one = nse_func(log(nstart));
   zero = nse_func(log(nstart));
-  std::vector<double> extremum(1, 1.e-300); 
-  
+  std::vector<double> extremum(1, 1.e-300);
+
+  // The 1.1 seems to be critical, increasing it's value makes things not work 
   for (double npt = nstart; npt<=np_max; npt*=1.1) {
     ntwo = none;
     two = one;
@@ -191,16 +190,15 @@ std::vector<NSEProperties> EOSNSE::GetExteriorProtonDensity(double ne,
     double np_low = extremum[i];
     double np_high = extremum[i+1];
     if (nse_func(log(np_high))*nse_func(log(np_low))>0.0) continue;
-      //std::cerr << "Expect bad interval." << std::endl;
     try { 
       double npo = exp(rootFinder1D(nse_func, log(np_low), log(np_high)));
       npsol.push_back(npo);
       EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, nno, npo));
       auto nucleiProps = GetNucleiScalars(eosOut, ne); 
       output.push_back(NSEProperties(
-      nucleiProps[0] + eosOut.Nn()*(1.0 - nucleiProps[2]), 
-      nucleiProps[1] + eosOut.Np()*(1.0 - nucleiProps[2]), 
-      T, eosOut, nucleiProps[2]));
+          nucleiProps[0] + eosOut.Nn()*(1.0 - nucleiProps[2]), 
+          nucleiProps[1] + eosOut.Np()*(1.0 - nucleiProps[2]), 
+          T, eosOut, nucleiProps[2]));
     } catch (...) {}
   } 
   
@@ -236,147 +234,6 @@ std::vector<NSEProperties> EOSNSE::GetExteriorProtonDensity(double ne,
   return output;
 }
 
-EOSData EOSNSE::GetState(const NSEProperties& Prop){
-	double T = Prop.eosExterior.T();
-	double ne = Prop.npTot;
-	double np0 = Prop.eosExterior.Np();
-	double nn0 = Prop.eosExterior.Nn();
-	double mun = Prop.eosExterior.Mun(); 
-	double mup = Prop.eosExterior.Mup();  
-	double muntot = mun, muptot	= muptot;
-	double nQ = pow(Constants::NeutronMassInFm * T / (2.0 * Constants::Pi), 1.5);  
-	double nn = 0.0; 
-	double np = 0.0;
-	double uNuc  = 0.0;
-	double vNuc  = 0.0;
-	double Ftot = (nn0+np0)*(Prop.eosExterior.E() - Prop.eosExterior.S()*T);
-	double Stot = (nn0+np0)*Prop.eosExterior.S();
-	double Ptot = Prop.eosExterior.P();
-  
-  // This is a good candidate for OpenMP parallelization
-  #pragma omp parallel for 
-  #pragma omp default(shared) 
-  #pragma omp schedule(static) 
-  #pragma omp reduce(+:nn,np,uNuc,vNuc,Ftot,Stot) 
-  for (int i=0; i<mNuclei.size(); ++i) {
-    double v = mNuclei[i]->GetVolume(Prop.eosExterior, ne);
-    double BE = mNuclei[i]->GetBindingEnergy(Prop.eosExterior, ne, v);
-    double aa = mNuclei[i]->GetN()*mun + mNuclei[i]->GetZ()*mup 
-        + BE - v*Prop.eosExterior.P(); 
-    double ni = std::min(nQ * pow((double) mNuclei[i]->GetA(), 1.5) 
-        * exp(aa/T), 1.e200);
-    nn += mNuclei[i]->GetN()*ni;
-    np += mNuclei[i]->GetZ()*ni;
-    Ftot += ni*mNuclei[i]->FreeEnergy(Prop.eosExterior,ne,ni);
-    Stot += ni*mNuclei[i]->Entropy(Prop.eosExterior,ne,ni);
-    uNuc += v*ni;
-    vNuc += v;
-  }
-  
-  double u0 = 1 - uNuc;
-  nn += u0*nn0;
-  np += u0*np0;
-  
-  // This is another good candidate for OpenMP parallelization
-  #pragma omp parallel for 
-  #pragma omp default(shared) 
-  #pragma omp schedule(static) 
-  #pragma omp reduce(+:Ptot,muntot,muptot)
-  for (int i=0; i<mNuclei.size(); ++i){ 
-	  double v = mNuclei[i]->GetVolume(Prop.eosExterior, ne);
-	  double BE = mNuclei[i]->GetBindingEnergy(Prop.eosExterior, ne, v);
-	  double aa = mNuclei[i]->GetN()*mun + mNuclei[i]->GetZ()*mup 
-	  		+ BE - v*Prop.eosExterior.P(); 
-	  double ni = std::min(nQ * pow((double) mNuclei[i]->GetA(), 1.5) 
-	  		* exp(aa/T), 1.e200);
-	  Ptot += ni*mNuclei[i]->NucleusPressure(Prop.eosExterior,ne,u0);
-	  muntot += mNuclei[i]->Nucleusmun(Prop.eosExterior,ne,u0,ni);
-	  muptot += mNuclei[i]->Nucleusmup(Prop.eosExterior,ne,u0,ni);
-  }
-  Ftot/=(nn+np);
-  Stot/=(nn+np);
-  double Etot = Ftot + T*Stot;
-  EOSData totalData = EOSData::Output(T, nn, np, mun, mup, Ptot, Stot, Etot);
-  return totalData;
-}	
-
-NSEProperties EOSNSE::GetStateNSEprop(const NSEProperties& Prop){
-	double T = Prop.eosExterior.T();
-	double ne = Prop.npTot;
-	double np0 = Prop.eosExterior.Np();
-	double nn0 = Prop.eosExterior.Nn();
-	double mun = Prop.eosExterior.Mun(); 
-	double mup = Prop.eosExterior.Mup();  
-	double muntot = mun, muptot	= muptot;
-	double nQ = pow(Constants::NeutronMassInFm * T / (2.0 * Constants::Pi), 1.5);  
-	double nn = 0.0; 
-	double np = 0.0;
-	double uNuc  = 0.0;
-	double vNuc  = 0.0;
-	double Ftot = (nn0+np0)*(Prop.eosExterior.E() - Prop.eosExterior.S()*T);
-	double Stot = (nn0+np0)*Prop.eosExterior.S();
-	double Ptot = Prop.eosExterior.P();
-	double avgEc = 0.0;
-	double nitot =0.0;
-	double avgBe = 0.0;
-    double avgPv = 0.0;
-  
-  // This is a good candidate for OpenMP parallelization
-  #pragma omp parallel for 
-  #pragma omp default(shared) 
-  #pragma omp schedule(static) 
-  #pragma omp reduce(+:nn,np,uNuc,vNuc,Ftot,Stot) 
-  for (int i=0; i<mNuclei.size(); ++i) {
-    double v = mNuclei[i]->GetVolume(Prop.eosExterior, ne);
-    double BE = mNuclei[i]->GetBindingEnergy(Prop.eosExterior, ne, v);
-    double EC = mNuclei[i]->CoulombEnergy(v, np0, ne);
-    avgBe += BE;
-    avgEc += EC;
-    double aa = mNuclei[i]->GetN()*mun + mNuclei[i]->GetZ()*mup 
-        + BE - v*Prop.eosExterior.P(); 
-    double ni = std::min(nQ * pow((double) mNuclei[i]->GetA(), 1.5) 
-        * exp(aa/T), 1.e200);
-    nitot += ni;
-    nn += mNuclei[i]->GetN()*ni;
-    np += mNuclei[i]->GetZ()*ni;
-    Ftot += ni*mNuclei[i]->FreeEnergy(Prop.eosExterior,ne,ni);
-    Stot += ni*mNuclei[i]->Entropy(Prop.eosExterior,ne,ni);
-    uNuc += v*ni;
-    vNuc += v;
-  }
-  avgBe /=(nitot+1.e-40);
-  avgEc /=(nitot+1.e-40); 
-  double u0 = 1 - uNuc;
-  nn += u0*nn0;
-  np += u0*np0;
-  
-  // This is another good candidate for OpenMP parallelization
-  #pragma omp parallel for 
-  #pragma omp default(shared) 
-  #pragma omp schedule(static) 
-  #pragma omp reduce(+:Ptot,muntot,muptot)
-  for (int i=0; i<mNuclei.size(); ++i){ 
-	  double v = mNuclei[i]->GetVolume(Prop.eosExterior, ne);
-	  double BE = mNuclei[i]->GetBindingEnergy(Prop.eosExterior, ne, v);
-	  double aa = mNuclei[i]->GetN()*mun + mNuclei[i]->GetZ()*mup 
-	  		+ BE - v*Prop.eosExterior.P(); 
-	  double ni = std::min(nQ * pow((double) mNuclei[i]->GetA(), 1.5) 
-	  		* exp(aa/T), 1.e200);
-	  Ptot += ni*mNuclei[i]->NucleusPressure(Prop.eosExterior,ne,u0);
-	  avgPv += ni*mNuclei[i]->NucleusPressure(Prop.eosExterior,ne,u0);
-	  muntot += mNuclei[i]->Nucleusmun(Prop.eosExterior,ne,u0,ni);
-	  muptot += mNuclei[i]->Nucleusmup(Prop.eosExterior,ne,u0,ni);
-  }
-  Ftot/=(nn+np+1.e-40);
-  Stot/=(nn+np+1.e-40);
-  avgPv/=(nitot+1.e-40);
-  double Etot = Ftot + T*Stot;  
-  NSEProperties totalData(nn, np, T, Prop.eosExterior, uNuc, avgEc, avgBe, avgPv,
-                           Etot, Stot, Ftot, Ptot, muntot, muptot);
-  //EOSData totalData = EOSData::Output(T, nn, np, mun, mup, Ptot, Stot, Etot);
-  return totalData;
-}
-
 
 // find the total electron number density from the exterior
 // proton and neutron number densities 
@@ -400,14 +257,58 @@ NSEProperties EOSNSE::GetTotalDensities(const EOSData& eosIn) {
     nucleiProps[2]);
 }
 
-	void EOSNSE::SeTNSEdata (const std::vector<NSEProperties> & NSEDat) {
-		NSEprop = NSEDat;
-	}
-  std::vector<NSEProperties> EOSNSE::GetNSEdata() {
-	  return NSEprop;
-  }
+EOSData EOSNSE::GetState(const NSEProperties& Prop){
+  NSEProperties f = GetStateNSEprop(Prop);
+  return EOSData::Output(f.T, f.nnTot, f.npTot, f.mun, f.mup, f.P, f.S, f.E);
+}	
 
-std::array<double, 4> EOSNSE::GetNucleiScalars(const EOSData& eosOut, double ne) {
+NSEProperties EOSNSE::GetStateNSEprop(const NSEProperties& Prop){
+  
+  auto nucTherm = GetNucleiScalars<true>(Prop.eosExterior, Prop.npTot); 
+  
+  double nn     = nucTherm[0]; 
+  double np     = nucTherm[1]; 
+  double Ftot   = nucTherm[4];
+  double Stot   = nucTherm[5];
+  double uNuc   = nucTherm[2];
+  double vNuc   = nucTherm[3];
+  double Ptot   = nucTherm[6];
+  double muntot = nucTherm[7];
+  double muptot = nucTherm[8];
+
+  double u0 = 1 - uNuc;
+  double nbo = Prop.eosExterior.Nb();
+  double T = Prop.eosExterior.T();
+  nn     += u0*Prop.eosExterior.Nn();
+  np     += u0*Prop.eosExterior.Np();
+  // I think these should have a u0 out front
+	Ftot   += u0*nbo*(Prop.eosExterior.E() - Prop.eosExterior.S()*T);
+	Stot   += u0*nbo*Prop.eosExterior.S();
+	muntot += Prop.eosExterior.Mun(); 
+  muptot += Prop.eosExterior.Mup();
+  Ptot   += Prop.eosExterior.P(); 
+   
+  Ftot/=(nn+np+1.e-40);
+  Stot/=(nn+np+1.e-40);
+  
+  double Etot = Ftot + T*Stot;  
+  double avgEc = nucTherm[9];
+  double avgBe = nucTherm[10];
+  double avgPv = nucTherm[11];
+  return NSEProperties(nn, np, T, Prop.eosExterior, uNuc, avgEc, avgBe, avgPv, 
+      Etot, Stot, Ftot, Ptot, muntot, muptot);
+}
+
+
+void EOSNSE::SeTNSEdata (const std::vector<NSEProperties> & NSEDat) {
+	NSEprop = NSEDat;
+}
+std::vector<NSEProperties> EOSNSE::GetNSEdata() {
+  return NSEprop;
+}
+
+template <bool getEosContributions>
+std::vector<double> EOSNSE::GetNucleiScalars(const EOSData& eosOut, double ne) {
   double mun = eosOut.Mun(); 
   double mup = eosOut.Mup(); 
   double T   = eosOut.T(); 
@@ -417,7 +318,7 @@ std::array<double, 4> EOSNSE::GetNucleiScalars(const EOSData& eosOut, double ne)
   double np = 0.0;
   double uNuc  = 0.0;
   double vNuc  = 0.0;
-  // This is a good candidate for OpenMP parallelization
+  
   #pragma omp parallel for 
   #pragma omp default(shared) 
   #pragma omp schedule(static) 
@@ -435,6 +336,41 @@ std::array<double, 4> EOSNSE::GetNucleiScalars(const EOSData& eosOut, double ne)
     uNuc += v*ni;
     vNuc += v; 
   }
-  return {nn, np, uNuc, vNuc};
+  
+  if (getEosContributions) { 
+    double u0 = 1.0 - uNuc; 
+    double Ftot = 0.0, Stot = 0.0, Ptot = 0.0, muntot = 0.0, muptot = 0.0; 
+    double avgEc = 0.0, avgBe = 0.0, avgP = 0.0, niTot = 0.0;
+    // Currently have to have this second loop because nuclei contributions 
+    // to thermodynamic quantities care about u0. May eventually fix how 
+    // nucleus class returns EoS quantities
+    #pragma omp parallel for 
+    #pragma omp default(shared) 
+    #pragma omp schedule(static) 
+    #pragma omp reduce(+:Ftot, Stot, Ptot, muntot, muptot, avgEc, avgBe, niTot) 
+    for (int i=0; i<mNuclei.size(); ++i) {
+      double v = mNuclei[i]->GetVolume(eosOut, ne);
+      double BE = mNuclei[i]->GetBindingEnergy(eosOut, ne, v);
+      double aa = mNuclei[i]->GetN()*mun + mNuclei[i]->GetZ()*mup 
+          + BE - v*eosOut.P(); 
+      double ni = std::min(nQ * pow((double) mNuclei[i]->GetA(), 1.5) 
+          * exp(aa/T), 1.e200);
+      niTot  += ni;
+      Ftot   += ni*mNuclei[i]->FreeEnergy(eosOut, ne, ni);
+      Stot   += ni*mNuclei[i]->Entropy(eosOut, ne, ni);
+	    Ptot   += ni*mNuclei[i]->NucleusPressure(eosOut, ne, u0);
+	    muntot += mNuclei[i]->Nucleusmun(eosOut, ne, u0, ni);
+	    muptot += mNuclei[i]->Nucleusmup(eosOut, ne, u0, ni);
+      avgEc  += mNuclei[i]->CoulombEnergy(v, ne, eosOut.Np()); 
+      avgBe  += BE;
+    }
+    avgEc /= niTot + 1.e-80;
+    avgBe /= niTot + 1.e-80;
+    avgP = Ptot/(niTot + 1.e-80);
+    return {nn, np, uNuc, vNuc, Ftot, Stot, Ptot, muntot, muptot, 
+        avgEc, avgBe, avgP};
+  } else {
+    return {nn, np, uNuc, vNuc};
+  }
 }
 

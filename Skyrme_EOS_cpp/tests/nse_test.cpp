@@ -9,6 +9,7 @@
 #include "EquationsOfState/GibbsPhaseConstruct.hpp"
 #include "EquationsOfState/SkyrmeParameters.hpp"
 #include "EquationsOfState/NucleusBase.hpp"
+#include "EquationsOfState/LDNucleus.hpp"
 #include "EquationsOfState/EOSNSE.hpp"
 
 int main() {

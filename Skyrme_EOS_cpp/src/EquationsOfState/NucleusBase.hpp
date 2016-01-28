@@ -73,41 +73,4 @@ protected:
 
 }; 
 
-class LDNucleus : public NucleusBase { 
-public:
-  
-  LDNucleus(int Z, int A, const EOSBase& eos);
-  
-  StaticNucleus GetStaticNucleus() const;
-
-  double GetVolume(const EOSData& eosIn, double ne) const;
-  double GetBindingEnergy(const EOSData& eosIn, double ne) const;
-  double GetBindingEnergy(const EOSData& eosIn, double ne, double v) const;
-  double FreeEnergy(const EOSData& eosIn, double ne, double ni) const;
-  double Entropy (const EOSData& eosIn, double ne, double ni) const;
-  double NucleusPressure (const EOSData& eosIn, double ne, double uo) const;
-  double Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const;
-  double Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const;
- 
-  std::unique_ptr<NucleusBase> MakeUniquePtr() const { 
-    return std::unique_ptr<NucleusBase>(new LDNucleus(GetZ(), 
-      GetA(), *mpEos));
-  }
-
-protected:
-  
-  double SurfacePressure(double v) const;
-  double SurfaceEnergy(double v) const;
-  double CoulombPressure(double v, double npo, double ne) const;
-  double CoulombEnergy(double v, double npo, double ne) const;
-  
-  std::unique_ptr<EOSBase> mpEos;
-  
-  double mSs0; 
-  double mSigma0; 
-  
-  std::vector<std::pair<double,double>> PvsV;  
-
-};
-
 #endif // EOS_NUCLEUSBASE_HPP_
