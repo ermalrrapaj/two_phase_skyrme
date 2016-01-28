@@ -277,7 +277,7 @@ NSEProperties EOSNSE::GetStateNSEprop(const NSEProperties& Prop){
   double muntot = nucTherm.mun;
   double muptot = nucTherm.mup;
 
-  double u0 = 1 - uNuc;
+  double u0 = 1.0 - uNuc;
   double nbo = Prop.eosExterior.Nb();
   double T = Prop.eosExterior.T();
   nn     += u0*Prop.eosExterior.Nn();
