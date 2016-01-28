@@ -34,8 +34,8 @@ std::vector<double> EOSNSE::GetExteriorDensities(const EOSData& eosIn) {
         exp(xx[0]), exp(xx[1])));
     auto nucleiProps = GetNucleiScalars(eosOut, eosIn.Np()); 
      
-    yy[0] = (1.0 - nucleiProps[2])*eosOut.Nn() + nucleiProps[0]; 
-    yy[1] = (1.0 - nucleiProps[2])*eosOut.Np() + nucleiProps[1]; 
+    yy[0] = (1.0 - nucleiProps.uNuc)*eosOut.Nn() + nucleiProps.nn; 
+    yy[1] = (1.0 - nucleiProps.uNuc)*eosOut.Np() + nucleiProps.np; 
     yy[0] = yy[0]/eosIn.Nn() - 1.0;
     yy[1] = yy[1]/eosIn.Np() - 1.0;
     return yy;
@@ -87,8 +87,8 @@ NSEProperties EOSNSE::GetExteriorNeutronDensity(double ne, double npo,
     double nno = exp(xx);
     EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, nno, npo));
     auto nucleiProps = GetNucleiScalars(eosOut, ne); 
-    double yy = 1.0 - (nucleiProps[1] + (1.0 - nucleiProps[2])*npo)/ne;
-    std::cerr << nno << " " << " " << nucleiProps[1] << " " << eosOut.Mun() 
+    double yy = 1.0 - (nucleiProps.np + (1.0 - nucleiProps.uNuc)*npo)/ne;
+    std::cerr << nno << " " << " " << nucleiProps.np << " " << eosOut.Mun() 
         << " " << eosOut.Mup() << " " << yy << std::endl;
     return yy;
   };
@@ -108,9 +108,9 @@ NSEProperties EOSNSE::GetExteriorNeutronDensity(double ne, double npo,
   // Set up output  
   EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, nno, npo));
   auto nucleiProps = GetNucleiScalars(eosOut, ne); 
-  return NSEProperties(nucleiProps[0] + eosOut.Nn()*(1.0 - nucleiProps[2]), 
-      nucleiProps[1] + eosOut.Np()*(1.0 - nucleiProps[2]), 
-      T, eosOut, nucleiProps[2]);
+  return NSEProperties(nucleiProps.nn + eosOut.Nn()*(1.0 - nucleiProps.uNuc), 
+      nucleiProps.np + eosOut.Np()*(1.0 - nucleiProps.uNuc), 
+      T, eosOut, nucleiProps.uNuc);
 }
 
 std::vector<NSEProperties> EOSNSE::GetExteriorProtonDensity(double ne, 
@@ -127,7 +127,7 @@ std::vector<NSEProperties> EOSNSE::GetExteriorProtonDensity(double ne,
     double npo = exp(xx);
     EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, nno, npo));
     auto nucleiProps = GetNucleiScalars(eosOut, ne); 
-    double yy = 1.0 - (nucleiProps[1] + (1.0 - nucleiProps[2])*npo)/ne;
+    double yy = 1.0 - (nucleiProps.np + (1.0 - nucleiProps.uNuc)*npo)/ne;
     return yy;
   };
 
@@ -196,9 +196,9 @@ std::vector<NSEProperties> EOSNSE::GetExteriorProtonDensity(double ne,
       EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, nno, npo));
       auto nucleiProps = GetNucleiScalars(eosOut, ne); 
       output.push_back(NSEProperties(
-          nucleiProps[0] + eosOut.Nn()*(1.0 - nucleiProps[2]), 
-          nucleiProps[1] + eosOut.Np()*(1.0 - nucleiProps[2]), 
-          T, eosOut, nucleiProps[2]));
+          nucleiProps.nn + eosOut.Nn()*(1.0 - nucleiProps.uNuc), 
+          nucleiProps.np + eosOut.Np()*(1.0 - nucleiProps.uNuc), 
+          T, eosOut, nucleiProps.uNuc));
     } catch (...) {}
   } 
   
@@ -242,7 +242,8 @@ NSEProperties EOSNSE::GetTotalDensities(const EOSData& eosIn) {
   EOSData eosOut = mpEos->FromNAndT(eosIn);
   auto nse_func = [&eosOut, this](double xx)->double{
     auto nucleiProps = GetNucleiScalars(eosOut, exp(xx)); 
-    double yy = (nucleiProps[1] + (1.0 - nucleiProps[2])*eosOut.Np())/exp(xx) - 1.0;
+    double yy = (nucleiProps.np + (1.0 - nucleiProps.uNuc)*eosOut.Np())/exp(xx) 
+        - 1.0;
     //std::cout << yy << " " << exp(xx) << std::endl;
     return yy;
   };
@@ -252,9 +253,9 @@ NSEProperties EOSNSE::GetTotalDensities(const EOSData& eosIn) {
   double ne_high = log(std::max(eosIn.Np(), 0.1));
   double ne = exp(rootFinder1D(nse_func, ne_low, ne_high));
   auto nucleiProps = GetNucleiScalars(eosOut, ne); 
-  return NSEProperties(nucleiProps[0] + eosOut.Nn()*(1.0 - nucleiProps[2]), 
-    nucleiProps[1] + eosOut.Np()*(1.0 - nucleiProps[2]), eosIn.T(), eosOut, 
-    nucleiProps[2]);
+  return NSEProperties(nucleiProps.nn + eosOut.Nn()*(1.0 - nucleiProps.uNuc), 
+    nucleiProps.np + eosOut.Np()*(1.0 - nucleiProps.uNuc), eosIn.T(), eosOut, 
+    nucleiProps.uNuc);
 }
 
 EOSData EOSNSE::GetState(const NSEProperties& Prop){
@@ -266,15 +267,15 @@ NSEProperties EOSNSE::GetStateNSEprop(const NSEProperties& Prop){
   
   auto nucTherm = GetNucleiScalars<true>(Prop.eosExterior, Prop.npTot); 
   
-  double nn     = nucTherm[0]; 
-  double np     = nucTherm[1]; 
-  double Ftot   = nucTherm[4];
-  double Stot   = nucTherm[5];
-  double uNuc   = nucTherm[2];
-  double vNuc   = nucTherm[3];
-  double Ptot   = nucTherm[6];
-  double muntot = nucTherm[7];
-  double muptot = nucTherm[8];
+  double nn     = nucTherm.nn; 
+  double np     = nucTherm.np; 
+  double Ftot   = nucTherm.F;
+  double Stot   = nucTherm.S;
+  double uNuc   = nucTherm.uNuc;
+  double vNuc   = nucTherm.vNuc;
+  double Ptot   = nucTherm.P;
+  double muntot = nucTherm.mun;
+  double muptot = nucTherm.mup;
 
   double u0 = 1 - uNuc;
   double nbo = Prop.eosExterior.Nb();
@@ -292,9 +293,9 @@ NSEProperties EOSNSE::GetStateNSEprop(const NSEProperties& Prop){
   Stot/=(nn+np+1.e-40);
   
   double Etot = Ftot + T*Stot;  
-  double avgEc = nucTherm[9];
-  double avgBe = nucTherm[10];
-  double avgPv = nucTherm[11];
+  double avgEc = nucTherm.avgEc;
+  double avgBe = nucTherm.avgBe;
+  double avgPv = nucTherm.avgP;
   return NSEProperties(nn, np, T, Prop.eosExterior, uNuc, avgEc, avgBe, avgPv, 
       Etot, Stot, Ftot, Ptot, muntot, muptot);
 }
@@ -307,8 +308,11 @@ std::vector<NSEProperties> EOSNSE::GetNSEdata() {
   return NSEprop;
 }
 
+// Calculate the number densities and other properties of the nuclear 
+// ensemble given a set of exterior conditions and total electron density
 template <bool getEosContributions>
-std::vector<double> EOSNSE::GetNucleiScalars(const EOSData& eosOut, double ne) {
+EOSNSE::NucleiProperties EOSNSE::GetNucleiScalars(const EOSData& eosOut, 
+    double ne) {
   double mun = eosOut.Mun(); 
   double mup = eosOut.Mup(); 
   double T   = eosOut.T(); 
@@ -336,7 +340,12 @@ std::vector<double> EOSNSE::GetNucleiScalars(const EOSData& eosOut, double ne) {
     uNuc += v*ni;
     vNuc += v; 
   }
-  
+  NucleiProperties out; 
+  out.nn = nn;   
+  out.np = np;   
+  out.uNuc = uNuc;   
+  out.vNuc = vNuc; 
+    
   if (getEosContributions) { 
     double u0 = 1.0 - uNuc; 
     double Ftot = 0.0, Stot = 0.0, Ptot = 0.0, muntot = 0.0, muptot = 0.0; 
@@ -367,10 +376,15 @@ std::vector<double> EOSNSE::GetNucleiScalars(const EOSData& eosOut, double ne) {
     avgEc /= niTot + 1.e-80;
     avgBe /= niTot + 1.e-80;
     avgP = Ptot/(niTot + 1.e-80);
-    return {nn, np, uNuc, vNuc, Ftot, Stot, Ptot, muntot, muptot, 
-        avgEc, avgBe, avgP};
-  } else {
-    return {nn, np, uNuc, vNuc};
-  }
+    out.F = Ftot;
+    out.S = Stot; 
+    out.P = Ptot;
+    out.mun = muntot;
+    out.mup = muptot;
+    out.avgEc = avgEc;
+    out.avgBe = avgBe;
+    out.avgP = avgP;
+  } 
+  return out;
 }
 

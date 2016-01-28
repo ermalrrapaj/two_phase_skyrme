@@ -148,16 +148,18 @@ public:
   }
   
 private: 
-  
+  struct NucleiProperties { 
+    double nn, np, uNuc, vNuc, F, S, P, mun, mup, avgEc, avgBe, avgP;
+  };
+
   template <bool getEosContributions = false>  
-  std::vector<double> GetNucleiScalars(const EOSData& eosOut, double ne);
+  NucleiProperties GetNucleiScalars(const EOSData& eosOut, double ne);
   
   std::vector<std::unique_ptr<NucleusBase>> mNuclei; 
   double mTMin;
   std::vector<NSEProperties> NSEprop;
   std::shared_ptr<EOSBase> mpEos;
-   
-
+  
 };
 
-#endif // EOS_EOSSKYRME_HPP_
+#endif // EOS_EOSNSE_HPP_
