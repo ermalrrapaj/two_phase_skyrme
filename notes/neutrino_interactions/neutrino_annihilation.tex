@@ -107,7 +107,7 @@ where the indices 1 and 3 represent the neutrino and antineutrino and 2 and 4 re
 We can also choose the standard decomposition of the matrix element in terms of the lepton tensor and something like the polarization function 
 \begin{equation*}
 \left\langle \left| M \right|^2 \right \rangle = \frac{G_F^2}{8}
-L_{\mu \nu} \Omega^{\mu \nu},
+L_{\mu \nu} \Lambda^{\mu \nu},
 \end{equation*}
 where 
 \begin{eqnarray*}
@@ -125,43 +125,43 @@ L^{\mu \nu} &=& \textrm{Tr}\left[
 \right].
 \end{eqnarray*}
 The baryon contribution to the matrix 
-element is given by 
+element is then given by 
 \begin{eqnarray*}
-\Omega^{\mu \nu} &=& \textrm{Tr}\left[
+\Lambda^{\mu \nu} &=& \textrm{Tr}\biggl[
 (-\fsl{p}_2 + m_2) 
 \left\{ C_V\gamma^\mu -C_A\gamma^\mu \gamma^5 
 + F_3\frac{i \sigma^{\mu \alpha}q_\alpha}{2 M_N} \right\}
-(-\fsl{p}_4 + m_4)
+\nonumber\\
+&& \times \, (-\fsl{p}_4 + m_4)
 \left \{ C_V\gamma^\nu -C_A\gamma^\nu \gamma^5 
 - F_3\frac{i \sigma^{\nu \alpha}q_\alpha}{2 M_N} \right\}
-\right] \\
-&=& C_V^2 \Omega^{\mu \nu}_V 
-+ C_A^2 \Omega^{\mu \nu}_A 
-+ 2 C_V C_A \Omega^{\mu \nu}_{VA} 
-+ \left( \frac{F_2}{2 M_N}\right)^2 \Omega^{\mu \nu}_F,
-+ 2\frac{F_2}{2 M_N}C_V \Omega^{\mu \nu}_{FV}, 
-+ 2\frac{F_2}{2 M_N}C_A \Omega^{\mu \nu}_{FV}, 
+\biggr] \\
+&=& C_V^2 \Lambda^{\mu \nu}_V 
++ C_A^2 \Lambda^{\mu \nu}_A 
++ F_2^2 \Lambda^{\mu \nu}_F,
++ 2 C_V C_A \Lambda^{\mu \nu}_{VA} 
++ 2 F_2 C_V \Lambda^{\mu \nu}_{VT}, 
++ 2 F_2 C_A \Lambda^{\mu \nu}_{AT},
 \end{eqnarray*}
-where 
-\begin{eqnarray*}
-\Omega_V^{\mu \nu} &=& 4 \left[
-p_2^\mu p_4^\nu + p_2^\nu p_4^\mu + (m_2 m_4 - p_2 \cdot p_4) \eta^{\mu \nu}
-\right] \\
-\Omega_A^{\mu \nu} &=& \Omega_V^{\mu \nu} - \eta^{\mu \nu} \Omega_A \\
-\Omega_A &=& 8 m_2 m_4 \\
-\Omega_{VA}^{\mu \nu} &=& - 4i \epsilon^{\alpha \mu \beta \nu} 
-p^2_\alpha p^4_\beta \\
-\Omega_F^{\mu \nu} &=& 4 m_2 m_4 \left\{3 q^\mu q^\nu - q_\alpha^2 \eta^{\mu \nu} \right\}
-+ \left \{ 12 q^\mu q^\nu - q_\alpha^2 \eta^{\mu \nu} \right \} (p_2 \cdot p_4) \\
-&&+ 8 (p_2 \cdot q)(p_4 \cdot q) \eta^{\mu \nu} 
-- 8 (p_2 \cdot q) p_4^\mu q^\nu
-- 8 (p_4 \cdot q) p_2^\nu q^\mu \\
-\Omega_{FV}^{\mu \nu} &=& 4 \left[(m_2 p_4^\nu - m_4 p_2^\nu)q^\mu 
-+ \eta^{\mu \nu}\left(m_4 (p_2 \cdot q) - m_2(p_4\cdot q) \right)  \right] \\
-\Omega_{FA}^{\mu \nu} &=&...
-\end{eqnarray*}
+where the $\Lambda$s are functions of $p_2^\mu$ and $q^\mu = p_4^\mu - p_2^\mu$.
+Working through the spin sums in the neutral current case gives
+\begin{eqnarray}
+\Lambda^{\mu\nu}_V &=& 2 q_\alpha^2 \eta^{\mu \nu} 
++ 4(p_2^\nu q^\mu + p_2^\mu q^\nu) + 8 p_2^\mu p_2^\nu \\
+\Lambda^{\mu\nu}_A &=& \Lambda^{\mu\nu}_V - 8 m_2^2 \eta^{\mu \nu} \\
+\Lambda^{\mu\nu}_T &=& 2 q_\alpha^2 
+\left(1 + \frac{q_\alpha^2}{4 m_2^2} \right)h^{\mu \nu}
+-\frac{q_\alpha^2}{4 m_2^2} \Lambda^{\mu \nu}_V \\
+\Lambda^{\mu\nu}_{VA} &=& 4 i \epsilon^{\mu \nu \alpha \beta}q_\alpha p_{2,\beta} 
+\\
+\Lambda^{\mu\nu}_{VT} &=& 2q_\alpha^2 h^{\mu \nu}
+\\
+\Lambda^{\mu\nu}_{AT} &=& 4 i \epsilon^{\mu \nu \alpha \beta}q_\alpha p_{2,\beta} , 
+\end{eqnarray}
+where $h^{\alpha \beta} = \eta^{\alpha \beta} - q^\alpha q^\beta/q_\mu^2$ is the
+orthogonal projection tensor relative to $q^\alpha$.
 
-\todo{Derive axial weak magnetism piece}
+\todo{Include charged current corrections to these results}
 
 \section{Scattering and Capture} 
 The differential cross section for neutrino scattering or capture is 
@@ -182,47 +182,18 @@ q^\mu = p_1^\mu - p_3^\mu=(q_0,0,0,-q),
 \end{equation}
 which is the energy momentum transfer from the neutrinos (or neutrino and lepton) to the other particle or particles involved in the interaction.  We can split this into neutrino dependent and neutrino independent pieces to get 
 \begin{eqnarray*}
-\frac{d \sigma(E_1)}{V} &=& \frac{d\textrm{LIPS}_3 (1-f_3) }{2 E_1(1- \exp((\mu_4 - \mu_2 - q_0)/T)}  
-p^1_\mu p^3_\nu \\
-&&\times \, 16 G_F^2\left( 
- (C_V+C_A)^2 \Pi_{(1)}^{\mu \nu}
-+(C_V-C_A)^2 \Pi_{(2)}^{\mu \nu}
--(C_V^2-C_A^2) \Pi_{(3)}^{\mu \nu} \right) \\
-&=& \frac{d\textrm{LIPS}_3 (1-f_3)}{2 E_1(1- \exp((\mu_4 - \mu_2 - q_0)/T)}   
-p^1_\mu p^3_\nu \\
-&&\times \, 16 G_F^2\left( 
-  C_V^2 \left(\Pi_{(+)}^{\mu \nu} - \Pi_{(3)}^{\mu \nu} \right) 
-+ C_A^2 \left(\Pi_{(+)}^{\mu \nu} + \Pi_{(3)}^{\mu \nu} \right) 
-+ 2 C_V C_A \Pi_{(-)}^{\mu \nu}
- \right) \\
+\frac{d \sigma(E_1)}{V} 
 &=& \frac{G_F^2 \, d\textrm{LIPS}_3 (1-f_3)}
 {16 E_1(1 - \exp((\mu_4 - \mu_2 - q_0)/T)} 
- L_{\mu \nu} 
-\left( 
-  C_V^2 \Pi_V^{\mu \nu} 
-+ C_A^2 \Pi_A^{\mu \nu}
-+ 2 C_V C_A \Pi_{VA}^{\mu \nu}
- \right )
+ L_{\mu \nu} \Pi^{\mu \nu}
 \end{eqnarray*}
 which defines the structure functions 
 \begin{eqnarray*}
-\Pi_{(1)}^{\mu \nu}(q^\alpha) &=& \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
-(2 \pi)^4 \delta^{(4)}\left(q^\alpha + p^\alpha_2 - p^\alpha_4 \right) 
-(f_2-f_4)p^\mu_2 p^\nu_4 \nonumber\\
-\Pi_{(2)}^{\mu \nu}(q^\alpha) &=& \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
-(2 \pi)^4 \delta^{(4)}\left(q^\alpha + p^\alpha_2 - p^\alpha_4 \right) 
-(f_2-f_4) p^\nu_2 p^\mu_4 \nonumber\\
-\Pi_{(\pm)}^{\mu \nu}(q^\alpha) &=& \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
-(2 \pi)^4 \delta^{(4)}\left(q^\alpha + p^\alpha_2 - p^\alpha_4 \right) 
-(f_2-f_4)(p^\nu_2 p^\mu_4 \pm p^\nu_4 p^\mu_2) \nonumber\\
-\Pi_{(3)}^{\mu \nu}(q^\alpha) &=& \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
-(2 \pi)^4 \delta^{(4)}\left(q^\alpha + p^\alpha_2 - p^\alpha_4 \right) 
-(f_2-f_4) \eta^{\mu \nu} m_2 m_4 \\
 \Pi_{i}^{\mu \nu}(q^\alpha) &=& \int d\textrm{LIPS}_2 \int d\textrm{LIPS}_4
 (2 \pi)^4 \delta^{(4)}\left(q^\alpha + p^\alpha_2 - p^\alpha_4 \right) 
-(f_2-f_4) \Omega_i^{\mu \nu}.
+(f_2-f_4) \Lambda_i^{\mu \nu}.
 \end{eqnarray*} 
-We now consider $\Pi_{(1)}$ and later generalize from this.  Using the momentum space delta function, we can integrate out the momenta of particle 4.  This gives
+Using the momentum space delta function, we can integrate out the momenta of particle 4.  This gives
 \begin{equation*}
 p^\mu_4 = (E_4, \, 
 -p_2 \cos \phi_2 \sqrt{1-\mu_2^2}, \,
@@ -253,65 +224,33 @@ We have the kinematic relations
 q = \sqrt{p_1^2 + p_3^2 - 2 p_1 p_3 \mu_{13}} \\
 q_0 = p_1 - p_3 \\ 
 \end{eqnarray*}
-which imply that $q_\mu^2 < 0$.
+which imply that $q_\mu^2 < 0$. Clearly, all of the polarizations can be expressed
+in terms of $q^\mu$ and the tensors
+\begin{equation}
+\Pi^{\{a_k\}} = \frac{1}{(4\pi)^2 q} \int_0^\infty dE_2 \int d\Omega_2 
+\Theta(\mu-\mu_0) (f_2 - f_4) p_2^{a_1}...p_2^{a_k}.
+\end{equation}
+This is basically the same as the PSTF formalism of Thorne 1981 and we can relate
+different polarization tensors via 
+\begin{equation}
+q_\mu \Pi^{\mu \{a_k\}} = - \frac{\beta q_\mu^2}{2}\Pi^{ \{a_k\}}.
+\end{equation}
+\todo{Have checked this in Mathematica for the tensors we care about, but need 
+to clarify if this is in fact general}
 
-\subsection{Pieces of the polarization}
-Because the $\Pi^{\mu \nu}$ are Lorentz invariant and only depend on $q^\alpha$, we can write them as   
-\begin{equation}
-\Pi_{(1,2)}^{\mu \nu}(q^\alpha) = h(q_\alpha^2) \frac{q^\mu q^\nu}{q_\alpha^2}
-+ g(q_\alpha^2) \eta^{\mu \nu} 
-+ f(q_\alpha^2) \epsilon^{\mu \nu \alpha \beta} \frac{q_\alpha q_\beta}{q_\lambda^2}
-\end{equation}
-\todo{Something is wrong since the mixed piece seems to disappear} 
-First, we find $g_{(1)}$ from 
+This relation comes in handy when trying to simplify the different parts of the 
+polarization; when $\Lambda^{\mu \nu}_i$ contains $(p_2 \cdot q)$, it can be
+replaced with $-\beta q_\mu^2/2$.
+
+\subsection{Pieces of the NC polarization}
+The most complicated piece of the polarization is the vector piece, which can be 
+expressed in terms of a Longitudinal piece and a Transverse piece 
 \begin{eqnarray}
-g &=& -\Pi^{11}_{(1)} = -\frac{1}{(4 \pi)^2 q} \int_{e_m}^\infty dE_2 
-(f_2 - f_4) \int d\Omega_2 \delta(\mu_2 - \mu_0) p_2^2 \cos^2 \phi_2 (1-\mu_2^2)
-\nonumber \\
-&=& \frac{1}{16 \pi q^3} \int_{e_m}^\infty dE_2 (f_2 - f_4)
-\left\{(E_2 q_0 + \beta q_\mu^2/2)^2 - E_2^2 q^2 + m_2^2 q^2\right\}
-\nonumber \\ 
-&=& \frac{q_\mu^2}{16 \pi q^3} \int_{e_m}^\infty dE_2 (f_2 - f_4)
-\left\{m_2^2 \frac{q^2}{q_\mu^2} + \beta^2 \frac{q^2_\mu}{4} 
-+ \beta E_2 q_0 + E_2^2 \right\}
+\Pi_L &=& \frac{q_\alpha^2}{2 \pi q^3}
+\int d \script{L} (4 E_2^2 + 4 E_2 q_0 + Q^2) \\
+\Pi_T &=& \frac{q_\alpha^2}{2 \pi q^3}
+\int d \script{L} (4 E_2^2 + 4 E_2 q_0 + Q^2)
 \end{eqnarray}
-We then consider 
-\begin{eqnarray}
-\Pi^{11}_{(1)}&=& h\frac{q_0^2}{q_\mu^2} + g 
-= \frac{1}{(4 \pi)^2 q} \int_{e_m}^\infty dE_2 (f_2 - f_4) 
-\int d\Omega_2 \delta(\mu_2 - \mu_0) E_2(E_2+q_0)
-\nonumber \\
-&=& \frac{1}{16 \pi q^3} \int_{e_m}^\infty dE_2 (f_2 - f_4) 
-\{ 2 q^2 E_2 (E_2 + q_0) \}, 
-\end{eqnarray}
-which defines 
-\begin{equation}
-h = \frac{q_\mu^2}{16 \pi q^3 q_0^2} \int_{e_m}^\infty dE_2 (f_2 - f_4)
-\left\{E_2^2(3 q^2-q_0^2) + E_2 q_0(2 q^2 - \beta q_\mu^2) 
-- m_2^2 q^2 - \beta^2 \frac{q^4_\mu}{4} \right\}
-\end{equation}
-Finally, we need 
-\begin{equation}
-\Pi^{\mu \nu}_{(3)}=\frac{m_2 m_4}{8 \pi q} \eta^{\mu \nu} 
-\int_{e_m}^\infty dE_2 (f_2 - f_4).
-\end{equation}  
-Essentially, we should be able to express these all in terms of integrals of the form 
-\begin{equation}
-\Gamma_n(\eta_2, \eta_4) = \int_0^\infty dx \left[ \frac{x^n}{1 + \exp[x - \eta_2]}
--\frac{ x^n}{1 + \exp[x - \eta_4]} \right],
-\end{equation}
-so that 
-\begin{eqnarray}
-h &=& \frac{q_\mu^2 T}{16 \pi q^3 q_0^2} 
-\left\{T^2 (3 q^2-q_0^2) \Gamma_2 + T q_0(2 q^2 - \beta q_\mu^2) \Gamma_1 
-- \left (m_2^2 q^2 + \beta^2 \frac{q^4_\mu}{4} \right) \Gamma_0 \right\} \\
-g &=& \frac{q_\mu^2 T}{16 \pi q^3}
-\left\{T^2 \Gamma_2 + T  \beta q_0 \Gamma_1
-+ \left( m_2^2 \frac{q^2}{q_\mu^2} 
-+ \beta^2 \frac{q^2_\mu}{4} \right) \Gamma_0  \right\} \\
-\Pi^{\mu \nu}_{(3)} &=& \frac{m_2 m_4 T}{8 \pi q} \eta^{\mu \nu} \, \Gamma_0,
-\end{eqnarray}
-with $\eta_2 = \mu_2/T - e_m/T$ and $\eta_4 = \mu_4/T - e_m/T - q_0/T$.
 
 
 
