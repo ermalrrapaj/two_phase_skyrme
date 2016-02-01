@@ -65,12 +65,13 @@ int main() {
     double deltaMin = 1.e-1;
     double deltaMax = 1.0;
     double nno = nn0;
+    
     std::vector<NSEProperties> allPts;
     std::vector<NSEProperties> allPtsNSE;
     std::vector<EOSData> alldata; 
     
     // Find all of the points
-    while (nn0<0.1) { 
+    while (nn0<1.e-12) { 
       std::cout << nn0;
       try {
         //NSEProperties nse = 

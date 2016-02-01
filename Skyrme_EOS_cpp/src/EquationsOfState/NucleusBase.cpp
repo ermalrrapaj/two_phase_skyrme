@@ -16,25 +16,28 @@
 static double HBC = Constants::HBCFmMeV; 
 static double MNUC = 938.918/HBC;
 
+std::vector<double> StaticNucleus::CoulombEnergy(double v, double npo, 
+    double ne) const {
+  double Z = (double) NucleusBase::mZ; 
+  double u = v*(ne - npo) / (Z - v*npo);
+  double D = 0.5*u - 1.5*pow(u,1.0/3.0);
+  double udDduoD = (0.5*u- 0.5*pow(u,1.0/3.0))/(D + 1.e-40);
+  double dludv = 1.0/ (v + 1.e-40) + npo / (Z - v*npo);
+  double dludne = v / (ne- npo+1.e-40);
+  double dludnpo = (u-1.0) / (ne - npo);
+  double vn1o3 = pow(v, -1.0/3.0);
+  double fac = 3.0 * Constants::ElementaryChargeSquared 
+      / (5.0 * pow(3.0 / (4.0 * Constants::Pi), 1.0/3.0));
 
-double NucleusBase::CoulombEnergy(double v, double npo, double ne) const {
-  double u = v*(ne - npo) / ((double)NucleusBase::mZ - v*npo);
-  double Ec = 3.0 * Constants::ElementaryChargeSquared 
-      / (5.0 * pow(3.0 * v / (4.0 * Constants::Pi), 1.0/3.0))
-      * pow((double)NucleusBase::mZ - npo*v, 2) * (0.5*u - 1.5*pow(u,1.0/3.0)) 
-      * pow(ne/(double)NucleusBase::mZ,1.0/3.0);
-  return Ec;
+  double Ec      = fac * vn1o3 * D * pow(Z - npo*v, 2);
+  double dEcdv   = Ec * (udDduoD * dludv - 1.0/(3.0 * v) - 2.0 * npo / (Z-npo*v));
+  double dEcdnpo = Ec * (udDduoD * dludnpo - 2.0 * v / (Z-npo*v)); 
+  double dEcdne  = Ec *  udDduoD * dludne; 
+  
+  return {Ec, dEcdv, dEcdnpo, dEcdne};
 }
 
-double NucleusBase::CoulombPressureExternal(double v, double npo, double ne) const {
-  double u = v*(ne - npo) / ((double)NucleusBase::mZ - v*npo);
-  return 3.0 * Constants::ElementaryChargeSquared 
-      / (5.0 * pow(3.0 / (4.0 * Constants::Pi), 1.0/3.0))
-      * pow((double)NucleusBase::mZ - v*npo, 2) * pow(u,-1.0/3.0)/3.0
-      * v/((double)NucleusBase::mZ - v*npo);
-}
-
-double NucleusBase::FreeEnergy(const EOSData& eosIn, double ne, double ni) const {
+double StaticNucleus::FreeEnergy(const EOSData& eosIn, double ne, double ni) const {
 	double T  = eosIn.T();
 	double BE = GetBindingEnergy(eosIn, ne);
 	double nQ = pow(MNUC*T/2/Constants::Pi,1.5); 
@@ -42,39 +45,21 @@ double NucleusBase::FreeEnergy(const EOSData& eosIn, double ne, double ni) const
 	return Fk - BE;
 }
 
-double NucleusBase::Entropy (const EOSData& eosIn, double ne, double ni) const {
+double StaticNucleus::Entropy (const EOSData& eosIn, double ne, double ni) const {
 	return 0.0;
 }
 
-double NucleusBase::NucleusPressure (const EOSData& eosIn, double ne, double uo) const{
-	double npo = eosIn.Np();
-	double T = eosIn.T();
-	double v = GetVolume(eosIn, ne);
-	double u = v*(ne - npo) / ((double)NucleusBase::mZ - v*npo +  1.e-100);
-	double EC = CoulombEnergy(v, npo, ne);
-  double DodD = (0.5*pow(u,5.0/3.0) - 1.5*u)/(0.5*pow(u, 2.0/3.0) - 0.5 + 1.e-40); 
-  double dDdu = 0.5 - 0.5*pow(u, -2.0/3.0);
-  
-  double dECdlogne = EC*DodD * v * ne / ((double)NucleusBase::mZ - v*npo +  1.e-40);
-  double dECdlognpo = -EC*DodD* v * npo / ((double)NucleusBase::mZ - v*npo +  1.e-40)
-    * (1.0 - u);
-
-  return T + dECdlogne + uo*dECdlognpo; 
+double StaticNucleus::NucleusPressure (const EOSData& eosIn, double ne, double uo) const{
+  auto Ec = CoulombEnergy(GetVolume(eosIn, ne), eosIn.Np(), ne);
+  return eosIn.T() + Ec[3] + eosIn.Np()/uo*Ec[2]; 
 }
 
-double NucleusBase::Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const {
-	double npo = eosIn.Np();
-	double T = eosIn.T();
-	double v = GetVolume(eosIn, ne);
-	double u = v*(ne - npo) / ((double)NucleusBase::mZ - v*npo);
-	double EC = CoulombEnergy(v, npo, ne);
-	double DuDnpo = v / ((double)NucleusBase::mZ - v*npo)*(u-1.0);
-	double DDu = 0.5*(1 - pow(u, -2.0/3.0))/(0.5*pow(u,5.0/3.0) - 1.5*u + 1.e-40);
-	double DFDnpo = EC*(DDu*DuDnpo - v/((double)NucleusBase::mZ - v*npo)/npo);
-	return ni/uo * DFDnpo;
+double StaticNucleus::Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const {
+  auto Ec = CoulombEnergy(GetVolume(eosIn, ne), eosIn.Np(), ne);
+	return ni/uo * Ec[2];
 }
 
-double NucleusBase::Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const {
+double StaticNucleus::Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const {
 	return 0.0;
 }
 

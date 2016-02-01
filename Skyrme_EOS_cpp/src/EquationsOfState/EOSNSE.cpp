@@ -370,7 +370,7 @@ EOSNSE::NucleiProperties EOSNSE::GetNucleiScalars(const EOSData& eosOut,
 	    Ptot   += ni*mNuclei[i]->NucleusPressure(eosOut, ne, u0);
 	    muntot += mNuclei[i]->Nucleusmun(eosOut, ne, u0, ni);
 	    muptot += mNuclei[i]->Nucleusmup(eosOut, ne, u0, ni);
-      avgEc  += mNuclei[i]->CoulombEnergy(v, ne, eosOut.Np()); 
+      avgEc  += mNuclei[i]->GetCoulombEnergy(eosOut, ne); 
       avgBe  += BE;
     }
     avgEc /= niTot + 1.e-80;

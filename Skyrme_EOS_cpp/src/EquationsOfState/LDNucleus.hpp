@@ -25,9 +25,13 @@ public:
   
   StaticNucleus GetStaticNucleus() const;
 
-  virtual double GetVolume(const EOSData& eosIn, double ne) const;
+  double GetVolume(const EOSData& eosIn, double ne) const;
   double GetBindingEnergy(const EOSData& eosIn, double ne) const;
   double GetBindingEnergy(const EOSData& eosIn, double ne, double v) const;
+  
+  double GetCoulombEnergy(const EOSData& eosIn, double ne) const {
+      return CoulombEnergy(GetVolume(eosIn, ne), eosIn.Nn(), eosIn.Np(), ne)[0];
+  }  
   double FreeEnergy(const EOSData& eosIn, double ne, double ni) const;
   double Entropy (const EOSData& eosIn, double ne, double ni) const;
   double NucleusPressure (const EOSData& eosIn, double ne, double uo) const;
@@ -41,10 +45,8 @@ public:
 
 protected:
   
-  double SurfacePressure(double v) const;
-  double SurfaceEnergy(double v) const;
-  double CoulombPressure(double v, double npo, double ne) const;
-  double CoulombEnergy(double v, double npo, double ne) const;
+  std::vector<double> SurfaceEnergy(double v, double nno, double npo, double ne) const;
+  std::vector<double> CoulombEnergy(double v, double nno, double npo, double ne) const;
   
   virtual EOSData GetBulk(double T, double v) const { 
       return mpEos->FromNAndT(EOSData::InputFromTNnNp(T, 
