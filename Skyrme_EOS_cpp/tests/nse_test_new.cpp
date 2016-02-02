@@ -31,7 +31,7 @@ int main() {
     for (int N=20; N<=40; N++) {
       nuclei.push_back(LDNucleus(Z, Z+N, eosInside).MakeUniquePtr());
       nucleiStatic.push_back(
-          LDNucleus(Z, Z+N, eosInside).GetStaticNucleus().MakeUniquePtr());
+          StaticLDNucleus(Z, Z+N, eosInside).MakeUniquePtr());
       //nucleiStatic.push_back(
       //    StaticLDNucleus(Z, Z+N, eosInside).MakeUniquePtr());
     }

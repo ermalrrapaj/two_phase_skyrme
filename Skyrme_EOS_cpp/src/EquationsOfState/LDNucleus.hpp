@@ -45,8 +45,10 @@ public:
 
 protected:
   
-  std::vector<double> SurfaceEnergy(double v, double nno, double npo, double ne) const;
-  std::vector<double> CoulombEnergy(double v, double nno, double npo, double ne) const;
+  std::vector<double> SurfaceEnergy(double v, double nno, double npo, 
+      double ne) const;
+  std::vector<double> CoulombEnergy(double v, double nno, double npo, 
+      double ne) const;
   
   virtual EOSData GetBulk(double T, double v) const { 
       return mpEos->FromNAndT(EOSData::InputFromTNnNp(T, 
@@ -84,7 +86,6 @@ protected:
   }
   
   EOSData mBulk;
-
 };
 
 #endif // EOS_LDNUCLEUS_HPP_

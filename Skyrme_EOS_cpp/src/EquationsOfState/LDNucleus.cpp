@@ -35,6 +35,7 @@ LDNucleus::LDNucleus(int Z, int A, const EOSBase& eos) : NucleusBase(Z, A),
     
   double n0 = 1.e-10;
   EOSData eosIn = mpEos->FromNAndT(EOSData::InputFromTNbYe(1.e-3/197.3, n0, 0.5));
+  mV0 = -1.0;
   mV0 = LDNucleus::GetVolume(eosIn, n0); 
   
   double vmax = (double) A / 0.5; 
@@ -56,7 +57,6 @@ double LDNucleus::GetVolume(const EOSData& eosIn, double ne) const {
   double Z = (double) NucleusBase::mZ; 
   double N = (double) NucleusBase::mN;
   double T = eosIn.T(); 
-  std::cerr << "Using LDNucleus GetVolume \n"; 
   auto pFunc = [this, ne, T, Z, N, &eosIn](double v) -> double {
     EOSData eosBulk = mpEos->FromNAndT(
         EOSData::InputFromTNnNp(T, N/v, Z/v)); 
@@ -131,16 +131,27 @@ double LDNucleus::FreeEnergy(const EOSData& eosIn, double ne, double ni) const {
 	return FE;	
 }
 
-std::vector<double> LDNucleus::SurfaceEnergy(double v, double /*nno*/, 
-    double /*npo*/, double /*ne*/) const {
+std::vector<double> LDNucleus::SurfaceEnergy(double v, double nno, 
+    double npo, double /*ne*/) const {
+  double A = (double) NucleusBase::mN + (double) NucleusBase::mZ;
   double Es = pow(36.0 * Constants::Pi, 1.0/3.0) * mSigma0 * pow(v, 2.0/3.0);
-  double dEsdv = 2.0/3.0*Es/v;
+  double dEsdv = 2.0/3.0*Es/v; 
+  double dEsdnno = 0.0; 
+  double dEsdnpo = 0.0;
+  
+  if (mV0>0.0) {
+    Es *= pow(nno/A + npo/A - 1.0/v, 2) * mV0 * mV0;
+    dEsdv   += 2.0*Es/(v*v*(nno/A + npo/A - 1.0/v)); 
+    dEsdnno += 2.0*Es/(A*(nno/A + npo/A - 1.0/v)); 
+    dEsdnpo += 2.0*Es/(A*(nno/A + npo/A - 1.0/v));
+    
+  } 
   // First value is surface energy 
   // second is derivative wrt v 
   // second is derivative wrt nno
   // second is derivative wrt npo
   // second is derivative wrt ne
-  return {Es, dEsdv, 0.0, 0.0, 0.0}; 
+  return {Es, dEsdv, dEsdnno, dEsdnpo, 0.0}; 
 }
 
 std::vector<double> LDNucleus::CoulombEnergy(double v, double /*nno*/, 
