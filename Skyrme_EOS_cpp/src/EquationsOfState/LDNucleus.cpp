@@ -174,7 +174,6 @@ double LDNucleus::NucleusPressure (const EOSData& eosIn, double ne, double uo) c
 	auto Ec = CoulombEnergy(v, eosIn.Nn(), eosIn.Np(), ne); 
 	auto Es = SurfaceEnergy(v, eosIn.Nn(), eosIn.Np(), ne);
   uo += 1.e-20;
-  std::cout << Ec[3] << " " << Ec[4] << " " << uo << std::endl;
   return eosIn.T() + eosIn.Np()/uo * (Ec[3] + Es[3]) + eosIn.Nn()/uo * Es[2] 
       + ne * Ec[4];
 }
@@ -192,7 +191,8 @@ double LDNucleus::Entropy (const EOSData& eosIn, double ne, double ni) const {
 	return Stot;
 }
 
-double LDNucleus::Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const {
+double LDNucleus::Nucleusmup (const EOSData& eosIn, double ne, double uo, 
+    double ni) const {
 	double v = GetVolume(eosIn, ne);
 	auto Ec = CoulombEnergy(v, eosIn.Nn(), eosIn.Np(), ne); 
 	auto Es = SurfaceEnergy(v, eosIn.Nn(), eosIn.Np(), ne);

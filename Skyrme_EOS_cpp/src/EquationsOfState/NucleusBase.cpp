@@ -23,8 +23,8 @@ std::vector<double> StaticNucleus::CoulombEnergy(double v, double npo,
   double D = 0.5*u - 1.5*pow(u,1.0/3.0);
   double udDduoD = (0.5*u- 0.5*pow(u,1.0/3.0))/(D + 1.e-40);
   double dludv = 1.0/ (v + 1.e-40) + npo / (Z - v*npo);
-  double dludne = v / (ne- npo+1.e-40);
-  double dludnpo = (u-1.0) / (ne - npo);
+  double dludne = v / (ne - npo + 1.e-40);
+  double dludnpo = (u - 1.0) / (ne - npo + 1.e-40);
   double vn1o3 = pow(v, -1.0/3.0);
   double fac = 3.0 * Constants::ElementaryChargeSquared 
       / (5.0 * pow(3.0 / (4.0 * Constants::Pi), 1.0/3.0));
@@ -51,7 +51,7 @@ double StaticNucleus::Entropy (const EOSData& eosIn, double ne, double ni) const
 
 double StaticNucleus::NucleusPressure (const EOSData& eosIn, double ne, double uo) const{
   auto Ec = CoulombEnergy(GetVolume(eosIn, ne), eosIn.Np(), ne);
-  return eosIn.T() + Ec[3] + eosIn.Np()/uo*Ec[2]; 
+  return eosIn.T() + Ec[3] + eosIn.Np()/(uo+1.e-80)*Ec[2]; 
 }
 
 double StaticNucleus::Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const {

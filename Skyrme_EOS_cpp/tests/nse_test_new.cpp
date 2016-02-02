@@ -71,7 +71,7 @@ int main() {
     std::vector<EOSData> alldata; 
     
     // Find all of the points
-    while (nn0<1.e-12) { 
+    while (nn0<4.e-2) { 
       std::cout << nn0;
       try {
         //NSEProperties nse = 
