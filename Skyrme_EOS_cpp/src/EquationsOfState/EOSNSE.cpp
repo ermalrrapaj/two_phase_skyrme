@@ -117,7 +117,6 @@ std::vector<NSEProperties> EOSNSE::GetExteriorProtonDensity(double ne,
     double nno, double T) {
   
   OneDimensionalRoot rootFinder1D(1.e-8, 100);
-  OneDimensionalMinimization minimize(1.e-12, 1000);
   
   double np_min = 1.e-300;
   double np_max = 1.2*ne;
@@ -149,7 +148,7 @@ std::vector<NSEProperties> EOSNSE::GetExteriorProtonDensity(double ne,
   std::vector<double> extremum(1, 1.e-300);
 
   // The 1.1 seems to be critical, increasing it's value makes things not work 
-  for (double npt = nstart; npt<=np_max; npt*=1.1) {
+  for (double npt = nstart; npt<=np_max; npt*=1.05) {
     ntwo = none;
     two = one;
     none = nzero;
@@ -159,6 +158,7 @@ std::vector<NSEProperties> EOSNSE::GetExteriorProtonDensity(double ne,
     double npmax2 = -1.0;
     
     if (one>=two && one>=zero) {
+      OneDimensionalMinimization minimize(1.e-7, 25);
       npmax2 = exp(minimize(nse_func, log(none), log(ntwo), log(nzero), true));  
       extremum.push_back(npmax2);
       //std::cerr << " Should be local maximum " << ntwo << " " << npmax2 << " " 
@@ -166,6 +166,7 @@ std::vector<NSEProperties> EOSNSE::GetExteriorProtonDensity(double ne,
     }
 
     if (one<=two && one<=zero) {
+      OneDimensionalMinimization minimize(1.e-7, 25);
       npmax2 = exp(minimize(nse_func, log(none), log(ntwo), log(nzero)));  
       extremum.push_back(npmax2);
       //std::cerr << " Should be local minimum " << ntwo << " " << npmax2 << " " 
@@ -173,17 +174,23 @@ std::vector<NSEProperties> EOSNSE::GetExteriorProtonDensity(double ne,
     }
 
     if (npt >= ne) {
+      OneDimensionalMinimization minimize(1.e-7, 25);
       npmax2 = exp(minimize(nse_func, log(none), log(ntwo), log(nzero), true));  
-      if (npmax2>ntwo*(1.0+1.e-7) && npmax2<nzero*(1.0-1.e-7)) {
+      if (npmax2>ntwo*(1.0+1.e-6) && npmax2<nzero*(1.0-1.e-6)) {
         extremum.push_back(npmax2);
-        //std::cerr << " Maybe there is a maxima here " << ntwo << " " << npmax2 << " "; 
       } else {
         npmax2 = -1.0;
       }
     }
   }
-
+  
+  //extremum.push_back(ne); 
   extremum.push_back(np_max);
+  std::sort(extremum.begin(), extremum.end(), 
+    [](double a, double b) {
+      return b>a;
+  });
+
   std::vector<double> npsol;
   std::vector<NSEProperties> output;
   for (int i=0; i<extremum.size()-1; i++) {
@@ -199,38 +206,10 @@ std::vector<NSEProperties> EOSNSE::GetExteriorProtonDensity(double ne,
           nucleiProps.nn + eosOut.Nn()*(1.0 - nucleiProps.uNuc), 
           nucleiProps.np + eosOut.Np()*(1.0 - nucleiProps.uNuc), 
           T, eosOut, nucleiProps.uNuc));
-    } catch (...) {}
+    } catch (...) { std::cout << "Did not find root " << np_low << " " 
+        << np_high << std::endl;}
   } 
   
-   
-  //np_low = exp(minimize(nse_func, log(0.95*ne), log(0.9*ne), log(ne), true));  
-  //np_high = ne; 
-  //while(fabs(nse_func(log(np_high)))>1.e10) np_high *= 0.9;
-  //
-  //while (nse_func(log(np_high))*nse_func(log(np_low))>0.0) {
-  //  np_low = np_high;
-  //  np_high *= 10.0;
-  //}
-  //while (nse_func(log(np_high))*nse_func(log(np_low))>0.0) {
-  //  np_high *=0.99;
-  //}
-  
-  // Find solution in interval
-  //if (nse_func(log(np_high))*nse_func(log(np_low))>0.0) std::cerr 
-  //    << "Expect bad interval." << std::endl;
-  //std::cerr << np_low << " " << np_high << " " << nse_func(log(0.9*ne)) << " " 
-  //<< nse_func(log(np_low)) 
-  //    << " " <<nse_func(log(np_high)) << std::endl;
-  //double npo = exp(rootFinder1D(nse_func, log(np_low), log(np_high)));
-  //std::cerr << np_low << " " << npo << " " << np_high << std::endl;
- 
-  // Set up output  
-  //double npo = npsol.back();
-  //EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, nno, npo));
-  //auto nucleiProps = GetNucleiScalars(eosOut, ne); 
-  //return NSEProperties(nucleiProps[0] + eosOut.Nn()*(1.0 - nucleiProps[2]), 
-  //    nucleiProps[1] + eosOut.Np()*(1.0 - nucleiProps[2]), 
-  //    T, eosOut, nucleiProps[2]);
   return output;
 }
 
@@ -301,9 +280,10 @@ NSEProperties EOSNSE::GetStateNSEprop(const NSEProperties& Prop){
 }
 
 
-void EOSNSE::SeTNSEdata (const std::vector<NSEProperties> & NSEDat) {
+void EOSNSE::SetNSEdata (const std::vector<NSEProperties> & NSEDat) {
 	NSEprop = NSEDat;
 }
+
 std::vector<NSEProperties> EOSNSE::GetNSEdata() {
   return NSEprop;
 }
@@ -322,21 +302,17 @@ EOSNSE::NucleiProperties EOSNSE::GetNucleiScalars(const EOSData& eosOut,
   double np = 0.0;
   double uNuc  = 0.0;
   double vNuc  = 0.0;
-  
-  #pragma omp parallel for 
-  #pragma omp default(shared) 
-  #pragma omp schedule(static) 
-  #pragma omp reduce(+:nn,np,uNuc,vNuc) 
+  const double Pout = eosOut.P();
+  #pragma omp parallel for reduction(+:nn,np,uNuc,vNuc)
   for (int i=0; i<mNuclei.size(); ++i) {
     double v = mNuclei[i]->GetVolume(eosOut, ne);
     double BE = mNuclei[i]->GetBindingEnergy(eosOut, ne, v);
-    double aa = mNuclei[i]->GetN()*mun + mNuclei[i]->GetZ()*mup 
-        + BE - v*eosOut.P(); 
+    double aa = mNuclei[i]->GetN()*mun + mNuclei[i]->GetZ()*mup + BE - v*Pout; 
     double ni = std::min(nQ * pow((double) mNuclei[i]->GetA(), 1.5) 
         * exp(aa/T), 1.e200);
+    
     nn += mNuclei[i]->GetN()*ni;
     np += mNuclei[i]->GetZ()*ni;
-    
     uNuc += v*ni;
     vNuc += v; 
   }
@@ -353,10 +329,8 @@ EOSNSE::NucleiProperties EOSNSE::GetNucleiScalars(const EOSData& eosOut,
     // Currently have to have this second loop because nuclei contributions 
     // to thermodynamic quantities care about u0. May eventually fix how 
     // nucleus class returns EoS quantities
-    #pragma omp parallel for 
-    #pragma omp default(shared) 
-    #pragma omp schedule(static) 
-    #pragma omp reduce(+:Ftot, Stot, Ptot, muntot, muptot, avgEc, avgBe, niTot) 
+    #pragma omp parallel for default(shared) schedule(static) \
+      reduction(+:Ftot, Stot, Ptot, muntot, muptot, avgEc, avgBe, niTot) 
     for (int i=0; i<mNuclei.size(); ++i) {
       double v = mNuclei[i]->GetVolume(eosOut, ne);
       double BE = mNuclei[i]->GetBindingEnergy(eosOut, ne, v);
@@ -364,14 +338,16 @@ EOSNSE::NucleiProperties EOSNSE::GetNucleiScalars(const EOSData& eosOut,
           + BE - v*eosOut.P(); 
       double ni = std::min(nQ * pow((double) mNuclei[i]->GetA(), 1.5) 
           * exp(aa/T), 1.e200);
-      niTot  += ni;
-      Ftot   += ni*mNuclei[i]->FreeEnergy(eosOut, ne, ni);
-      Stot   += ni*mNuclei[i]->Entropy(eosOut, ne, ni);
-	    Ptot   += ni*mNuclei[i]->NucleusPressure(eosOut, ne, u0);
-	    muntot += mNuclei[i]->Nucleusmun(eosOut, ne, u0, ni);
-	    muptot += mNuclei[i]->Nucleusmup(eosOut, ne, u0, ni);
-      avgEc  += mNuclei[i]->GetCoulombEnergy(eosOut, ne); 
-      avgBe  += BE;
+      if (ni > 1.e-200) { // Ignore contributions from nuclei with small abundances
+        Ftot   += ni*mNuclei[i]->FreeEnergy(eosOut, ne, ni);
+        Stot   += ni*mNuclei[i]->Entropy(eosOut, ne, ni);
+	      Ptot   += ni*mNuclei[i]->NucleusPressure(eosOut, ne, u0);
+	      muntot += mNuclei[i]->Nucleusmun(eosOut, ne, u0, ni);
+	      muptot += mNuclei[i]->Nucleusmup(eosOut, ne, u0, ni);
+        avgEc  += mNuclei[i]->GetCoulombEnergy(eosOut, ne); 
+        avgBe  += BE;
+        niTot  += ni;
+      }
     }
     avgEc /= niTot + 1.e-80;
     avgBe /= niTot + 1.e-80;

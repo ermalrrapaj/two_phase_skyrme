@@ -132,7 +132,7 @@ public:
   double GetMinimumT() const {return mTMin;}
   double GetMaximumT() const {return 200.0/Constants::HBCFmMeV;}
   
-  void SeTNSEdata (const std::vector<NSEProperties> & NSEDat);
+  void SetNSEdata (const std::vector<NSEProperties> & NSEDat);
   std::vector<NSEProperties> GetNSEdata();
   
   std::unique_ptr<EOSBase> MakeUniquePtr() const {
