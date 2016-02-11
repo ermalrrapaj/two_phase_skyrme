@@ -24,6 +24,7 @@ public:
       mTol(tol), mMaxIter(maxIter) {
     T = gsl_root_fsolver_brent; 
     s = gsl_root_fsolver_alloc(T); 
+    gsl_set_error_handler_off();
   } 
   
   ~OneDimensionalRoot() { gsl_root_fsolver_free(s);}
@@ -45,7 +46,6 @@ public:
     }
     
     
-    gsl_set_error_handler_off();
     
     // Similar to stack overflow 13289311 via Jonas 
     gsl_function F; 

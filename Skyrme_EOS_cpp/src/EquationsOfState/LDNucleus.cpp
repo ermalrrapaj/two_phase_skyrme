@@ -37,6 +37,8 @@ LDNucleus::LDNucleus(int Z, int A, const EOSBase& eos) : NucleusBase(Z, A),
   EOSData eosIn = mpEos->FromNAndT(EOSData::InputFromTNbYe(1.e-3/197.3, n0, 0.5));
   mV0 = -1.0;
   mV0 = LDNucleus::GetVolume(eosIn, n0); 
+  //std::cout << Z << " " << A << " " << (double)A/mV0 << " " 
+  //    << 197.3*GetBindingEnergy(eosIn, 1.e-6, mV0)/((double) A) <<std::endl; 
   
   double vmax = (double) A / 0.5; 
   double v = (double) A / 1.e-4;
@@ -46,7 +48,6 @@ LDNucleus::LDNucleus(int Z, int A, const EOSBase& eos) : NucleusBase(Z, A),
     double Pb = eosBulk.P();
     double Ps = -SurfaceEnergy(v, 0.0, 0.0, 0.0)[1];
     double Pc = -CoulombEnergy(v, 0.0, 0.0, 0.0)[1];
-    std::cout << A-Z << " " << v << " " << Pb << " " << Ps << " " << Pc << std::endl;
     PvsV.push_back(std::pair<double, double>(Pb+Ps+Pc, v)); 
     v /= 1.3;
   } 
@@ -116,9 +117,13 @@ double LDNucleus::GetBindingEnergy(const EOSData& eosIn,
   double T = eosIn.T(); 
    
   EOSData eosBulk = GetBulk(T, v); 
-  return -(eosBulk.E() - eosBulk.T()*eosBulk.S()) * A 
-         - SurfaceEnergy(v, eosIn.Nn(), eosIn.Np(), ne)[0] 
-         - CoulombEnergy(v, eosIn.Nn(), eosIn.Nn(), ne)[0];
+  double BEb = -(eosBulk.E() - eosBulk.T()*eosBulk.S()) * A;
+  double BEs = - SurfaceEnergy(v, eosIn.Nn(), eosIn.Np(), ne)[0];
+  double BEc = - CoulombEnergy(v, eosIn.Nn(), eosIn.Np(), ne)[0];
+  double BE = BEb + BEs + BEc;
+  if (BE!=BE) std::cout << "Bad binding energy " 
+      << BEb << " " << BEc << " " << BEs << std::endl;
+  return BE;
 }
 
 double LDNucleus::FreeEnergy(const EOSData& eosIn, double ne, double ni) const {
@@ -126,8 +131,8 @@ double LDNucleus::FreeEnergy(const EOSData& eosIn, double ne, double ni) const {
 	double A = (double) NucleusBase::mA;
 	double BE = GetBindingEnergy(eosIn,ne);
 	double nQ = pow(MNUC*T/2/Constants::Pi,1.5); 
-	double Fk = T*log(ni/nQ/pow(A,1.5))-T;
-	double FE= Fk-BE;
+	double Fk = T*log(ni/nQ/pow(A,1.5)) - T;
+	double FE= Fk - BE;
 	return FE;	
 }
 
@@ -157,7 +162,7 @@ std::vector<double> LDNucleus::SurfaceEnergy(double v, double nno,
 std::vector<double> LDNucleus::CoulombEnergy(double v, double /*nno*/, 
     double npo, double ne) const {
   double Z = (double) NucleusBase::mZ; 
-  double u = v*(ne - npo) / (Z - v*npo);
+  double u = std::max(v*(ne - npo) / (Z - v*npo), 0.0);
   double D = 1.0 + 0.5*u - 1.5*pow(u,1.0/3.0); // Note the extra 1.0
   double udDduoD = (0.5*u - 0.5*pow(u,1.0/3.0))/(D + 1.e-40);
   double dludv   = 1.0 / (v + 1.e-40) + npo / (Z - v*npo);

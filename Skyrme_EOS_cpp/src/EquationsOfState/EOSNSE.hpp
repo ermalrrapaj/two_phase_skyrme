@@ -74,6 +74,11 @@ public:
       nnTot(nnTot), npTot(npTot), T(T), unuc(unuc), avgEc(avgEc), avgBe(avgBe),
       avgPv(avgPv), eosExterior(eosExterior), E(E), S(S), F(F), P(P),
       mun(mun), mup(mup) {}
+  
+  NSEProperties(const EOSData& eosIn) : nnTot(eosIn.Nn()), npTot(eosIn.Np()),
+      T(eosIn.T()), mun(eosIn.Mun()), mup(eosIn.Mup()), unuc(0.0), avgEc(0.0),
+      avgBe(0.0), avgPv(0.0), E(eosIn.E()), S(eosIn.S()), P(eosIn.P()), 
+      F(eosIn.E()-eosIn.T()*eosIn.S()), eosExterior(eosIn){}
 
   double nnTot, npTot, T, mun, mup;
   double unuc, avgEc, avgBe, avgPv, E, S, P, F; 
@@ -125,10 +130,13 @@ public:
   NSEProperties GetStateNSEprop(const NSEProperties& Prop);
   
   std::vector<double> GetExteriorDensities(const EOSData& eosIn);
+  NSEProperties GetExteriorDensities(const EOSData& eosIn, 
+      const EOSData& extGuess);
+  std::vector<NSEProperties> GetExteriorProtonDensity(double ne, 
+      double nno, double T);
   NSEProperties GetTotalDensities(const EOSData& eosIn);
-  std::vector<NSEProperties> GetExteriorProtonDensity(double ne, double nno, double T);
-  NSEProperties GetExteriorNeutronDensity(double ne, double npo, double T);
-  
+  NSEProperties GetTotalDensities(const EOSData& eosIn, double ne); 
+    
   double GetMinimumT() const {return mTMin;}
   double GetMaximumT() const {return 200.0/Constants::HBCFmMeV;}
   

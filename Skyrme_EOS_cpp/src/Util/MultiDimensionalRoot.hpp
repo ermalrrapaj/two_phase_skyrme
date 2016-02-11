@@ -78,9 +78,9 @@ public:
       gsl_vector_set(x, i, xg[i]); 
     }
 
-    const gsl_multiroot_fsolver_type *T = gsl_multiroot_fsolver_hybrids; 
+    //const gsl_multiroot_fsolver_type *T = gsl_multiroot_fsolver_hybrids; 
     //const gsl_multiroot_fsolver_type *T = gsl_multiroot_fsolver_hybrid; 
-    //const gsl_multiroot_fsolver_type *T = gsl_multiroot_fsolver_dnewton; 
+    const gsl_multiroot_fsolver_type *T = gsl_multiroot_fsolver_dnewton; 
     gsl_multiroot_fsolver *s = gsl_multiroot_fsolver_alloc(T, nFunc);
     int status = gsl_multiroot_fsolver_set(s, &F, x);
      

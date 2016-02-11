@@ -24,6 +24,46 @@ EOSData EOSNSE::FromNAndT(const EOSData& eosIn) {
   return EOSData(); 
 }
 
+NSEProperties EOSNSE::GetExteriorDensities(const EOSData& eosIn, 
+    const EOSData& extGuess) {
+  double T = extGuess.T();
+  double T0 = eosIn.T();
+  auto nse_funcs = [&T,eosIn,this](std::vector<double> xx)->std::vector<double> {
+    std::vector<double> yy(2, 0.0);
+    EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, 
+        exp(xx[0]), exp(xx[1])));
+    auto nucleiProps = GetNucleiScalars(eosOut, eosIn.Np()); 
+     
+    yy[0] = (1.0 - nucleiProps.uNuc)*eosOut.Nn() + nucleiProps.nn; 
+    yy[1] = (1.0 - nucleiProps.uNuc)*eosOut.Np() + nucleiProps.np; 
+    yy[0] = yy[0]/eosIn.Nn() - 1.0;
+    yy[1] = yy[1]/eosIn.Np() - 1.0;
+    return yy;
+  };
+  
+  MultiDimensionalRoot rootFinder = MultiDimensionalRoot(1.e-6, 1000);
+  std::vector<double> in = {log(extGuess.Nn()), log(extGuess.Np())};
+  std::vector<double> res;
+  if (T0 < T) {
+    for (; T>T0; T *=0.999) 
+      in = rootFinder(nse_funcs, in, 2);
+  }
+  if (T0 > T) {
+    for (; T<T0; T *=1.001)
+      in = rootFinder(nse_funcs, in, 2);
+  }
+  T = T0;
+  res = rootFinder(nse_funcs, in, 2);
+  EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, 
+        exp(res[0]), exp(res[1])));
+  auto nucleiProps = GetNucleiScalars(eosOut, eosIn.Np());
+   
+  return GetStateNSEprop(NSEProperties(
+          nucleiProps.nn + eosOut.Nn()*(1.0 - nucleiProps.uNuc), 
+          nucleiProps.np + eosOut.Np()*(1.0 - nucleiProps.uNuc), 
+          T, eosOut, nucleiProps.uNuc));
+}
+
 std::vector<double> EOSNSE::GetExteriorDensities(const EOSData& eosIn) {
 
   double T = eosIn.T();
@@ -74,44 +114,6 @@ std::vector<double> EOSNSE::GetExteriorDensities(const EOSData& eosIn) {
   return dens;
 }
 
-NSEProperties EOSNSE::GetExteriorNeutronDensity(double ne, double npo, 
-    double T) {
-  
-  OneDimensionalRoot rootFinder1D(1.e-8, 100);
-  
-  double nn_low = 1.e-10;
-  double nn_high = 2.0;
-  
-  // Find a good interval 
-  auto nse_func = [npo, ne, T, this](double xx)->double{
-    double nno = exp(xx);
-    EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, nno, npo));
-    auto nucleiProps = GetNucleiScalars(eosOut, ne); 
-    double yy = 1.0 - (nucleiProps.np + (1.0 - nucleiProps.uNuc)*npo)/ne;
-    std::cerr << nno << " " << " " << nucleiProps.np << " " << eosOut.Mun() 
-        << " " << eosOut.Mup() << " " << yy << std::endl;
-    return yy;
-  };
-
-  //while(fabs(nse_func(log(nn_high)))>1.e10) nn_high *= 0.9;
-  
-  //while (nse_func(log(nn_high))*nse_func(log(nn_low))>0.0) {
-  //  nn_low = nn_high;
-  //  nn_high *= 10.0;
-  //}
-  while (nse_func(log(nn_high))*nse_func(log(nn_low))>0.0) {
-    nn_high *=0.99;
-  }
-  
-  double nno = exp(rootFinder1D(nse_func, log(nn_low), log(nn_high)));
- 
-  // Set up output  
-  EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, nno, npo));
-  auto nucleiProps = GetNucleiScalars(eosOut, ne); 
-  return NSEProperties(nucleiProps.nn + eosOut.Nn()*(1.0 - nucleiProps.uNuc), 
-      nucleiProps.np + eosOut.Np()*(1.0 - nucleiProps.uNuc), 
-      T, eosOut, nucleiProps.uNuc);
-}
 
 std::vector<NSEProperties> EOSNSE::GetExteriorProtonDensity(double ne, 
     double nno, double T) {
@@ -199,6 +201,10 @@ std::vector<NSEProperties> EOSNSE::GetExteriorProtonDensity(double ne,
     if (nse_func(log(np_high))*nse_func(log(np_low))>0.0) continue;
     try { 
       double npo = exp(rootFinder1D(nse_func, log(np_low), log(np_high)));
+      // Make sure we don't have two solutions that are the same
+      //for (auto npt : npsol) {
+      //  if (fabs(npo/npt - 1.0)<1.e-2) continue;
+      //}
       npsol.push_back(npo);
       EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, nno, npo));
       auto nucleiProps = GetNucleiScalars(eosOut, ne); 
@@ -213,6 +219,12 @@ std::vector<NSEProperties> EOSNSE::GetExteriorProtonDensity(double ne,
   return output;
 }
 
+NSEProperties EOSNSE::GetTotalDensities(const EOSData& eosOut, double ne) {
+  NucleiProperties nucleiProps = GetNucleiScalars(eosOut, ne);
+  return NSEProperties(nucleiProps.nn + eosOut.Nn()*(1.0 - nucleiProps.uNuc), 
+    nucleiProps.np + eosOut.Np()*(1.0 - nucleiProps.uNuc), eosOut.T(), eosOut, 
+    nucleiProps.uNuc);
+}
 
 // find the total electron number density from the exterior
 // proton and neutron number densities 
