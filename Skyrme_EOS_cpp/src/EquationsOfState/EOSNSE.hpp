@@ -97,12 +97,7 @@ public:
 class EOSNSE : public EOSBase {
 public:
   EOSNSE(const std::vector<std::unique_ptr<NucleusBase>>& nuclei,
-      const EOSBase& eos) : 
-      mTMin(0.1/Constants::HBCFmMeV), 
-      mpEos(eos.MakeUniquePtr()) { 
-    for (auto& nuc : nuclei) 
-      mNuclei.push_back(nuc->MakeUniquePtr());
-  }
+      const EOSBase& eos, bool buildGuessArray = false); 
   
   EOSNSE(const EOSNSE& other); 
    
@@ -127,6 +122,7 @@ public:
   EOSData FromNAndT(const EOSData& eosIn);
   
   EOSData GetState(const NSEProperties& Prop);
+
   NSEProperties GetStateNSEprop(const NSEProperties& Prop);
   
   std::vector<double> GetExteriorDensities(const EOSData& eosIn);
@@ -146,7 +142,14 @@ public:
   std::unique_ptr<EOSBase> MakeUniquePtr() const {
     return std::unique_ptr<EOSBase>(new EOSNSE(*this));
   }  
-	
+
+  // Functions for finding guesses initial
+  bool KeepPointBasedOnF(NSEProperties pt);
+  std::vector<NSEProperties> GetAllPoints(double npo, double T, double nniMin, 
+      double nniMax);
+  std::vector<NSEProperties> GetValidPoints(double npo, double T, double nniMin, 
+      double nniMax);
+
   /// Allows for easy serialization of the class so the phase boundary can 
   /// easily be read from file.  
   friend class boost::serialization::access; 
@@ -163,9 +166,11 @@ private:
   template <bool getEosContributions = false>  
   NucleiProperties GetNucleiScalars(const EOSData& eosOut, double ne);
   
-  std::vector<std::unique_ptr<NucleusBase>> mNuclei; 
   double mTMin;
   std::vector<NSEProperties> NSEprop;
+  std::vector<std::vector<NSEProperties>> nseGuesses;
+  
+  std::vector<std::unique_ptr<NucleusBase>> mNuclei; 
   std::shared_ptr<EOSBase> mpEos;
   
 };

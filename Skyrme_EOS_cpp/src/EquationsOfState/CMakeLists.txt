@@ -8,6 +8,7 @@ set(eos_files
   NucleusBase.cpp
   LDNucleus.cpp
   EOSNSE.cpp
+  EOSNSE_constructors.cpp
   EOSElectron.cpp
 )
 add_library(eos ${eos_files})

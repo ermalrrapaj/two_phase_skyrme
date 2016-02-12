@@ -13,13 +13,6 @@
 #include "Util/OneDimensionalMinimization.hpp"
 #include "Util/MultiDimensionalRoot.hpp" 
 
-EOSNSE::EOSNSE(const EOSNSE& other) : 
-    EOSNSE(std::vector<std::unique_ptr<NucleusBase>>(), *other.mpEos) {
-  for (auto& nuc : other.mNuclei) {
-    mNuclei.push_back(nuc->MakeUniquePtr());
-  } 
-}
-
 EOSData EOSNSE::FromNAndT(const EOSData& eosIn) {
   return EOSData(); 
 }
@@ -44,6 +37,9 @@ NSEProperties EOSNSE::GetExteriorDensities(const EOSData& eosIn,
   MultiDimensionalRoot rootFinder = MultiDimensionalRoot(1.e-6, 1000);
   std::vector<double> in = {log(extGuess.Nn()), log(extGuess.Np())};
   std::vector<double> res;
+  
+  // Search in temperature if the guess temperature is different from 
+  // the desired temperature
   if (T0 < T) {
     for (; T>T0; T *=0.999) 
       in = rootFinder(nse_funcs, in, 2);
@@ -52,8 +48,12 @@ NSEProperties EOSNSE::GetExteriorDensities(const EOSData& eosIn,
     for (; T<T0; T *=1.001)
       in = rootFinder(nse_funcs, in, 2);
   }
+
+  // Now find the solution at the actual temperature
   T = T0;
   res = rootFinder(nse_funcs, in, 2);
+
+  // Find the nuclear properties and return the thermodynamic state
   EOSData eosOut = mpEos->FromNAndT(EOSData::InputFromTNnNp(T, 
         exp(res[0]), exp(res[1])));
   auto nucleiProps = GetNucleiScalars(eosOut, eosIn.Np());
