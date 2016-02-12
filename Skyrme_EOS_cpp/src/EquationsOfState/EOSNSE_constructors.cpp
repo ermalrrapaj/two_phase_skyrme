@@ -14,12 +14,15 @@
 #include "Util/MultiDimensionalRoot.hpp" 
 
 EOSNSE::EOSNSE(const std::vector<std::unique_ptr<NucleusBase>>& nuclei,
-    const EOSBase& eos, bool buildGuessArray) : mTMin(0.1/Constants::HBCFmMeV), 
-    mpEos(eos.MakeUniquePtr()) { 
+    const EOSBase& eos, bool buildGuessArray, double npomin, double npomax, 
+    double nniMin, double nniMax, double T0) 
+    : mTMin(0.1/Constants::HBCFmMeV), mpEos(eos.MakeUniquePtr()) { 
   for (auto& nuc : nuclei) 
     mNuclei.push_back(nuc->MakeUniquePtr());
   if (buildGuessArray) {
-    // Do iteration stuff here
+    for (double npo = npomin; npo<=npomax; npo *= 1.5) {
+      nseGuesses.push_back(GetValidPoints(npo, T0, nniMin, nniMax));  
+    }
   }
 }
 
@@ -27,7 +30,9 @@ EOSNSE::EOSNSE(const EOSNSE& other) :
     EOSNSE(std::vector<std::unique_ptr<NucleusBase>>(), *other.mpEos) {
   for (auto& nuc : other.mNuclei) {
     mNuclei.push_back(nuc->MakeUniquePtr());
-  } 
+  }
+  nseGuesses = other.nseGuesses;
+  mTMin = other.mTMin; 
 }
 
 std::vector<NSEProperties> EOSNSE::GetAllPoints(double npo, double T, 

@@ -97,7 +97,9 @@ public:
 class EOSNSE : public EOSBase {
 public:
   EOSNSE(const std::vector<std::unique_ptr<NucleusBase>>& nuclei,
-      const EOSBase& eos, bool buildGuessArray = false); 
+      const EOSBase& eos, bool buildGuessArray = false, double npomin = 1.e-4, 
+      double npomax = 1.e-1, double T0 = 1.0/Constants::HBCFmMeV,
+      double nniMin = 1.e-14, double nniMax = 1.0); 
   
   EOSNSE(const EOSNSE& other); 
    

@@ -106,12 +106,12 @@ int main() {
           std::cout << std::endl;
           continue;
         }
-        lb = lb - 1; 
+        
         std::cout << lb->eosExterior.Nn() << " " << lb->nnTot << std::endl;
         try {
-        auto gp = nseEos.GetExteriorDensities(
-            EOSData::InputFromTNnNp(TT, nnt, np0), lb->eosExterior);
-        uniGrid.push_back(gp); 
+          auto gp = nseEos.GetExteriorDensities(
+              EOSData::InputFromTNnNp(TT, nnt, np0), lb->eosExterior);
+          uniGrid.push_back(gp); 
         } catch (...) { 
           std::cout << "Failed at nnt = " << nnt << " " << TT << std::endl;
         }
