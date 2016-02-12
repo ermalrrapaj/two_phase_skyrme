@@ -14,6 +14,16 @@
 #include "EquationsOfState/NucleusBase.hpp" 
 #include "Util/Constants.hpp"
 
+#include <boost/archive/text_iarchive.hpp> 
+#include <boost/archive/text_oarchive.hpp> 
+#include <boost/archive/binary_iarchive.hpp> 
+#include <boost/archive/binary_oarchive.hpp> 
+
+#include <boost/serialization/base_object.hpp> 
+#include <boost/serialization/utility.hpp> 
+#include <boost/serialization/list.hpp> 
+#include <boost/serialization/assume_abstract.hpp> 
+
 /// 
 /// For a reaction $i \leftrightarrow j + k$, it is easy to show that the principle
 /// of detailed balance implies that
@@ -57,25 +67,37 @@
 
 class NSEProperties { 
 public:
-  NSEProperties(double nnTot, double npTot, double T, EOSData eosExterior,
-      double unuc = 0.0, double avgEc = 0.0, double avgBe = 0.0, 
-      double avgPv = 0.0) :
+  NSEProperties(double nnTot=0.0, double npTot=0.0, double T=0.0, 
+      EOSData eosExterior = EOSData(), double unuc = 0.0, double avgEc = 0.0, 
+      double avgBe = 0.0, double avgPv = 0.0, double E = 0.0, double S = 0.0, 
+      double F = 0.0, double P = 0.0, double mun =0.0, double mup = 0.0) :
       nnTot(nnTot), npTot(npTot), T(T), unuc(unuc), avgEc(avgEc), avgBe(avgBe),
-      avgPv(avgPv), eosExterior(eosExterior) {}
-  double nnTot, npTot, T;
-  double unuc, avgEc, avgBe, avgPv; 
-  EOSData eosExterior;
+      avgPv(avgPv), eosExterior(eosExterior), E(E), S(S), F(F), P(P),
+      mun(mun), mup(mup) {}
+  
+  NSEProperties(const EOSData& eosIn) : nnTot(eosIn.Nn()), npTot(eosIn.Np()),
+      T(eosIn.T()), mun(eosIn.Mun()), mup(eosIn.Mup()), unuc(0.0), avgEc(0.0),
+      avgBe(0.0), avgPv(0.0), E(eosIn.E()), S(eosIn.S()), P(eosIn.P()), 
+      F(eosIn.E()-eosIn.T()*eosIn.S()), eosExterior(eosIn){}
+
+  double nnTot, npTot, T, mun, mup;
+  double unuc, avgEc, avgBe, avgPv, E, S, P, F; 
+  EOSData eosExterior; 
+  
+  /// 
+  friend class boost::serialization::access; 
+  template<class Archive> 
+  void serialize(Archive & ar, const unsigned int /* File Version */) {
+    ar & nnTot & npTot & T & mun & mup & unuc & avgEc & avgBe & avgPv & E
+    & S & P & F & eosExterior;
+  }
+
 }; 
 
 class EOSNSE : public EOSBase {
 public:
   EOSNSE(const std::vector<std::unique_ptr<NucleusBase>>& nuclei,
-      const EOSBase& eos) : 
-      mTMin(0.1/Constants::HBCFmMeV), 
-      mpEos(eos.MakeUniquePtr()) { 
-    for (auto& nuc : nuclei) 
-      mNuclei.push_back(nuc->MakeUniquePtr());
-  }
+      const EOSBase& eos, bool buildGuessArray = false); 
   
   EOSNSE(const EOSNSE& other); 
    
@@ -99,25 +121,58 @@ public:
   
   EOSData FromNAndT(const EOSData& eosIn);
   
-  std::vector<double> GetExteriorDensities(const EOSData& eosIn);
-  NSEProperties GetTotalDensities(const EOSData& eosIn);
-  NSEProperties GetExteriorProtonDensity(double ne, double nno, double T);
-  NSEProperties GetExteriorNeutronDensity(double ne, double npo, double T);
+  EOSData GetState(const NSEProperties& Prop);
+
+  NSEProperties GetStateNSEprop(const NSEProperties& Prop);
   
+  std::vector<double> GetExteriorDensities(const EOSData& eosIn);
+  NSEProperties GetExteriorDensities(const EOSData& eosIn, 
+      const EOSData& extGuess);
+  std::vector<NSEProperties> GetExteriorProtonDensity(double ne, 
+      double nno, double T);
+  NSEProperties GetTotalDensities(const EOSData& eosIn);
+  NSEProperties GetTotalDensities(const EOSData& eosIn, double ne); 
+    
   double GetMinimumT() const {return mTMin;}
   double GetMaximumT() const {return 200.0/Constants::HBCFmMeV;}
-
+  
+  void SetNSEdata (const std::vector<NSEProperties> & NSEDat);
+  std::vector<NSEProperties> GetNSEdata();
+  
   std::unique_ptr<EOSBase> MakeUniquePtr() const {
     return std::unique_ptr<EOSBase>(new EOSNSE(*this));
   }  
 
+  // Functions for finding guesses initial
+  bool KeepPointBasedOnF(NSEProperties pt);
+  std::vector<NSEProperties> GetAllPoints(double npo, double T, double nniMin, 
+      double nniMax);
+  std::vector<NSEProperties> GetValidPoints(double npo, double T, double nniMin, 
+      double nniMax);
+
+  /// Allows for easy serialization of the class so the phase boundary can 
+  /// easily be read from file.  
+  friend class boost::serialization::access; 
+  template<class Archive> 
+  void serialize(Archive & ar, const unsigned int /* File Version */) {
+    ar & mTMin & NSEprop;
+  }
+  
 private: 
-  std::vector<std::unique_ptr<NucleusBase>> mNuclei; 
+  struct NucleiProperties { 
+    double nn, np, uNuc, vNuc, F, S, P, mun, mup, avgEc, avgBe, avgP;
+  };
+
+  template <bool getEosContributions = false>  
+  NucleiProperties GetNucleiScalars(const EOSData& eosOut, double ne);
+  
   double mTMin;
-  std::shared_ptr<EOSBase> mpEos; 
-
-  std::array<double, 4> GetNucleiScalars(const EOSData& eosOut, double ne);
-
+  std::vector<NSEProperties> NSEprop;
+  std::vector<std::vector<NSEProperties>> nseGuesses;
+  
+  std::vector<std::unique_ptr<NucleusBase>> mNuclei; 
+  std::shared_ptr<EOSBase> mpEos;
+  
 };
 
-#endif // EOS_EOSSKYRME_HPP_
+#endif // EOS_EOSNSE_HPP_

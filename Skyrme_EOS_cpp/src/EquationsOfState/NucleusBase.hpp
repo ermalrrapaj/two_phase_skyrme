@@ -24,19 +24,29 @@ public:
   virtual double GetBindingEnergy(const EOSData& eosIn, double ne, 
       double v) const =0; 
   virtual double GetVolume(const EOSData& eosIn, double ne) const =0; 
+  
   virtual std::unique_ptr<NucleusBase> MakeUniquePtr() const =0;
    
   double GetN() const {return (double) mN;} 
   double GetZ() const {return (double) mZ;} 
   double GetA() const {return (double) mA;} 
     
-  virtual double CoulombPressure(double v, double npo, double ne) const { 
-      return 0.0;
+  virtual double GetCoulombEnergy(const EOSData& /*eosIn*/, double /*ne*/) const {
+    return 0.0; 
   }
-  virtual double CoulombPressureExternal(double v, double npo, double ne) const;
-  virtual double CoulombEnergy(double v, double npo, double ne) const;
+   
+  virtual double GetSurfaceEnergy(const EOSData& /*eosIn*/, double /*ne*/) const {
+    return 0.0; 
+  }
+   
+  virtual double FreeEnergy(const EOSData& eosIn, double ne, double ni) const=0;
+  virtual double Entropy(const EOSData& eosIn, double ne, double ni) const=0;
+  virtual double NucleusPressure (const EOSData& eosIn, double ne, double uo) const=0;
+  virtual double Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const=0;
+  virtual double Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const=0;
 
 protected:
+  
   int mZ, mN, mA;
 
 }; 
@@ -49,53 +59,35 @@ public:
 
   /// \todo Still need to include partition function in binding energy
   double GetBindingEnergy(const EOSData& eosExt, double ne) const { 
-    return mBE - CoulombEnergy(mV, 0.0, ne);
+    return mBE - CoulombEnergy(mV, eosExt.Np(), ne)[0];
   }
   
   double GetBindingEnergy(const EOSData& eosIn, double ne, double /*v*/) const { 
     return GetBindingEnergy(eosIn, ne);
   }
-
+	
   double GetVolume(const EOSData& /*eosIn*/, double /*ne*/) const {return mV;}
   
+  virtual double GetCoulombEnergy(const EOSData& eosIn, double ne) const {
+    return CoulombEnergy(mV, eosIn.Np(), ne)[0]; 
+  }
+  
+  double FreeEnergy(const EOSData& eosIn, double ne, double ni) const;
+  double Entropy(const EOSData& eosIn, double ne, double ni) const;
+  double NucleusPressure (const EOSData& eosIn, double ne, double uo) const;
+  double Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const;
+  double Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const;
+   
   std::unique_ptr<NucleusBase> MakeUniquePtr() const { 
     return std::unique_ptr<NucleusBase>(new StaticNucleus(*this));
   }
-   
+  
 protected: 
   double mBE, mV;
   std::vector<double> mTg, mPFg;
 
+  std::vector<double> CoulombEnergy(double v, double npo, double ne) const;
+
 }; 
-
-class LDNucleus : public NucleusBase { 
-public:
-  
-  LDNucleus(int Z, int A, const EOSBase& eos) : NucleusBase(Z, A), 
-      mpEos(eos.MakeUniquePtr()),
-      mSigma0(1.15/Constants::HBCFmMeV),
-      mSs0(45.8/Constants::HBCFmMeV) {} 
-  
-  StaticNucleus GetStaticNucleus() const;
-
-  double GetVolume(const EOSData& eosIn, double ne) const;
-  double GetBindingEnergy(const EOSData& eosIn, double ne) const;
-  double GetBindingEnergy(const EOSData& eosIn, double ne, double v) const;
-
-  std::unique_ptr<NucleusBase> MakeUniquePtr() const { 
-    return std::unique_ptr<NucleusBase>(new LDNucleus(GetZ(), 
-      GetA(), *mpEos));
-  }
-
-protected:
-  double SurfacePressure(double v) const;
-  double SurfaceEnergy(double v) const;
-  double CoulombPressure(double v, double npo, double ne) const;
-  double CoulombEnergy(double v, double npo, double ne) const;
-  std::unique_ptr<EOSBase> mpEos;
-  double mSs0; 
-  double mSigma0; 
-
-};
 
 #endif // EOS_NUCLEUSBASE_HPP_

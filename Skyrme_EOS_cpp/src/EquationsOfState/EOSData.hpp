@@ -131,7 +131,7 @@ public:
   /// from EOSBase calls.
   static EOSData Output(const double T, const double nn, const double np, 
       const double mun, const double mup,  
-      const double pp = STDNAN, const double ss = STDNAN, const double ee = STDNAN,
+      const double pp, const double ss, const double ee,
       const double dpdnn=STDNAN, const double dpdnp=STDNAN, const double dpdt=STDNAN,
       const double dmundnn=STDNAN, const double dmundnp=STDNAN, const double dmundt=STDNAN,
       const double dmupdnn=STDNAN, const double dmupdnp=STDNAN, const double dmupdt=STDNAN,
