@@ -36,7 +36,7 @@ std::vector<NSEProperties> EOSNSE::GetAllPoints(double npo, double T,
   double nn0 = nniMin;
   double delta = 0.01;
   double deltaMin = 1.e-2; 
-  double deltaMax = 1.e-1;
+  double deltaMax = 5.e-2;
   double nno = nn0;
   while (nn0<=nniMax) {
     try {
@@ -53,13 +53,14 @@ std::vector<NSEProperties> EOSNSE::GetAllPoints(double npo, double T,
             nn0 /= 1.0 + delta; 
             delta *= 0.5;
           } else { 
-            if (fabs(nnt/nno - 1.0)<0.01) delta /= 0.5;
+            if (fabs(nnt/nno - 1.0)<0.01 && delta<deltaMax) delta /= 0.5;
             nno = nnt;
           }
       }
     } catch(...) {}
     nn0 *= 1.0 + delta; 
   }
+  return allPts;
 }
 
 bool EOSNSE::KeepPointBasedOnF(NSEProperties pt) {

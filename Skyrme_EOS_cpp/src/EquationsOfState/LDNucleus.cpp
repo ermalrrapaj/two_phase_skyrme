@@ -121,9 +121,9 @@ double LDNucleus::GetBindingEnergy(const EOSData& eosIn,
   double BEs = - SurfaceEnergy(v, eosIn.Nn(), eosIn.Np(), ne)[0];
   double BEc = - CoulombEnergy(v, eosIn.Nn(), eosIn.Np(), ne)[0];
   double BE = BEb + BEs + BEc;
-  if (BE!=BE) std::cout << "Bad binding energy " 
-      << BEb << " " << BEc << " " << BEs << " " << eosIn.Nn() << " " 
-      << eosIn.Np() << " " << ne << std::endl;
+  //if (BE!=BE) std::cout << "Bad binding energy " 
+  //    << BEb << " " << BEc << " " << BEs << " " << eosIn.Nn() << " " 
+  //    << eosIn.Np() << " " << ne << std::endl;
   return BE;
 }
 

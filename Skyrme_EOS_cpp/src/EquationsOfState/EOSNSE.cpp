@@ -41,12 +41,28 @@ NSEProperties EOSNSE::GetExteriorDensities(const EOSData& eosIn,
   // Search in temperature if the guess temperature is different from 
   // the desired temperature
   if (T0 < T) {
-    for (; T>T0; T *=0.999) 
-      in = rootFinder(nse_funcs, in, 2);
+    double fac = 0.99;
+    for (; T>T0; T *=fac)
+      try { 
+        in = rootFinder(nse_funcs, in, 2);
+      } catch(MultiDRootException& e) {
+        T /= fac;
+        fac = 1.0 - (1.0 - fac)*0.8;
+        if (1.0 - fac < 1.e-5) throw e; 
+      }
   }
+
   if (T0 > T) {
-    for (; T<T0; T *=1.001)
-      in = rootFinder(nse_funcs, in, 2);
+    double fac = 1.01;
+    for (; T<T0; T *=fac) {
+      try {
+        in = rootFinder(nse_funcs, in, 2);
+      } catch(MultiDRootException& e) {
+        T /= fac;
+        fac = 1.0 + (fac - 1.0)*0.8;
+        if (fac - 1.0 < 1.e-5) throw e; 
+      }
+    }
   }
 
   // Now find the solution at the actual temperature
@@ -65,7 +81,7 @@ NSEProperties EOSNSE::GetExteriorDensities(const EOSData& eosIn,
 }
 
 std::vector<double> EOSNSE::GetExteriorDensities(const EOSData& eosIn) {
-
+  
   double T = eosIn.T();
   double nQ = pow(Constants::NeutronMassInFm * T / (2.0 * Constants::Pi), 1.5);
   auto nse_funcs = [&](std::vector<double> xx)->std::vector<double> {
@@ -289,15 +305,6 @@ NSEProperties EOSNSE::GetStateNSEprop(const NSEProperties& Prop){
   double avgPv = nucTherm.avgP;
   return NSEProperties(nn, np, T, Prop.eosExterior, uNuc, avgEc, avgBe, avgPv, 
       Etot, Stot, Ftot, Ptot, muntot, muptot);
-}
-
-
-void EOSNSE::SetNSEdata (const std::vector<NSEProperties> & NSEDat) {
-	NSEprop = NSEDat;
-}
-
-std::vector<NSEProperties> EOSNSE::GetNSEdata() {
-  return NSEprop;
 }
 
 // Calculate the number densities and other properties of the nuclear 

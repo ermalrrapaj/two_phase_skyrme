@@ -136,9 +136,6 @@ public:
   double GetMinimumT() const {return mTMin;}
   double GetMaximumT() const {return 200.0/Constants::HBCFmMeV;}
   
-  void SetNSEdata (const std::vector<NSEProperties> & NSEDat);
-  std::vector<NSEProperties> GetNSEdata();
-  
   std::unique_ptr<EOSBase> MakeUniquePtr() const {
     return std::unique_ptr<EOSBase>(new EOSNSE(*this));
   }  
@@ -155,7 +152,7 @@ public:
   friend class boost::serialization::access; 
   template<class Archive> 
   void serialize(Archive & ar, const unsigned int /* File Version */) {
-    ar & mTMin & NSEprop;
+    ar & mTMin & nseGuesses;
   }
   
 private: 
@@ -167,7 +164,6 @@ private:
   NucleiProperties GetNucleiScalars(const EOSData& eosOut, double ne);
   
   double mTMin;
-  std::vector<NSEProperties> NSEprop;
   std::vector<std::vector<NSEProperties>> nseGuesses;
   
   std::vector<std::unique_ptr<NucleusBase>> mNuclei; 

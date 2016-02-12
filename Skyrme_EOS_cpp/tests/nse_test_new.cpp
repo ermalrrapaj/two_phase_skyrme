@@ -283,18 +283,18 @@ int main() {
     }
 
     // Test serialization repeatedly
-    nseEosStatic.SetNSEdata(allPtsNSE);
+    //nseEosStatic.SetNSEdata(allPtsNSE);
     
-    std::ofstream ofs("nse.dat"); 
-    boost::archive::binary_oarchive oa(ofs); 
-    oa << nseEosStatic; 
-    ofs.close();
+    //std::ofstream ofs("nse.dat"); 
+    //boost::archive::binary_oarchive oa(ofs); 
+    //oa << nseEosStatic; 
+    //ofs.close();
 
-	  EOSNSE nsedat(nucleiStatic, eos); 
-	  std::ifstream ifs("nse.dat");
-	  boost::archive::binary_iarchive ia(ifs); 
-	  ia >> nsedat;
-    ifs.close();
+	  //EOSNSE nsedat(nucleiStatic, eos); 
+	  //std::ifstream ifs("nse.dat");
+	  //boost::archive::binary_iarchive ia(ifs); 
+	  //ia >> nsedat;
+    //ifs.close();
   
   }  // End of loop over nptot
 
