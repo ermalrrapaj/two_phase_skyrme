@@ -137,19 +137,99 @@ v_i + \frac{\partial V_o}{\partial \mathcal{N}_i} = 0, \,\, \,\,
 \end{eqnarray}
 and results in the system of equations 
 \begin{eqnarray}
+\frac{\partial F}{\partial \mathcal{N}_i} &=& v_i f_{B,i} + F_{FS,i} 
++ \mu_{K,i} + E_{0,i} - Z_i \mu_{p,o} - N_i \mu_{n,o} + v_i P_o \nonumber\\
 \label{eq:dFdN}
-&&\frac{\partial F}{\partial \mathcal{N}_i} = v_i f_{B,i} + F_{FS,i} 
-+ \mu_{K,i} + E_{0,i} - Z_i \mu_{p,o} - N_i \mu_{n,o} + v_i P_o  = 0 \\
+&&- \frac{n_i}{u_o} 
+\left[(Z_i-v_i n_{p,o}) \frac{\partial F_{FS,i}}{\partial n_{p,o}} 
++ (N_i-v_i n_{n,o}) \frac{\partial F_{FS,i}}{\partial n_{n,o}} \right] = 0 
+\\
 \label{eq:dFdv}
-&&\frac{\partial F}{\partial v_i} = \mathcal{N}_i 
-\left(- P_{B,i} - P_{FS,i} + P_{o} \right) = 0 \\ 
-&&\sum Z_i n_i + \left(1-\sum v_i n_i \right) n_{p,o} = n_p = n_e \\
-&&\sum N_i n_i + \left(1-\sum v_i n_i \right) n_{n,o} = n_n,
+\frac{\partial F}{\partial v_i} &=& \mathcal{N}_i 
+\left(- P_{B,i} - P_{FS,i} + P_{o} 
++ \frac{n_i}{u_o}\left[\frac{\partial F_{FS,i}}{\partial \ln n_{p,o}} 
++ \frac{\partial F_{FS,i}}{ \partial \ln n_{n,o}}\right]\right) = 0 \\
+\label{eq:ncons} 
+&&\sum Z_i n_i + u_o n_{p,o} = n_p = n_e \\
+\label{eq:pcons} 
+&&\sum N_i n_i + u_o n_{n,o} = n_n,
 \end{eqnarray}
 where we have defined $\mu_{K,i} = T \ln (A_i^{-3/2} n_i/n_Q)$, 
-$P_{B,i} = -\partial (v_i f_{B,i}) / \partial v_i$, and 
-$P_{FS,i} = -\partial (F_{S,i}) / \partial v_i$.
+$P_{B,i} = -\partial (v_i f_{B,i}) / \partial v_i$,  
+$P_{FS,i} = -\partial (F_{S,i}) / \partial v_i$, and $u_o = 1 - \sum_i v_i n_i$. 
+The terms in brackets were missed in my first derivation and they clearly add 
+significant complexity to solving this system of equations. Because equations 
+\ref{eq:dFdN} and \ref{eq:dFdv} both depend on all the $n_i$, one must solve 
+simultaneously for all $n_i$ and $v_i$ for a fixed set of exterior conditions. 
+Especially for a large set of nuclei, this may be computationally expensive. 
+Nonetheless, we can still use our general NSE strategy for solving equations 
+\ref{eq:ncons} and \ref{eq:pcons} and the other equations can be solved 
+separately. In practice, the bracketed terms are unlikely to contribute except in 
+a small region of phase space. Coulomb corrections will depend on $n_{p,o}$, but 
+the correction will generally be negligible because of the small free proton 
+fraction at almost all densities. The surface term will also get some contribution
+from the external density, but this should be small as well except near the 
+liquid-gas phase transition. 
 
+When solving the full set of equations, it is best to approach things in steps.
+First, fix $u_o$, $n_{p,o}$, and $n_{n,o}$. Then for each nuclear species, there 
+are two equations to solve simultaneously for $n_i$ and $v_i$. 
+Second, notice that equations \ref{eq:dFdN} and \ref{eq:dFdv} have a complicated 
+dependence on $v_i$ but a relatively simple dependence on $n_i$. Equation
+\ref{eq:dFdN} is transcendental in $n_i$, but it can be formally solved in terms 
+of the Lambert $W$ function. The Lambert function is defined by 
+\begin{equation}
+W(x)e^{W(x)} = x.
+\end{equation}
+It can be shown to have two branches for $x<0$ but it is single valued for $x>0$.
+It is undefined below $x=-1/e$.  We will be interested in the upper branch $W_0$ 
+that extends to positive infinity. It's major practical advantage is that it can
+easily be tabulated to find solutions of transcendental equations. After 
+performing a simple transformation, we are left with 
+\begin{equation} 
+n_i = \frac{n_Q A_i^{3/2}}{b} W\left[ b  \exp\left(\tilde B_i/T 
++ Z_i \mu_{p,o}/T + N_i \mu_{n,o}/T - v_i P_o/T \right) \right],
+\end{equation}
+where 
+\begin{equation}
+b = -\frac{n_Q A_i^{3/2}}{u_o T} 
+\left[(Z_i-v_i n_{p,o}) \frac{\partial F_{FS,i}}{\partial n_{p,o}} 
++ (N_i-v_i n_{n,o}) \frac{\partial F_{FS,i}}{\partial n_{n,o}} \right].
+\end{equation}
+For small $|x|$, $W_0(x) \approx x$ and we retrieve the standard NSE expression for 
+the number density. This result can be used in equation \ref{eq:dFdv} to give 
+a single implicit equation for $v_i$. Once we are able to find solutions for each
+nucleus with fixed $u_o$, we can then solve the single equation 
+$u_o = 1 - \sum_i v_i n_i(u_o)$. Of course, this is likely to get expensive very
+quickly due to the large number of solves required.
+
+\subsection{Single Nucleus Approximation}
+We can move to the single nucleus approximation by including only one heavy nuclear
+species and letting $N_i$ and $Z_i$ become parameters to minimize with respect to.
+Using our constraints, we find the extra relations 
+\begin{eqnarray}
+\mathcal{N}_i  + \frac{\partial Z_o}{\partial Z_i} = 0 \\
+\mathcal{N}_i  + \frac{\partial Z_o}{\partial N_i} = 0.
+\end{eqnarray}
+Minimizing with respect to these variables as well gives the extra equations 
+\begin{eqnarray}
+\frac{\partial F}{\partial Z_i} &=& \mathcal{N}_i \left(\mu_{p,i} + 
+\frac{\partial F_{FS}}{\partial Z_i} 
+- \frac{n_i}{u_o} \frac{\partial F_{FS}}{\partial n_{p,o}}  
+- \frac{3 T}{2 A_i} - \mu_{p,o} \right) = 0 \\
+\frac{\partial F}{\partial N_i} &=& \mathcal{N}_i \left(\mu_{p,i} + 
+\frac{\partial F_{FS}}{\partial N_i}
+- \frac{n_i}{u_o} \frac{\partial F_{FS}}{\partial n_{n,o}}  
+- \frac{3 T}{2 A_i} - \mu_{n,o} \right) = 0.
+\end{eqnarray}
+In L\&S, they also make the approximation that $v_i$ is fixed by the competition
+of the surface term and Coulomb terms alone. Aside from this change and the 
+different treatment of the kinetic term, their 
+constraint equations can be recovered from our constraint equations, up to their 
+treatment of the kinetic term. 
+
+\subsection{Zero Temperature Limit}
+How do people treat the crust?
 
 \subsection{Connection to NSE} 
 Here we discuss the physics of NSE for an ensemble of non-interacting nuclei and
