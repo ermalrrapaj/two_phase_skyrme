@@ -163,7 +163,8 @@ private:
   };
 
   template <bool getEosContributions = false>  
-  NucleiProperties GetNucleiScalars(const EOSData& eosOut, double ne);
+  NucleiProperties GetNucleiScalars(const EOSData& eosOut, double ne, 
+      double uo = 0.0);
   
   double mTMin;
   std::vector<std::vector<NSEProperties>> nseGuesses;

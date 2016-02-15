@@ -311,7 +311,7 @@ NSEProperties EOSNSE::GetStateNSEprop(const NSEProperties& Prop){
 // ensemble given a set of exterior conditions and total electron density
 template <bool getEosContributions>
 EOSNSE::NucleiProperties EOSNSE::GetNucleiScalars(const EOSData& eosOut, 
-    double ne) {
+    double ne, double uog) {
   double mun = eosOut.Mun(); 
   double mup = eosOut.Mup(); 
   double T   = eosOut.T(); 
@@ -325,10 +325,7 @@ EOSNSE::NucleiProperties EOSNSE::GetNucleiScalars(const EOSData& eosOut,
   #pragma omp parallel for reduction(+:nn,np,uNuc,vNuc)
   for (int i=0; i<mNuclei.size(); ++i) {
     double v = mNuclei[i]->GetVolume(eosOut, ne);
-    double BE = mNuclei[i]->GetBindingEnergy(eosOut, ne, v);
-    double aa = mNuclei[i]->GetN()*mun + mNuclei[i]->GetZ()*mup + BE - v*Pout; 
-    double ni = std::min(nQ * pow((double) mNuclei[i]->GetA(), 1.5) 
-        * exp(aa/T), 1.e200);
+    double ni = mNuclei[i]->GetDensity(eosOut, ne, uog, v);
     
     nn += mNuclei[i]->GetN()*ni;
     np += mNuclei[i]->GetZ()*ni;
@@ -342,7 +339,7 @@ EOSNSE::NucleiProperties EOSNSE::GetNucleiScalars(const EOSData& eosOut,
   out.vNuc = vNuc; 
     
   if (getEosContributions) { 
-    double u0 = 1.0 - uNuc; 
+    double uo = 1.0 - uNuc; 
     double Ftot = 0.0, Stot = 0.0, Ptot = 0.0, muntot = 0.0, muptot = 0.0; 
     double avgEc = 0.0, avgBe = 0.0, avgP = 0.0, niTot = 0.0;
     // Currently have to have this second loop because nuclei contributions 
@@ -353,16 +350,13 @@ EOSNSE::NucleiProperties EOSNSE::GetNucleiScalars(const EOSData& eosOut,
     for (int i=0; i<mNuclei.size(); ++i) {
       double v = mNuclei[i]->GetVolume(eosOut, ne);
       double BE = mNuclei[i]->GetBindingEnergy(eosOut, ne, v);
-      double aa = mNuclei[i]->GetN()*mun + mNuclei[i]->GetZ()*mup 
-          + BE - v*eosOut.P(); 
-      double ni = std::min(nQ * pow((double) mNuclei[i]->GetA(), 1.5) 
-          * exp(aa/T), 1.e200);
+      double ni = mNuclei[i]->GetDensity(eosOut, ne, 0.0, v);
       if (ni > 1.e-200) { // Ignore contributions from nuclei with small abundances
         Ftot   += ni*mNuclei[i]->FreeEnergy(eosOut, ne, ni);
         Stot   += ni*mNuclei[i]->Entropy(eosOut, ne, ni);
-	      Ptot   += ni*mNuclei[i]->NucleusPressure(eosOut, ne, u0);
-	      muntot += mNuclei[i]->Nucleusmun(eosOut, ne, u0, ni);
-	      muptot += mNuclei[i]->Nucleusmup(eosOut, ne, u0, ni);
+	      Ptot   += ni*mNuclei[i]->NucleusPressure(eosOut, ne, uo);
+	      muntot += mNuclei[i]->Nucleusmun(eosOut, ne, uo, ni);
+	      muptot += mNuclei[i]->Nucleusmup(eosOut, ne, uo, ni);
         avgEc  += mNuclei[i]->GetCoulombEnergy(eosOut, ne); 
         avgBe  += BE;
         niTot  += ni;

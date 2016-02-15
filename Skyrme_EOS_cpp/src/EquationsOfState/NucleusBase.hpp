@@ -38,7 +38,13 @@ public:
   virtual double GetSurfaceEnergy(const EOSData& /*eosIn*/, double /*ne*/) const {
     return 0.0; 
   }
-   
+  
+  double GetDensity(const EOSData& eosIn, double ne, double uo) {
+    double v = GetVolume(eosIn, ne);
+    return GetDensity(eosIn, ne, uo, v);
+  }
+  
+  virtual double GetDensity(const EOSData& eosIn, double ne, double uo, double v) const =0;
   virtual double FreeEnergy(const EOSData& eosIn, double ne, double ni) const=0;
   virtual double Entropy(const EOSData& eosIn, double ne, double ni) const=0;
   virtual double NucleusPressure (const EOSData& eosIn, double ne, double uo) const=0;
@@ -72,6 +78,7 @@ public:
     return CoulombEnergy(mV, eosIn.Np(), ne)[0]; 
   }
   
+  double GetDensity(const EOSData& eosIn, double ne, double uo, double v) const;
   double FreeEnergy(const EOSData& eosIn, double ne, double ni) const;
   double Entropy(const EOSData& eosIn, double ne, double ni) const;
   double NucleusPressure (const EOSData& eosIn, double ne, double uo) const;

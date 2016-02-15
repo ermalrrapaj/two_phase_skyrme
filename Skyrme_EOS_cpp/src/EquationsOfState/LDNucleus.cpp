@@ -127,6 +127,15 @@ double LDNucleus::GetBindingEnergy(const EOSData& eosIn,
   return BE;
 }
 
+double LDNucleus::GetDensity(const EOSData& eosIn, double ne, double uo, 
+    double v) const {
+  double nQ = pow(Constants::NeutronMassInFm 
+      * eosIn.T() / (2.0 * Constants::Pi), 1.5);
+  double aa = (GetN()*eosIn.Mun() + GetZ()*eosIn.Mup() 
+      + GetBindingEnergy(eosIn, ne, v) - v*eosIn.P())/eosIn.T();
+  return std::min(nQ * pow((double) GetA(), 1.5) * exp(aa), 1.e200);
+}
+
 double LDNucleus::FreeEnergy(const EOSData& eosIn, double ne, double ni) const {
 	double T = eosIn.T();
 	double A = (double) NucleusBase::mA;

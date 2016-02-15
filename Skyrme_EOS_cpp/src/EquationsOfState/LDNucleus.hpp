@@ -28,6 +28,7 @@ public:
   double GetVolume(const EOSData& eosIn, double ne) const;
   double GetBindingEnergy(const EOSData& eosIn, double ne) const;
   double GetBindingEnergy(const EOSData& eosIn, double ne, double v) const;
+  double GetDensity(const EOSData& eosIn, double ne, double uo, double v) const;
   
   double GetCoulombEnergy(const EOSData& eosIn, double ne) const {
       return CoulombEnergy(GetVolume(eosIn, ne), eosIn.Nn(), eosIn.Np(), ne)[0];
