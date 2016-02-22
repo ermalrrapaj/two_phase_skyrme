@@ -143,56 +143,56 @@ element is then given by
 + 2 F_2 C_V \Lambda^{\mu \nu}_{VT}, 
 + 2 F_2 C_A \Lambda^{\mu \nu}_{AT},
 \end{eqnarray*}
-where the $\Lambda$s are functions of $p_2^\mu$ and $q^\mu = p_4^\mu - p_2^\mu$.
-Working through the spin sums in the neutral current case gives
-\begin{eqnarray}
-\Lambda^{\mu\nu}_V &=& 2 q_\alpha^2 \eta^{\mu \nu} 
-+ 4(p_2^\nu q^\mu + p_2^\mu q^\nu) + 8 p_2^\mu p_2^\nu \\
-\Lambda^{\mu\nu}_A &=& \Lambda^{\mu\nu}_V - 8 m_2^2 \eta^{\mu \nu} \\
-\Lambda^{\mu\nu}_T &=& 2 q_\alpha^2 
-\left(1 + \frac{q_\alpha^2}{4 m_2^2} \right)h^{\mu \nu}
--\frac{q_\alpha^2}{4 m_2^2} \Lambda^{\mu \nu}_V \\
-\Lambda^{\mu\nu}_{VA} &=& 4 i \epsilon^{\mu \nu \alpha \beta}q_\alpha p_{2,\beta} 
-\\
-\Lambda^{\mu\nu}_{VT} &=& 2q_\alpha^2 h^{\mu \nu}
-\\
-\Lambda^{\mu\nu}_{AT} &=& 4 i \epsilon^{\mu \nu \alpha \beta}q_\alpha p_{2,\beta} , 
-\end{eqnarray}
-where $h^{\alpha \beta} = \eta^{\alpha \beta} - q^\alpha q^\beta/q_\mu^2$ is the
-orthogonal projection tensor relative to $q^\alpha$.
+where the $\Lambda$s are functions of $p_2^\mu$ and $q^\mu = p_4^\mu - p_2^\mu = 
+p_1^\mu - p^3_\mu$.
 
-\todo{Include charged current corrections to these results}
-
-\section{Generic Decomposition of Tensors in Terms of $q^\mu$} 
+\section{Generic Decomposition of Tensors and Kinematic Factors} 
 Here, we partially follow Le Bellac on pages 113, 118, and 214. First, we choose to 
 decompose the momentum transfer as $q_\mu = (q_0, 0, 0, q)$ and build a second 
 vector orthogonal to $q_\mu$ in the time-z plane, $n_\mu = (q, 0, 0, q_0)$. We 
 then define the transverse projector 
 \begin{eqnarray}
-P_{\mu \nu}^T &=& g_{\mu \nu} - \frac{q_\mu q_\nu}{q_\mu^2} - \frac{n_\mu n_\nu}{n^2} 
+P_{\mu \nu}^T &=& \eta_{\mu \nu} - \frac{q_\mu q_\nu}{q_\mu^2} 
+- \frac{n_\mu n_\nu}{n^2} 
 \nonumber\\
-&=& g_{\mu \nu} + \frac{n_\mu n_\nu - q_\mu q_\nu}{q_\mu^2},
+&=& \eta_{\mu \nu} + \frac{n_\mu n_\nu - q_\mu q_\nu}{q_\mu^2},
 \end{eqnarray}
 which picks out the portion of a vector orthogonal to $q_\mu$ and $n_\mu$. We 
-can also define the projectors orthogonal to $q_\mu$ and $n_\mu$
+can also define the projectors along $q_\mu$ and $n_\mu$ as
 \begin{eqnarray}
 P^L_{\mu \nu} &=&  \frac{n_\mu n_\nu}{n_\mu^2} = -\frac{n_\mu n_\nu}{q_\mu^2}  \\
-P^Q_{\mu \nu} &=&  \frac{q_\mu q_\nu}{q_\mu^2} \\
-P^M_{\mu \nu} &=&  \frac{q_\mu n_\nu + q_\nu n_\mu}{q_\mu^2}
+P^Q_{\mu \nu} &=&  \frac{q_\mu q_\nu}{q_\mu^2}. 
+\end{eqnarray}
+It is also useful to define the quantities 
+\begin{eqnarray}
+P^M_{\mu \nu} &=&  \frac{q_\mu n_\nu + q_\nu n_\mu}{q_\mu^2} \\
+P^{MA}_{\mu \nu} &=&  \frac{q_\mu n_\nu - q_\nu n_\mu}{q_\mu^2} \\
+P^A_{\mu \nu} &=&  \epsilon_{\mu \nu \lambda \delta} 
+\frac{q^\lambda n^\delta}{q_\alpha^2}
 \end{eqnarray} 
-The general decomposition of a vector in terms of these is given by 
+Any rank two tensor can be decomposed  as 
 \begin{equation}
-f_\mu = f_q q_\mu + f_n n_\mu + \tilde f_\mu,
+A_{\mu\nu} = A_Q P^Q_{\mu \nu} + A_L P^L_{\mu \nu} 
++ A_M P^M_{\mu \nu} + A_{MA} P^{MA}_{\mu \nu} + \tilde A_{\mu \nu}.
 \end{equation}
-where $\tilde f^\mu = P_T^{\mu \nu} f_\nu$. A symmetric tensor can be decomposed 
-as 
+If there are no other preferred directions that enter into $\tilde A_{\mu \nu}$
+(which is the case with the polarization tensors as long as the distribution
+function is isotropic), we have 
 \begin{equation}
-h_{\mu\nu} = h_Q P^Q_{\mu \nu} + h_L P^L_{\mu \nu} 
-+ h_M P^M_{\mu \nu} + \tilde h_{\mu \nu}.
-\end{equation}
-If there are no other preferred directions that enter into $h_{\mu \nu}$ (which is 
-the case with the polarization tensors), we have $\tilde h_{\mu \nu} = h_T 
-P^T_{\mu \nu}$, since $P^T$ is the only available transverse, symmetric tensor.
+\tilde A_{\mu \nu} = A_T P^T_{\mu \nu} + A_A P^A_{\mu \nu},
+\end{equation} 
+since $P^T$ is the only available transverse, symmetric tensor and the second 
+piece is the only anti-symmetric tensor that can be made from the Levi-Civita 
+tensor. They can be recovered using 
+\begin{eqnarray}
+A_Q &=& P_Q^{\mu \nu} A_{\mu \nu}\\
+A_L &=& P_L^{\mu \nu} A_{\mu \nu}\\ 
+A_M &=&-\frac{1}{2} P_M^{\mu \nu} A_{\mu \nu}\\
+A_{MA} &=&-\frac{1}{2} P_{MA}^{\mu \nu} A_{\mu \nu}\\
+A_A &=& P^{\mu \nu}_A A_{\mu \nu}\\
+A_T &=&-\Pi_{22}.
+\end{eqnarray}
+The last relation holds when $n_\mu$ and $q_\mu$ are in the 0-3 plane. 
 When current conservation holds for a polarization tensor, $q_\mu \Pi^{\mu \nu}
 = 0$, we recover the standard decomposition of the vector part of the 
 neutral current polarization tensor
@@ -202,45 +202,52 @@ neutral current polarization tensor
 which gives $\Pi^{NC}_L = -\frac{q_\mu^2}{q^2} \Pi^{NC}_{00}$ and $\Pi^{NC}_T =
 -\Pi^{NC}_{22}$, similar to the relations used in previous works. In contrast, 
 the charged current vector polarization tensor does not obey current conservation
-and will have four separate pieces.  They can be recovered using 
-\begin{eqnarray}
-\Pi_Q &=& \frac{q^\mu q^\nu}{q_\mu^2} \Pi_{\mu \nu}\\
-\Pi_L &=&-\frac{n^\mu n^\nu}{q_\mu^2} \Pi_{\mu \nu}\\ 
-\Pi_M &=&-\frac{n^\mu q^\nu}{q_\mu^2} \Pi_{\mu \nu}\\
-\Pi_T &=&-\Pi_{22}.
-\end{eqnarray}
+and will have four separate pieces.  
+
 Because the polarization tensors can be expressed in terms of these tensors and 
 scalar functions, we will need the contraction of these tensors with the lepton 
-tensor to get the matrix element. Contracting with $q_\mu$ is straightforward, 
-but contraction with $n_\mu$ is not obvious. First, we note that we can generically
-write (assuming particle 1 is massless) 
+tensor to get the matrix element. Contracting $p^1_\mu$ with $q_\mu$ is 
+straightforward, but contraction with $n_\mu$ is not obvious. First, we note that
+we can generically write (assuming particle 1 is massless) 
 \begin{eqnarray}
 p_1^\mu = (p_1, -p_1 \sqrt{1-\mu_1^2}, 0, - p_1 \mu_1) \\
 p_3^\mu = (p_1 - q_0, -p_1 \sqrt{1-\mu_1^2}, 0, - p_1 \mu_1 + q) \\
-p_1 \cdot p_3 = -p_1 q_0  + q p_1 \mu_1 = -\frac{q_\alpha^2-m_3^2}{2},  
+p_1 \cdot p_3 = -p_1 q_0  + q p_1 \mu_1 = -\frac{q_\alpha^2-m_3^2}{2} \\
+p_1 \cdot q = -p_1\cdot p_3 = \frac{q_\alpha^2-m_3^2}{2},  
 \end{eqnarray}
 where the relation $p_1 \cdot p_3 = - (q_\alpha^2-m_3^2)/2$ is easily derived. 
 Solving for $\mu_1$ and substituting into $p_1 \cdot n$ gives
 \begin{eqnarray}
 p_1 \cdot n &=& p_1 \left(q - \frac{q_0^2}{q} 
 + \frac{q_0 (q_\mu^2 - m_3^2)}{2 p_1 q} \right) \\
-&=& - \frac{q_\alpha^2}{2 q}\left(E_1 + E_3 - \frac{q_0m_3^2}{q_\alpha^2} \right).
+&=& - \frac{q_\alpha^2}{2 q}\left(E_1 + E_3 + \frac{q_0m_3^2}{q_\alpha^2} \right).
 \end{eqnarray}  
 With this result, one can show 
 \begin{eqnarray}
-L_{\mu \nu} q^\mu q^\nu &=& 0 \\
-L_{\mu \nu} \eta^{\mu \nu} &=& 8 q_\alpha^2 \\
-L_{\mu \nu} n^\mu n^\nu &=& 4 \left[ 4 (p_1 \cdot n)^2 - q_\alpha^2 \right]
-\nonumber\\
-&=& 8q_\alpha^2 \frac{4E_1E_3 + q_\alpha^2 - 2(E_1 + E_3) q_0 m_3^2/q_\alpha^2
-+ q_0^2 m_3^4/q_\alpha^4}{2 q^2} = 8 q_\alpha^2 B, 
+L_{\mu \nu} \eta^{\mu \nu} &=&-8 (m_3^2 - q_\alpha^2 ) \\
+L_{\mu \nu} q^\mu q^\nu &=& 4 m_3^2 \left(m_3^2 - q_\alpha^2 \right) \\
+L_{\mu \nu} n^\mu n^\nu &=& 8 q_\alpha^4 B \\
+L_{\mu \nu} i \epsilon^{\mu \nu \alpha \beta} q_\alpha n_\beta &=& 
+16 q_\alpha^2 (n \cdot p_1) \\
+L_{\mu \nu} i \epsilon^{\mu \nu \alpha \beta} q_\alpha q_\beta &=& 
+0,
 \end{eqnarray}
-where the fraction in the last line reduces to the $B$ in the old paper when 
+where 
+\begin{equation}
+B = \frac{4 E_1 E_3 + q_\alpha^2 
++ \frac{m_3^2}{q_\alpha^2}\left[2q_0(E_1+E_3) + q^2 
++ q_0^2 \frac{m_3^2}{q_\alpha^2}\right]}{2 q^2}, 
+\end{equation}
+which reduces to the neutral current expression when 
 $m_3=0$. Then, we have
 \begin{eqnarray}
-L^{\mu \nu} P^T_{\mu \nu} &=& 8q_\alpha^2(B+1) \\  
-L^{\mu \nu} P^L_{\mu \nu} &=&-8q_\alpha^2 B \\
-L^{\mu \nu} P^Q_{\mu \nu} &=&0,
+L^{\mu \nu} P^T_{\mu \nu} &=& 8 q_\alpha^2
+\left(B + 1 - \frac{m_3^2}{2 q_\alpha^2} - \frac{m_3^4}{2 q_\alpha^4}\right) \\  
+L^{\mu \nu} P^L_{\mu \nu} &=&-8 q_\alpha^2 B \\
+L^{\mu \nu} P^Q_{\mu \nu} &=& 4 m_3^2\left(\frac{m_3^2}{q_\alpha^2} - 1\right) \\
+L^{\mu \nu} P^M_{\mu \nu} &=& 8 \frac{m_3^2}{q} 
+\left(E_1 + E_3 + \frac{q_0 m_3^2}{q_\alpha^2} \right) \\
+L^{\mu \nu} P^A_{\mu \nu} &=& 16 i (n \cdot p) 
 \end{eqnarray}
 \todo{Still need to include relations for the mixed part}
 
@@ -322,49 +329,130 @@ to clarify if this is in fact general}
 This relation comes in handy when trying to simplify the different parts of the 
 polarization; when $\Lambda^{\mu \nu}_i$ contains $(p_2 \cdot q)$, it can be
 replaced with $-\beta q_\mu^2/2$.  We now consider the expansion of $\Pi^{\mu \nu}$ 
-in terms of the projections introduced in the previous section. The result is 
+in terms of the projections introduced in the previous section. We expand in the 
+form 
+\begin{equation}
+\Pi_{\mu \nu} = \beta^2 \Pi_Q P^Q_{\mu \nu} 
++ \Pi_L P^L_{\mu \nu}
++ \Pi_T P^T_{\mu \nu}
++ \beta \Pi_M P^M_{\mu \nu},  
+\end{equation} 
+where we have pulled out factors of $\beta$ for convenience, and the expansion
+terms are 
 \begin{eqnarray}
-\Pi_Q &=& \frac{\beta^2 q_\mu^2}{32 \pi q} \int_{e_m}^\infty dE_2(f_2 - f_4) \\
+\Pi_Q &=& \frac{q_\mu^2}{32 \pi q} \int_{e_m}^\infty dE_2(f_2 - f_4) \\
 \Pi_L &=&-\frac{q_\mu^2}{32 \pi q^3} \int_{e_m}^\infty dE_2 (f_2 - f_4) 
 (2 E_2 + \beta q_0)^2 \\
-\Pi_M &=&-\frac{\beta q_\mu^2}{32 \pi q^2} \int_{e_m}^\infty dE_2 (f_2 - f_4) 
+\Pi_M &=&-\frac{q_\mu^2}{32 \pi q^2} \int_{e_m}^\infty dE_2 (f_2 - f_4) 
 (2 E_2 + \beta q_0) \\
 \Pi_T &=& - \frac{1}{2}\Pi_L 
-+ \left(\frac{2 m_2^2}{\beta^2 q_\alpha^2} - \frac{1}{2}\right)\Pi_Q.
++ \left(\frac{2 m_2^2}{q_\alpha^2} - \frac{\beta^2}{2}\right)\Pi_Q.
 \end{eqnarray}
 We then find 
 \begin{eqnarray}
-\Pi^\nu &=& -\frac{2 q^\nu}{\beta q_\alpha^2} \Pi_Q 
-- \frac{2 n^\nu}{\beta q_\alpha^2} \Pi_M \\
-\Pi &=& \frac{4 }{\beta^2 q_\alpha^2} \Pi_Q 
+\Pi^\nu &=& -\frac{2 q^\nu \beta }{q_\alpha^2} \Pi_Q 
+- \frac{2 n^\nu}{q_\alpha^2} \Pi_M \\
+\Pi &=& \frac{4 }{q_\alpha^2} \Pi_Q 
 \end{eqnarray}
 
 
 \subsection{Pieces of the NC polarization}
-The most complicated piece of the polarization is the vector piece, which can be 
-expressed in terms of a Longitudinal piece and a Transverse piece 
+Working through the spin sums in the neutral current case gives
 \begin{eqnarray}
-\Pi_L^{vv} &=& -\frac{n^\mu n^\nu}{q_\alpha^2} \Pi^{vv}_{\mu \nu} 
-= 8 \Pi_L + 2 q_\alpha^2 \Pi = 8(\beta^{-2} \Pi_Q + \Pi_L) \nonumber \\
-&=& -\frac{q_\mu^2}{4 \pi q^3} \int_{e_m}^\infty dE_2 (f_2 - f_4) 
-\left[(2 E_2 + \beta q_0)^2 - q^2 \right] \\
-\Pi_T^{vv} &=& 2 q_\alpha^2 \Pi + 8 \Pi_T = 8 (\beta^{-2} \Pi_Q + \Pi_T), 
+\Lambda^{\mu\nu}_V &=& 2 q_\alpha^2 \eta^{\mu \nu} 
++ 4(p_2^\nu q^\mu + p_2^\mu q^\nu) + 8 p_2^\mu p_2^\nu \\
+\Lambda^{\mu\nu}_A &=& \Lambda^{\mu\nu}_V - 8 m_2^2 \eta^{\mu \nu} \\
+\Lambda^{\mu\nu}_T &=& 2 q_\alpha^2 
+\left(1 + \frac{q_\alpha^2}{4 m_2^2} \right)h^{\mu \nu}
+-\frac{q_\alpha^2}{4 m_2^2} \Lambda^{\mu \nu}_V \\
+\Lambda^{\mu\nu}_{VA} &=& 4 i \epsilon^{\mu \nu \alpha \beta}q_\alpha p_{2,\beta} 
+\\
+\Lambda^{\mu\nu}_{VT} &=& 2q_\alpha^2 h^{\mu \nu}
+\\
+\Lambda^{\mu\nu}_{AT} &=& 4 i \epsilon^{\mu \nu \alpha \beta}q_\alpha p_{2,\beta} , 
 \end{eqnarray}
-the other projections are zero due to current conservation. 
-\todo{Understand why the longitudinal expression differs from Sanjay's old work 
-by a sign and a factor of 2} Therefore, the vector polarization is 
+where $h^{\alpha \beta} = \eta^{\alpha \beta} - q^\alpha q^\beta/q_\mu^2$ is the
+orthogonal projection tensor relative to $q^\alpha$.
+
+First, consider the vector piece of the polarization. It is useful to note 
 \begin{equation}
-\Pi^{vv}_{\mu \nu} = \Pi^{vv}_L P^L_{\mu \nu} + \Pi^{vv}_T P^T_{\mu \nu}
+p_2^\nu q^\mu + p_2^\mu q^\nu \rightarrow 
+\Pi^\nu q^\mu + \Pi^\mu q^\nu = 
+- 2 \left(2 \beta \Pi_Q P_Q^{\mu \nu} + \Pi_M P_M^{\mu \nu} \right)
 \end{equation}
+Expanding in terms of the projection tensors defined above, we have
+\begin{eqnarray}
+\Pi^{\mu\nu}_V &=& 
+8 \left(P_T^{\mu\nu} + P_Q^{\mu\nu} + P_L^{\mu\nu} \right) \Pi_Q
+- 8 (2 \beta P^{\mu \nu}_Q \Pi_Q + P^{\mu \nu}_M \Pi_M) 
+\nonumber\\ && 
++ 8 P^{\mu \nu}_Q \Pi_Q 
++ 8 P^{\mu \nu}_L \Pi_L
++ 8 P^{\mu \nu}_M \Pi_M
++ 8 P^{\mu \nu}_T \Pi_T  \\
+&=& 8 \Pi_Q  \left[1  - 2\beta + \beta^2 \right]  P^{\mu \nu}_Q
+  + 8 \left[\Pi_Q + \Pi_L \right] P_L^{\mu \nu} \\
+&&  + 8 \left[\Pi_Q + \Pi_T \right] P_T^{\mu \nu} 
+  + 8 \Pi_M \left[\beta - 1 \right] P_M^{\mu \nu}, 
+\end{eqnarray}
+So that 
+\begin{eqnarray}
+\Pi_Q^{V} &=& 8\Pi_Q(1 - 2 \beta + \beta^2) \\ 
+\Pi_L^{V} &=& 8(\Pi_Q + \Pi_L) \\
+\Pi_T^{V} &=& 8(\Pi_Q + \Pi_T) \\
+\Pi_M^{V} &=& 8\Pi_M(\beta-1).
+\end{eqnarray}
+The non-zero pieces of the axial polarization are 
+\begin{eqnarray}
+\Pi_Q^{A} &=& 8\Pi_Q 
+(1 - 2 \beta + \beta^2 - \frac{4 m_2^2}{q_\alpha^2}) \\ 
+\Pi_L^{A} &=& 8( \Pi_Q + \Pi_L - \frac{4 m_2^2}{q_\alpha^2}\Pi_Q) \\
+\Pi_T^{A} &=& 8(\Pi_Q + \Pi_T - \frac{4 m_2^2}{q_\alpha^2}\Pi_Q) \\
+\Pi_M^{A} &=& 8\Pi_M(\beta-1).
+\end{eqnarray}
+The non-zero pieces of the tensor polarization are
+\begin{eqnarray}
+\Pi_Q^{T} &=& -\frac{2 q_\alpha^2}{m_2^2} \Pi_Q(1 - 2 \beta + \beta^2) \\ 
+\Pi_L^{T} &=& -\frac{2 q_\alpha^2}{m_2^2} (\Pi_Q + \Pi_L) 
++ 8 \left(1+\frac{q_\alpha^2}{4 m_2^2}\right) \Pi_Q \\
+\Pi_T^{T} &=& -\frac{2 q_\alpha^2}{m_2^2} (\Pi_Q + \Pi_T) 
+ + 8 \left(1+\frac{q_\alpha^2}{4 m_2^2}\right) \Pi_Q \\
+\Pi_M^{T} &=& -\frac{2 q_\alpha^2}{m_2^2} \Pi_M(\beta-1).
+\end{eqnarray}
+The mixed vector axial piece is 
+\begin{equation}
+\Pi^{VA}_A = - i 8 \Pi_M. 
+\end{equation}
+The vector tensor piece is 
+\begin{equation} 
+\Pi_L^{VT} = \Pi_T^{VT} = 8 \Pi_Q. 
+\end{equation}
+The axial tensor piece is
+\begin{equation}
+\Pi^{AT}_A = - i 8 \Pi_M. 
+\end{equation}
+
+When $\beta=1$, which is true for neutral current reactions, only two pieces of 
+the vector polarization survive  
+\begin{eqnarray}
+\Pi_L^{V,nc} &=& 8(\Pi_Q + \Pi_L) \nonumber \\
+&=& -\frac{q_\mu^2}{4 \pi q^3} \int_{e_m}^\infty dE_2 (f_2 - f_4) 
+\left[(2 E_2 + q_0)^2 - q^2 \right] \\
+\Pi_T^{V,nc} &=& 8 (\Pi_Q + \Pi_T).
+\end{eqnarray}
+This is exactly what we expect from neutral current current conservation. 
+\todo{Understand why the longitudinal expression differs from Sanjay's old work 
+by a sign and a factor of 2. Sign is probably okay since we get the opposite sign
+on the kinematic factor}
 We can also see that 
 \begin{equation}
-\Pi^{aa}_{\mu \nu} = \Pi^{vv}_L P^L_{\mu \nu} + \Pi^{vv}_T P^T_{\mu \nu} 
+\Pi^{A,nc}_{\mu \nu} = \Pi^{V,nc}_L P^L_{\mu \nu} + \Pi^{V,nc}_T P^T_{\mu \nu} 
 + \eta_{\mu \nu} \Pi_A
 \end{equation}
 with 
 \begin{equation}
 \Pi_A =-8 m_2^2 \Pi = -\frac{32 m_2^2}{\beta^2 q_\alpha^2} \Pi_Q
-= \frac{m_2^2}{\pi q} \int_{e_m}^\infty dE_2 (f_2 - f_4). 
+= -\frac{m_2^2}{\pi q} \int_{e_m}^\infty dE_2 (f_2 - f_4). 
 \end{equation}
 \todo{Once again this differs by a sign and a factor of 2} 
 The vector-axial tensor obviously does not depend on our symmetric projections.
@@ -377,6 +465,32 @@ by the completely anti-symmetric tensor. Therefore,
 \end{equation}
 The other two terms are just proportional to $\Pi$.
 
+\subsection{Charged Current Corrections to the Polarization}
+We now write down the corrections to the baryon tensor due to different masses
+$m_2$ and $m_4$ in terms of the quantities $\lambda=\beta - 1$ and $\Delta = (m_4-m_2)/m_2$, such that the total baryon tensors are given by $\Lambda + 
+\tilde \Lambda$. The result is
+\begin{eqnarray}
+\tilde \Lambda^{\mu\nu}_V &=& (4 \Delta m_2^2 + 2 \lambda q_\alpha^2) 
+\eta^{\mu \nu}\\
+\tilde \Lambda^{\mu\nu}_A &=& -8 \Delta m_2^2 \eta^{\mu \nu} \\
+\tilde \Lambda^{\mu\nu}_T &=& \Delta q_\alpha^2 h^{\mu \nu} 
+ - \lambda q_\alpha^2 \frac{q_\alpha^2 \eta^{\mu \nu} + 2 p_2^\mu q^\nu 
+ + 2p_2^\nu q^\mu + q^\mu q^\nu}{2 m_2^2}
+ - \lambda^2 \frac{q_\alpha^4 }{2 m_2^2} \eta^{\mu \nu}
+\\
+&=& \left(\Delta + \lambda \frac{q_\alpha}{2 m_2^2} \right) q_\alpha^2 h^{\mu \nu}
+- \lambda^2 q_\alpha^2 
+\frac{q_\alpha^2 \eta^{\mu \nu} + p_2^\mu q^\nu + p_2^\nu q^\mu}{m_2^2} 
+- \lambda^2  q_\alpha^2 \frac{q_\alpha^2}{2m_2^2} \eta^{\mu \nu}
+\\
+\tilde \Lambda^{\mu\nu}_{VA} &=& 0
+\\
+\tilde \Lambda^{\mu\nu}_{VT} &=& 2 \Delta (q_\alpha^2[1+\lambda] \eta^{\mu \nu} 
++ p_2^\nu q^\mu + p_2^\mu q^\nu)
+\\
+\tilde \Lambda^{\mu\nu}_{AT} &=& -4 i \Delta 
+\epsilon^{\mu \nu \alpha \beta}q_\alpha p_{2,\beta} , 
+\end{eqnarray}
 
 \section{Annihilation}
 The differential annihilation cross section for neutrino annihilation is 
