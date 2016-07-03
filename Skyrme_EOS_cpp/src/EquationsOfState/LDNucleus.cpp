@@ -11,6 +11,7 @@
 #include "EquationsOfState/LDNucleus.hpp"
 #include "Util/Constants.hpp"
 #include "Util/OneDimensionalRoot.hpp"
+#incldue "Util/LambertW.h"
 #include <iostream> 
 #include <math.h> 
 
@@ -28,7 +29,7 @@ StaticNucleus LDNucleus::GetStaticNucleus() const {
   return StaticNucleus(NucleusBase::mZ, A, BE, {}, {}, v);
 }
 
-LDNucleus::LDNucleus(int Z, int A, const EOSBase& eos) : NucleusBase(Z, A),
+LDNucleus::LDNucleus(int Z, int A, const EOSBase& eos, double uo) : NucleusBase(Z, A),
       mpEos(eos.MakeUniquePtr()),
       mSigma0(1.15/Constants::HBCFmMeV),
       mSs0(45.8/Constants::HBCFmMeV) {
@@ -36,7 +37,7 @@ LDNucleus::LDNucleus(int Z, int A, const EOSBase& eos) : NucleusBase(Z, A),
   double n0 = 1.e-10;
   EOSData eosIn = mpEos->FromNAndT(EOSData::InputFromTNbYe(1.e-3/197.3, n0, 0.5));
   mV0 = -1.0;
-  mV0 = LDNucleus::GetVolume(eosIn, n0); 
+  mV0 = LDNucleus::GetVolume(eosIn, n0, uo); 
   //std::cout << Z << " " << A << " " << (double)A/mV0 << " " 
   //    << 197.3*GetBindingEnergy(eosIn, 1.e-6, mV0)/((double) A) <<std::endl; 
   
@@ -54,17 +55,45 @@ LDNucleus::LDNucleus(int Z, int A, const EOSBase& eos) : NucleusBase(Z, A),
 
 } 
 
-double LDNucleus::GetVolume(const EOSData& eosIn, double ne) const {
+double LDNucleus::GetDensity(const EOSData& eosIn, double ne, double uo, 
+    double v) const {
+  double Z = (double) NucleusBase::mZ; 
+  double N = (double) NucleusBase::mN;
+  double Mupo = eosIn.Mup();
+  double Muno = eosIn.Mun();
+  double Nno = eosIn.Nn();
+  double Npo = eosIn.Np();
+  double Po = eosIn.P();
+  double T = eosIn.T();
+  auto Ec = CoulombEnergy(v, Nno, Npo, ne); 
+  auto Es = SurfaceEnergy(v, Nno, Npo, ne); 
+  double nQ = pow(Constants::NeutronMassInFm 
+      * T / (2.0 * Constants::Pi), 1.5);
+  double c11 = (Z-v*Npo)*(Ec[3]+Es[3]) + (N-v*Nno)* (Ec[2]+Es[2]);
+  double c1 = c11/uo;
+  double den = nQ * pow((double) GetA(), 1.5);
+  double aa = (GetN()*eosIn.Mun() + GetZ()*eosIn.Mup() 
+      + GetBindingEnergy(eosIn, ne, v) - v*eosIn.P())/eosIn.T();
+  return std::min(0.0-T/c1*LambertW(0,0.0-c1*den/T * exp(aa)), 1.e200);
+}
+
+
+double LDNucleus::GetVolume(const EOSData& eosIn, double ne,
+		double uo) const {
   double Z = (double) NucleusBase::mZ; 
   double N = (double) NucleusBase::mN;
   double T = eosIn.T(); 
-  auto pFunc = [this, ne, T, Z, N, &eosIn](double v) -> double {
+  auto pFunc = [this, ne, uo, T, Z, N, &eosIn](double v) -> double {
     EOSData eosBulk = mpEos->FromNAndT(
         EOSData::InputFromTNnNp(T, N/v, Z/v)); 
     double Pb = eosBulk.P();
     double Ps = -SurfaceEnergy(v, eosIn.Np(), eosIn.Nn(), ne)[1];
     double Pc = -CoulombEnergy(v, eosIn.Np(), eosIn.Nn(), ne)[1];
-    return (Pb + Ps + Pc)/eosIn.P() - 1.0;  
+    double ni = GetDensity(eosIn, ne, uo, v);
+    auto Ec = CoulombEnergy(v, Nno, Npo, ne); 
+    auto Es = SurfaceEnergy(v, Nno, Npo, ne);
+    double Pextr = ni/uo*(Nno*(Ec[2]+Es[2])+Npo*(Ec[3]+Es[3]));  
+    return (Pb + Ps + Pc-Pextr)/eosIn.P() - 1.0;  
   };
   
   OneDimensionalRoot rootFinder(1.e-8); 
@@ -105,12 +134,13 @@ double LDNucleus::GetVolume(const EOSData& eosIn, double ne) const {
   }
 }
 
-double LDNucleus::GetBindingEnergy(const EOSData& eosIn, double ne) const {
-  return GetBindingEnergy(eosIn, ne, GetVolume(eosIn, ne));
+//double LDNucleus::GetBindingEnergy(const EOSData& eosIn, double ne, double uo) const {
+ // return GetBindingEnergy(eosIn, ne, GetVolume(eosIn, ne, uo));
 }
 
 double LDNucleus::GetBindingEnergy(const EOSData& eosIn, 
-    double ne, double v) const {
+    double ne, double uo) const {
+  v = GetVolume(eosIn, ne, uo);
   double Z = (double) NucleusBase::mZ; 
   double N = (double) NucleusBase::mN;
   double A = (double) NucleusBase::mA;
@@ -127,19 +157,13 @@ double LDNucleus::GetBindingEnergy(const EOSData& eosIn,
   return BE;
 }
 
-double LDNucleus::GetDensity(const EOSData& eosIn, double ne, double uo, 
-    double v) const {
-  double nQ = pow(Constants::NeutronMassInFm 
-      * eosIn.T() / (2.0 * Constants::Pi), 1.5);
-  double aa = (GetN()*eosIn.Mun() + GetZ()*eosIn.Mup() 
-      + GetBindingEnergy(eosIn, ne, v) - v*eosIn.P())/eosIn.T();
-  return std::min(nQ * pow((double) GetA(), 1.5) * exp(aa), 1.e200);
-}
 
-double LDNucleus::FreeEnergy(const EOSData& eosIn, double ne, double ni) const {
+double LDNucleus::FreeEnergy(const EOSData& eosIn, double ne, double uo) const {
+//	v = GetVolume(eosIn, ne, uo);
+//	ni =  GetDensity(eosIn, ne, uo, v);
 	double T = eosIn.T();
 	double A = (double) NucleusBase::mA;
-	double BE = GetBindingEnergy(eosIn,ne);
+	double BE = GetBindingEnergy(eosIn,ne,uo);
 	double nQ = pow(MNUC*T/2/Constants::Pi,1.5); 
 	double Fk = T*log(ni/nQ/pow(A,1.5)) - T;
 	double FE= Fk - BE;
@@ -196,7 +220,7 @@ std::vector<double> LDNucleus::CoulombEnergy(double v, double /*nno*/,
 }
 
 double LDNucleus::NucleusPressure (const EOSData& eosIn, double ne, double uo) const {
-	double v = GetVolume(eosIn, ne);
+	double v = GetVolume(eosIn, ne, uo);
 	auto Ec = CoulombEnergy(v, eosIn.Nn(), eosIn.Np(), ne); 
 	auto Es = SurfaceEnergy(v, eosIn.Nn(), eosIn.Np(), ne);
   uo += 1.e-20;
@@ -204,8 +228,8 @@ double LDNucleus::NucleusPressure (const EOSData& eosIn, double ne, double uo) c
       + ne * Ec[4];
 }
 
-double LDNucleus::Entropy (const EOSData& eosIn, double ne, double ni) const {
-	double v = GetVolume(eosIn, ne);
+double LDNucleus::Entropy (const EOSData& eosIn, double ne, double ni, double uo) const {
+	double v = GetVolume(eosIn, ne, uo);
 	double Z = (double) NucleusBase::mZ; 
 	double N = (double) NucleusBase::mN;
 	double A = (double) NucleusBase::mA;
@@ -219,7 +243,7 @@ double LDNucleus::Entropy (const EOSData& eosIn, double ne, double ni) const {
 
 double LDNucleus::Nucleusmup (const EOSData& eosIn, double ne, double uo, 
     double ni) const {
-	double v = GetVolume(eosIn, ne);
+	double v = GetVolume(eosIn, ne, uo);
 	auto Ec = CoulombEnergy(v, eosIn.Nn(), eosIn.Np(), ne); 
 	auto Es = SurfaceEnergy(v, eosIn.Nn(), eosIn.Np(), ne);
   uo += 1.e-20;
@@ -227,7 +251,7 @@ double LDNucleus::Nucleusmup (const EOSData& eosIn, double ne, double uo,
 }
 
 double LDNucleus::Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const {
-	double v = GetVolume(eosIn, ne);
+	double v = GetVolume(eosIn, ne, uo);
 	auto Ec = CoulombEnergy(v, eosIn.Nn(), eosIn.Np(), ne); 
 	auto Es = SurfaceEnergy(v, eosIn.Nn(), eosIn.Np(), ne);
   uo += 1.e-20;

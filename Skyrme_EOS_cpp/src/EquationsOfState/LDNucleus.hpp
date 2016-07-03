@@ -21,17 +21,17 @@
 class LDNucleus : public NucleusBase { 
 public:
   
-  LDNucleus(int Z, int A, const EOSBase& eos);
+  LDNucleus(int Z, int A, const EOSBase& eos, double uo);
   
   StaticNucleus GetStaticNucleus() const;
 
-  double GetVolume(const EOSData& eosIn, double ne) const;
-  double GetBindingEnergy(const EOSData& eosIn, double ne) const;
+  double GetVolume(const EOSData& eosIn, double ne, double uo) const;
+  //double GetBindingEnergy(const EOSData& eosIn, double ne) const;
   double GetBindingEnergy(const EOSData& eosIn, double ne, double v) const;
   double GetDensity(const EOSData& eosIn, double ne, double uo, double v) const;
   
-  double GetCoulombEnergy(const EOSData& eosIn, double ne) const {
-      return CoulombEnergy(GetVolume(eosIn, ne), eosIn.Nn(), eosIn.Np(), ne)[0];
+  double GetCoulombEnergy(const EOSData& eosIn, double ne, double uo) const {
+      return CoulombEnergy(GetVolume(eosIn, ne, uo), eosIn.Nn(), eosIn.Np(), ne)[0];
   }  
   double FreeEnergy(const EOSData& eosIn, double ne, double ni) const;
   double Entropy (const EOSData& eosIn, double ne, double ni) const;

@@ -28,17 +28,6 @@ namespace utl {
 	double LambertW0(const double x);
 	double LambertWNegative(const double x);
 	
-
-  inline
-  double
-  LambertW(const int branch, const double x)
-  {
-    switch (branch) {
-    case -1: return LambertWNegative(x);
-    case  0: return LambertW0(x);
-    default: return std::numeric_limits<double>::quiet_NaN();
-    }
-  }
 //	  template<int branch>
  // double LambertW(const double x);
 
@@ -46,3 +35,14 @@ namespace utl {
 
 
 #endif
+
+  inline
+  double
+  LambertW(const int branch, const double x)
+  {
+    switch (branch) {
+    case -1: return utl::LambertWNegative(x);
+    case  0: return utl::LambertW0(x);
+    default: return std::numeric_limits<double>::quiet_NaN();
+    }
+  }

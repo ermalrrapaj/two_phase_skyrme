@@ -20,10 +20,10 @@
 class NucleusBase {
 public:
   NucleusBase(int Z, int A) : mZ(Z), mA(A), mN(A-Z) {}
-  virtual double GetBindingEnergy(const EOSData& eosIn, double ne) const =0; 
+  //virtual double GetBindingEnergy(const EOSData& eosIn, double ne) const =0; 
   virtual double GetBindingEnergy(const EOSData& eosIn, double ne, 
-      double v) const =0; 
-  virtual double GetVolume(const EOSData& eosIn, double ne) const =0; 
+      double uo) const =0; 
+  virtual double GetVolume(const EOSData& eosIn, double ne, double uo) const =0; 
   
   virtual std::unique_ptr<NucleusBase> MakeUniquePtr() const =0;
    
@@ -31,22 +31,24 @@ public:
   double GetZ() const {return (double) mZ;} 
   double GetA() const {return (double) mA;} 
     
-  virtual double GetCoulombEnergy(const EOSData& /*eosIn*/, double /*ne*/) const {
+  virtual double CoulombEnergy(double v, double /*nno*/, 
+    double npo, double ne) const {
     return 0.0; 
   }
    
-  virtual double GetSurfaceEnergy(const EOSData& /*eosIn*/, double /*ne*/) const {
+  virtual double SurfaceEnergy(double v, double nno, 
+    double npo, double /*ne*/) const {
     return 0.0; 
   }
   
   double GetDensity(const EOSData& eosIn, double ne, double uo) {
-    double v = GetVolume(eosIn, ne);
+    double v = GetVolume(eosIn, ne,uo);
     return GetDensity(eosIn, ne, uo, v);
   }
   
   virtual double GetDensity(const EOSData& eosIn, double ne, double uo, double v) const =0;
-  virtual double FreeEnergy(const EOSData& eosIn, double ne, double ni) const=0;
-  virtual double Entropy(const EOSData& eosIn, double ne, double ni) const=0;
+  virtual double FreeEnergy(const EOSData& eosIn, double ne, double uo) const=0;
+  virtual double Entropy (const EOSData& eosIn, double ne, double ni, double uo) const=0;
   virtual double NucleusPressure (const EOSData& eosIn, double ne, double uo) const=0;
   virtual double Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const=0;
   virtual double Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const=0;
@@ -72,15 +74,16 @@ public:
     return GetBindingEnergy(eosIn, ne);
   }
 	
-  double GetVolume(const EOSData& /*eosIn*/, double /*ne*/) const {return mV;}
+  double GetVolume(const EOSData& /*eosIn*/, double /*ne*/, double /*uo*/) const {return mV;}
+  
   
   virtual double GetCoulombEnergy(const EOSData& eosIn, double ne) const {
-    return CoulombEnergy(mV, eosIn.Np(), ne)[0]; 
+    return CoulombEnergy(mV, eosIn.Nn() ,eosIn.Np(), ne)[0]; 
   }
   
   double GetDensity(const EOSData& eosIn, double ne, double uo, double v) const;
   double FreeEnergy(const EOSData& eosIn, double ne, double ni) const;
-  double Entropy(const EOSData& eosIn, double ne, double ni) const;
+  double Entropy(const EOSData& eosIn, double ne, double ni, double uo) const;
   double NucleusPressure (const EOSData& eosIn, double ne, double uo) const;
   double Nucleusmup (const EOSData& eosIn, double ne, double uo, double ni) const;
   double Nucleusmun (const EOSData& eosIn, double ne, double uo, double ni) const;
@@ -93,7 +96,7 @@ protected:
   double mBE, mV;
   std::vector<double> mTg, mPFg;
 
-  std::vector<double> CoulombEnergy(double v, double npo, double ne) const;
+  std::vector<double> CoulombEnergy(double v, double nno, double npo, double ne) const;
 
 }; 
 
