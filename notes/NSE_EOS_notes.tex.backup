@@ -14,7 +14,6 @@
 \usepackage{amssymb}
 \usepackage{listings}
 \usepackage{booktabs}
-\usepackage{verbatim}
 \usepackage{setspace}
 \usepackage[colorlinks,citecolor=blue]{hyperref}
 \usepackage{xcolor}
@@ -501,7 +500,7 @@ This is represented by the step function in the figure.
 In order to make the 2 descriptions match, our description needs to include a surface contribution:
 \begin{equation}
  \begin{split}
-  &4\pi \int_{R^{-}}^{R^{+}}dr\ r^2 E(r)=E^{S}(R^{WS})\\
+  &4\pi \int_{R^{-}}^{R^{+}}dr E(r)=E^{S}(R^{WS})\\
   &E^{S} = 4\pi (R^{WS})^2 \sigma\\
   &R^{\pm}=R^{WS}\pm \text{cosh}^{-1}(2)\ a_{WS}
  \end{split}
@@ -513,7 +512,6 @@ So,
   \sigma=&2 a_{WS} \text{cosh}^{-1}(2) E[n_H]\big[1+\frac{1}{3}(\frac{a_{WS}}{R_{WS}}\text{cosh}^{-1}(2))^2\big] +R_{WS}(E[n_H]-E[n_L])\big[ (\frac{a_{WS}}{R_{WS}}\text{cosh}^{-1}(2))^2-1\big]
  \end{split}
 \end{equation}
-
 \begin{comment}
 The skyrme energy density:
 \begin{equation}
